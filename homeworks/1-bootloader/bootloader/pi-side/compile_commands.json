@@ -1,0 +1,52 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-nostdlib",
+            "-nostartfiles",
+            "-ffreestanding",
+            "-march=armv6",
+            "-Og",
+            "-std=gnu99",
+            "reboot.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side/libpi.small",
+        "file": "reboot.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-nostdlib",
+            "-nostartfiles",
+            "-ffreestanding",
+            "-march=armv6",
+            "-Og",
+            "-std=gnu99",
+            "timer.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side/libpi.small",
+        "file": "timer.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Ilibpi.small/..",
+            "-I.",
+            "-Wall",
+            "-Og",
+            "-nostdlib",
+            "-nostartfiles",
+            "-ffreestanding",
+            "-o",
+            "bootloader.o",
+            "bootloader.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side",
+        "file": "bootloader.c"
+    }
+]

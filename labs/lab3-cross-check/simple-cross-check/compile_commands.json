@@ -1,0 +1,54 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "test-blink.o",
+            "test-blink.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/labs/lab3-cross-check/simple-cross-check",
+        "file": "test-blink.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "fake-pi.o",
+            "fake-pi.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/labs/lab3-cross-check/simple-cross-check",
+        "file": "fake-pi.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "blink.o",
+            "blink.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/labs/lab3-cross-check/simple-cross-check",
+        "file": "blink.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "simple-check.o",
+            "simple-check.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/labs/lab3-cross-check/simple-cross-check",
+        "file": "simple-check.c"
+    }
+]

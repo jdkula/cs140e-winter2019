@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Og 
+CFLAGS = -Wall -Og -g -ggdb
 CC = gcc
 SRC = my-install.c fatal.c simple-boot.c  support.c
 OBJS = $(SRC:.c=.o)
@@ -6,7 +6,7 @@ OBJS = $(SRC:.c=.o)
 all : my-install 
 
 my-install:  $(OBJS) 
-	$(CC) $(CFLAGS) $(OBJS) -o my-install -lm
+	$(CC) $(CFLAGS) $(OBJS) -o my-install -lm -g -ggdb
 
 clean :
 	rm -f *.o *~ Makefile.bak my-install

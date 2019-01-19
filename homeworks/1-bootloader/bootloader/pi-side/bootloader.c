@@ -9,10 +9,10 @@
 #include "libpi.small/rpi.h"
 
 static void send_byte(unsigned char uc) {
-	uart_putc(uc);
+  uart_putc(uc);
 }
 static unsigned char get_byte(void) { 
-        return uart_getc();
+  return uart_getc();
 }
 
 static unsigned get_uint(void) {
@@ -23,15 +23,15 @@ static unsigned get_uint(void) {
 	return u;
 }
 static void put_uint(unsigned u) {
-        send_byte((u >> 0)  & 0xff);
-        send_byte((u >> 8)  & 0xff);
-        send_byte((u >> 16) & 0xff);
-        send_byte((u >> 24) & 0xff);
+  send_byte((u >> 0)  & 0xff);
+  send_byte((u >> 8)  & 0xff);
+  send_byte((u >> 16) & 0xff);
+  send_byte((u >> 24) & 0xff);
 }
 
 static void die(int code) {
-        put_uint(code);
-        reboot();
+  put_uint(code);
+  reboot();
 }
 
 //  bootloader:
@@ -53,6 +53,32 @@ void notmain(void) {
 
 
 	/* XXX put your bootloader implementation here XXX */
+  unsigned lastMessage = get_uint();
+  while(lastMessage != SOH) ;
+  
+  unsigned numBytes = get_uint();
+  unsigned msgCrc = get_uint();
+
+  put_uint(SOH);
+
+  unsigned bytesCrc = crc32(&numBytes, 4);
+  put_uint(bytesCrc);
+
+  put_uint(msgCrc);
+
+  unsigned bytesRead = 0;
+  unsigned lastData = get_uint();
+  while(lastData != EOT) {
+    PUT32(ARMBASE + bytesRead, lastData);
+    bytesRead += 4;
+    lastData = get_uint();
+  }
+
+  if(bytesRead != numBytes) die(0xFF1);
+
+  if(crc32((void*) ARMBASE, bytesRead) != msgCrc) die(0xFF2);
+
+  put_uint(ACK);
 
 
 	// XXX: appears we need these delays or the unix side gets confused.
@@ -61,7 +87,7 @@ void notmain(void) {
 	delay_ms(500);
 
 	// run what client sent.
-        BRANCHTO(ARMBASE);
+  BRANCHTO(ARMBASE);
 	// should not get back here, but just in case.
 	reboot();
 }

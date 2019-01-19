@@ -75,6 +75,14 @@ enum {
   GPIO_FUNC_INVALID = 8 // Only returned for invalid pins
 };
 
+#define GPIO_BASE 0x20200000
+
+enum {
+  volatile unsigned* GPIO_FSEL0 = (volatile unsigned *)(GPIO_BASE + 0x00);
+  volatile unsigned* GPIO_SET0  = (volatile unsigned *)(GPIO_BASE + 0x1C);
+  volatile unsigned* GPIO_CLR0  = (volatile unsigned *)(GPIO_BASE + 0x28);
+}
+
 void gpio_init();
 unsigned int gpio_pin_valid(unsigned int pin);
 unsigned int gpio_function_valid(unsigned int pin);

@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+#include <limits.h>
 #include "demand.h"
+#include "support.h"
 
 #define __SIMPLE_IMPL__
 #include "../shared-code/simple-boot.h"
@@ -36,11 +38,13 @@ static unsigned get_uint(int fd) {
         u |= get_byte(fd) << 8;
         u |= get_byte(fd) << 16;
         u |= get_byte(fd) << 24;
+        printf("< %#010x\n", u);
         return u;
 }
 
 void put_uint(int fd, unsigned u) {
 	// mask not necessary.
+        printf("> %#010x\n", u);
         send_byte(fd, (u >> 0)  & 0xff);
         send_byte(fd, (u >> 8)  & 0xff);
         send_byte(fd, (u >> 16) & 0xff);
@@ -58,5 +62,40 @@ void expect(const char *msg, int fd, unsigned v) {
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
 void simple_boot(int fd, const unsigned char * buf, unsigned n) { 
-	unimplemented();
+  unsigned nCrc = crc32(&n, 4);
+  unsigned bufCrc = crc32(buf, n);
+  
+  put_uint(fd, SOH);
+  put_uint(fd, n);
+  put_uint(fd, bufCrc);
+
+  unsigned lastMessage = get_uint(fd);
+
+  if(lastMessage != SOH) panic("Pi didn't echo SOH!");
+  printf("SOH received...\n");
+
+  lastMessage = get_uint(fd);
+  if(lastMessage != nCrc) panic("Byte number CRC failed to verify!");
+  printf("Byte number CRC verified... %#010x\n", nCrc);
+
+  lastMessage = get_uint(fd);
+  if(lastMessage != bufCrc) panic("Data CRC checksum failed to verify!");
+  printf("Data CRC verified...\n");
+  printf("Data CRC verified... %#010x\n", bufCrc);
+
+  const unsigned* intBuf = (const unsigned*) (buf);
+  unsigned intBufSize = n / 4;
+  printf("File info: %u bytes / %u chunks\n", n, intBufSize);
+
+  for(int i = 0; i < intBufSize; i++) {
+    put_uint(fd, intBuf[i]);
+  }
+  printf("Sent all data...\n");
+
+  put_uint(fd, EOT);
+  printf("Sent EOT...\n");
+
+  lastMessage = get_uint(fd);
+  if(lastMessage != ACK) panic("Did not receive ACK!");
+  printf("Received ACK!\n");
 }

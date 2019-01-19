@@ -1,0 +1,18 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-nostdlib",
+            "-nostartfiles",
+            "-ffreestanding",
+            "-fno-builtin",
+            "-o",
+            "blink.o",
+            "blink.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/labs/lab1-blink/part3",
+        "file": "blink.c"
+    }
+]

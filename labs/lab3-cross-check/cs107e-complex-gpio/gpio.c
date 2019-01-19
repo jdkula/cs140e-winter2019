@@ -1,189 +1,19 @@
-/* GPIO (general purpose input/output) pins can be configured in many
-   ways, so there are a lot of configuration data data register for them.
-   Currently this library only supports basic input/output. It does not
-   support edge detection, level detection, or pull-up/pull-down
-   configuration.
-   
-   The BCM2835 supports 54 GPIO pins. Each pin can be configured to be
-   in one of up to 8 states: input, output, then one of 6 functions
-   which is pin-specific. Consult the BCM2835 ARM peripheral manual,
-   section 6.2 (pages 102-103) for details on these 6 functions. Some
-   pins support 6, some support 3, some actually support none (pins
-   46-54).
+/*
+ * blink for arbitrary pins.    
+ * Implement:
+ *	- gpio_set_output;
+ *	- gpio_set_on;
+ * 	- gpio_set_off.
+ *
+ *
+ * - try deleting volatile.
+ * - change makefile to use -O3
+ * - get code to work by calling out to a set32 function to set the address.
+ * - initialize a structure with all the fields.
+ */
 
-   In addition to these configurations, a pin can also be configured
-   to be pull-up or pull-down. This is useful for when you have an input
-   pin. If there is no input, a pull-up pin will default to 1, while
-   a pull-down pin will default to 0. The table on pages 102-103 suggests
-   each pin can be put into only one of these states. 
-*/
-
-#include "gpio.h"
-#include "system.h"
-#include "timer.h"
-
-#define PULLDOWN 1
-#define PULLUP   2
-
-#define GPFSEL0 0x20200000
-#define GPFSEL1 0x20200004
-#define GPFSEL2 0x20200008
-#define GPFSEL3 0x2020000c
-#define GPFSEL4 0x20200010
-#define GPFSEL5 0x20200014
-
-// Pin output set: Set an output pin to be 1
-#define GPSET0  0x2020001C
-#define GPSET1  0x20200020
-// Pin output clear: Set an output pin to be 0
-#define GPCLR0  0x20200028
-#define GPCLR1  0x2020002C
-// Pin level: read a pin (high or low)
-#define GPLEV0  0x20200034
-#define GPLEV1  0x20200038
-// Pin event detect status (has the event occured)
-#define GPEDS0  0x20200040
-#define GPEDS1  0x20200044
-// Pin rising edge detect 
-#define GPREN0  0x2020004C
-#define GPREN1  0x20200050
-// Pin falling edge detect 
-#define GPFEN0  0x20200058
-#define GPFEN1  0x2020005C
-// Pin high detect
-#define GPHEN0  0x20200064
-#define GPHEN1  0x20200068
-// Pin low detect
-#define GPLEN0  0x20200070
-#define GPLEN1  0x20200074
-// Pin async rising edge detect
-#define GPAREN0 0x2020007C
-#define GPAREN1 0x20200080
-// Pin async falling edge detect
-#define GPAFEN0 0x20200088
-#define GPAFEN1 0x2020008C
-
-// Pin pull-up/pull-down enable
-#define GPPUD   0x20200094
-// Pin pull-up/pull-down enabe clock
-#define GPPUDCLK0 0x20200098
-#define GPPUDCLK1 0x2020009C
-
-/* The BCM2835 manual (p 91-94) gives the layout for function selection
-   bits in configuration registers. There are 54 GPIO pins and 8 possible
-   functions for each pin (input, output, one of up to 6 other pin-dependent
-   uses). So each pin has 3 bits of configuration. There are 6 configuration
-   registers, each stores state for up to 10 pins.*/
-
-// Given a pin number, return the function select register to use
-unsigned int gpio_pin_to_function_register(unsigned int pin) {
-  unsigned int val = pin / 10;
-  switch (val) {
-  case 0:
-    return GPFSEL0;
-  case 1:
-    return GPFSEL1;
-  case 2:
-    return GPFSEL2;
-  case 3:
-    return GPFSEL3;
-  case 4:
-    return GPFSEL4;
-  case 5:
-    return GPFSEL5;
-  default:
-    return 0;
-  }
-}
-
-// Given a pin number, return the bit offset within its select
-// register to use. E.g., if this returns 6 the pin uses bits 6-8.
-unsigned int gpio_pin_to_function_offset(unsigned int pin) {
-  unsigned int offset = (pin % 10) * 3;
-  return offset;
-}
-
-unsigned int gpio_pin_to_input_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPLEV0;
-  } else {
-    return GPLEV1;
-  }
-}
-
-unsigned int gpio_pin_to_bit_offset(pin) {
-  return pin % 32;
-}
-
-unsigned int gpio_pin_to_input_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-unsigned int gpio_pin_to_set_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPSET0;
-  } else {
-    return GPSET1;
-  }
-}
-
-unsigned int gpio_pin_to_set_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-unsigned int gpio_pin_to_clear_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPCLR0;
-  } else {
-    return GPCLR1;
-  }
-}
-
-unsigned int gpio_pin_to_clear_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-unsigned int gpio_pin_to_event_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPEDS0;
-  } else {
-    return GPEDS1;
-  }
-}
-
-unsigned int gpio_pin_to_event_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-
-unsigned int gpio_pin_to_falling_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPFEN0;
-  } else {
-    return GPFEN1;
-  }
-}
-
-unsigned int gpio_pin_to_falling_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-unsigned int gpio_pin_to_rising_register(unsigned int pin) {
-  if (pin <= GPIO_PIN31) {
-    return GPREN0;
-  } else {
-    return GPREN1;
-  }
-}
-
-unsigned int gpio_pin_to_rising_offset(unsigned int pin) {
-  return gpio_pin_to_bit_offset(pin);
-}
-
-
-void gpio_init() {
-  timer_init();
-}
+// see broadcomm documents for magic addresses.
+#include "rpi.h"
 
 unsigned int gpio_pin_valid(unsigned int pin) {
   return (pin >= GPIO_PIN_FIRST && pin <= GPIO_PIN_LAST);
@@ -392,3 +222,58 @@ void gpio_set_pulldown(unsigned int pin) {
  * Author: Philip Levis <pal@cs.stanford.edu>
  * Date: 9/26/2014
  */
+
+// XXX might need memory barriers.
+void gpio_set_output(unsigned pin) {
+
+  unsigned int offset = (pin / 10);
+  pin -= (offset * 10);
+  if(offset > 5) return;  // Don't pass the maximum offset.
+
+  volatile unsigned* fsel = gpio_fsel0 + offset;
+
+  unsigned int current = get32(fsel);
+  unsigned int bits = 0b001 << pin;
+
+  current = (current & ~bits) | bits;
+
+  put32(fsel, current);
+}
+
+void gpio_set_on(unsigned pin) {
+  unsigned int offset = (pin / 32);
+  pin -= offset * 32;
+  if(offset > 1) return;
+
+  volatile unsigned* set = gpio_set0 + offset;
+
+  put32(set, 1 << pin);
+}
+void gpio_set_off(unsigned pin) {
+  unsigned int offset = (pin / 32);
+  pin -= offset * 32;
+  if(offset > 1) return;
+
+  volatile unsigned* clr = gpio_clr0 + offset;
+
+  put32(clr, 1 << pin);
+}
+
+// countdown 'ticks' cycles; the asm probably isn't necessary.
+void delay(unsigned ticks) {
+	while(ticks-- > 0)
+		asm("add r1, r1, #0");
+}
+
+int notmain ( void ) {
+	int led = 20;
+
+  	gpio_set_output(led);
+        while(1) {
+                gpio_set_on(led);
+                delay(1000000);
+                gpio_set_off(led);
+                delay(1000000);
+        }
+	return 0;
+}

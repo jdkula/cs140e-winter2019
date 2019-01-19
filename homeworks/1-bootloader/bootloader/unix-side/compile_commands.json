@@ -1,0 +1,54 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "simple-boot.o",
+            "simple-boot.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/unix-side",
+        "file": "simple-boot.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "support.o",
+            "support.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/unix-side",
+        "file": "support.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "fatal.o",
+            "fatal.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/unix-side",
+        "file": "fatal.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-Og",
+            "-o",
+            "my-install.o",
+            "my-install.c"
+        ],
+        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/unix-side",
+        "file": "my-install.c"
+    }
+]
