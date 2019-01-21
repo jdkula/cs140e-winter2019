@@ -1,5 +1,5 @@
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef __JONAK_GPIO_H__
+#define __JONAK_GPIO_H__
 
 /*
  * Functions for controlling Raspberry Pi GPIO.
@@ -12,6 +12,7 @@
  * Last edited Jan 2018
  */
 
+#include <stdint.h>
 
 /*
  * These enumerated values establish symbolic names for each of the GPIO pins.
@@ -55,29 +56,7 @@ enum {
     GPIO_PIN29 = 29,
     GPIO_PIN30 = 30,
     GPIO_PIN31 = 31,
-    GPIO_PIN32 = 32,
-    GPIO_PIN33 = 33,
-    GPIO_PIN34 = 34,
-    GPIO_PIN35 = 35,
-    GPIO_PIN36 = 36,
-    GPIO_PIN37 = 37,
-    GPIO_PIN38 = 38,
-    GPIO_PIN39 = 39,
-    GPIO_PIN40 = 40,
-    GPIO_PIN41 = 41,
-    GPIO_PIN42 = 42,
-    GPIO_PIN43 = 43,
-    GPIO_PIN44 = 44,
-    GPIO_PIN45 = 45,
-    GPIO_PIN46 = 46,
-    GPIO_PIN47 = 47,
-    GPIO_PIN48 = 48,
-    GPIO_PIN49 = 49,
-    GPIO_PIN50 = 50,
-    GPIO_PIN51 = 51,
-    GPIO_PIN52 = 52,
-    GPIO_PIN53 = 53,
-    GPIO_PIN_LAST =  53
+    GPIO_PIN_LAST =  31
 };
 
 // GPIO pin mappings for UART
@@ -91,18 +70,19 @@ enum {
  * function to GPIO_FUNC_INPUT configures the pin to be used as an input.
  */
 enum {
-    GPIO_FUNC_INPUT   = 0,
-    GPIO_FUNC_OUTPUT  = 1,
-    GPIO_FUNC_ALT0    = 4,
-    GPIO_FUNC_ALT1    = 5,
-    GPIO_FUNC_ALT2    = 6,
-    GPIO_FUNC_ALT3    = 7,
-    GPIO_FUNC_ALT4    = 3,
-    GPIO_FUNC_ALT5    = 2,
+    GPIO_FUNC_INPUT   = 0b000,
+    GPIO_FUNC_OUTPUT  = 0b001,
+    GPIO_FUNC_ALT0    = 0b100,
+    GPIO_FUNC_ALT1    = 0b101,
+    GPIO_FUNC_ALT2    = 0b110,
+    GPIO_FUNC_ALT3    = 0b111,
+    GPIO_FUNC_ALT4    = 0b011,
+    GPIO_FUNC_ALT5    = 0b010,
 };
 
 #define GPIO_INVALID_REQUEST  -1  // return value for invalid request
-
+#define GPIO_HIGH 1
+#define GPIO_LOW 0
 
 /*
  * Initialize the GPIO code module. For assignment 2, this does nothing.
@@ -120,7 +100,7 @@ void gpio_init(void);
  *
  * If `pin` or `function` is invalid, does nothing.
  */
-void gpio_set_function(unsigned int pin, unsigned int function);
+void gpio_set_function(uint8_t pin, uint8_t function);
 
 /*
  * Get the GPIO function for GPIO pin number `pin`.
@@ -130,7 +110,7 @@ void gpio_set_function(unsigned int pin, unsigned int function);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-unsigned int gpio_get_function(unsigned int pin);
+uint32_t gpio_get_function(uint8_t pin);
 
 /*
  * Convenience functions for setting a pin to GPIO_FUNC_INPUT or
@@ -138,8 +118,8 @@ unsigned int gpio_get_function(unsigned int pin);
  *
  * @param pin the GPIO pin number to set the function of
  */
-void gpio_set_input(unsigned int pin);
-void gpio_set_output(unsigned int pin);
+void gpio_set_input(uint8_t pin);
+void gpio_set_output(uint8_t pin);
 
 /*
  * Set GPIO pin number `pin` to high (1) or low (0). This
@@ -151,7 +131,7 @@ void gpio_set_output(unsigned int pin);
  *
  * If `pin` is invalid, does nothing.
  */
-void gpio_write(unsigned int pin, unsigned int val);
+void gpio_write(uint8_t pin, uint8_t val);
 
 /*
  * Get current level (1 for high, 0 for low) for GPIO pin number `pin`.
@@ -161,15 +141,15 @@ void gpio_write(unsigned int pin, unsigned int val);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-unsigned int gpio_read(unsigned int pin);
+uint8_t gpio_read(uint8_t pin);
 
 enum {
     GPIO_PUD_DISABLE  = 0,
     GPIO_PUD_PULLDOWN = 1,
     GPIO_PUD_PULLUP   = 2,
 };
-void gpio_set_pud(unsigned pin, unsigned pud);
-void gpio_set_pullup(unsigned pin);
-void gpio_set_pulldown(unsigned pin);
+void gpio_set_pud(uint8_t pin, uint8_t pud);
+void gpio_set_pullup(uint8_t pin);
+void gpio_set_pulldown(uint8_t pin);
 
-#endif
+#endif // __JONAK_GPIO_H
