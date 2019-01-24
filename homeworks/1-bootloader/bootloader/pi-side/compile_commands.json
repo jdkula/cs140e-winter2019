@@ -3,38 +3,6 @@
         "arguments": [
             "cc",
             "-c",
-            "-Wall",
-            "-nostdlib",
-            "-nostartfiles",
-            "-ffreestanding",
-            "-march=armv6",
-            "-Og",
-            "-std=gnu99",
-            "reboot.c"
-        ],
-        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side/libpi.small",
-        "file": "reboot.c"
-    },
-    {
-        "arguments": [
-            "cc",
-            "-c",
-            "-Wall",
-            "-nostdlib",
-            "-nostartfiles",
-            "-ffreestanding",
-            "-march=armv6",
-            "-Og",
-            "-std=gnu99",
-            "timer.c"
-        ],
-        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side/libpi.small",
-        "file": "timer.c"
-    },
-    {
-        "arguments": [
-            "cc",
-            "-c",
             "-Ilibpi.small/..",
             "-I.",
             "-Wall",
@@ -46,7 +14,23 @@
             "bootloader.o",
             "bootloader.c"
         ],
-        "directory": "/home/jonak/cs140e-win19/homeworks/1-bootloader/bootloader/pi-side",
+        "directory": "/home/jonak/cs140e-winter2019/homeworks/1-bootloader/bootloader/pi-side",
         "file": "bootloader.c"
+    },
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-Wall",
+            "-nostdlib",
+            "-nostartfiles",
+            "-ffreestanding",
+            "-march=armv6",
+            "-Og",
+            "-std=gnu99",
+            "gpio.c"
+        ],
+        "directory": "/home/jonak/cs140e-winter2019/homeworks/1-bootloader/bootloader/pi-side/libpi.small",
+        "file": "gpio.c"
     }
 ]
