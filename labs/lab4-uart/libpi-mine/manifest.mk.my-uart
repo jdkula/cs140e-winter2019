@@ -7,7 +7,7 @@
 
 # put all of your source files you have here. e.g., 
 # 	SRC = my-uart.c
-SRC = my-uart.c
+SRC = my-uart.c aux.c helper.c
 
 ###########################################################################
 # these are .o's we give you --- when to use your my-uart.c you remove this.

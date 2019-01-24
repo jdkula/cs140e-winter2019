@@ -81,8 +81,8 @@ enum {
 };
 
 // GPIO pin mappings for UART
-#define GPIO_TX GPIO_PIN14
-#define GPIO_RX GPIO_PIN15
+#define PIN_TX GPIO_PIN14
+#define PIN_RX GPIO_PIN15
 
 /*
  * These enumerated values establish symbolic names for each of the
