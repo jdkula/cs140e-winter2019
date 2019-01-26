@@ -1,36 +1,79 @@
+##########
+# CS140E: PiOS
+# Jonathan Kula
+# Winter 2019
+#
+# This build file is basically a meta-build-file that orchestrates
+# and unifies the build files for each submodule, providing resolution
+# for all of them.
+#
+# This build file was last updated on January 25th, 2019.
+# If you're unfamiliar with CMake, you can just use the
+# build.sh file present in the project root directory.
+#
+# This project should be generated with an ARM toolchain;
+# please build with -DCMAKE_TOOLCHAIN_FILE=/path/to/arm-gcc-toolchain.cmake
+
 cmake_minimum_required(VERSION 3.10)
+
+########################################
+# Project Setup                        #
+########################################
 
 project(PiOS C ASM)
 
-include("${CMAKE_ROOT}/Modules/ExternalProject.cmake")
-
+# Output Directory Setup
 file(MAKE_DIRECTORY "./out")
-file(MAKE_DIRECTORY "./out/lib")
-file(MAKE_DIRECTORY "./out/bin")
-file(MAKE_DIRECTORY "./out/img")
-file(MAKE_DIRECTORY "./out/meta")
+file(MAKE_DIRECTORY "./out/lib")    # Library files (.a, .so, etc.)
+file(MAKE_DIRECTORY "./out/bin")    # Binary files (piboot, etc.)
+file(MAKE_DIRECTORY "./out/img")    # Kernel image files (bootloader/kernel.img, etc.)
 
+# Resolve absolute pathes to these directories
 get_filename_component(LIB_OUT_DIR out/lib REALPATH)
 get_filename_component(EXE_OUT_DIR out/bin REALPATH)
 get_filename_component(IMG_OUT_DIR out/img REALPATH)
-get_filename_component(META_OUT_DIR out/meta REALPATH)
 get_filename_component(PIBOOT_DIR PiBoot REALPATH)
 
-ExternalProject_Add(piboot
-        PREFIX "${PIBOOT_DIR}"
-        SOURCE_DIR "${PIBOOT_DIR}"
-        CMAKE_ARGS ""
-        BUILD_ALWAYS TRUE
-        INSTALL_COMMAND cp "${PIBOOT_DIR}/out/piboot" "${EXE_OUT_DIR}"
-        )
+set(CMAKE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 
-add_subdirectory(modules/libpi)
+########################################
+#> End Project Setup                  <#
+########################################
+
+########################################
+# Submodule Setup                      #
+########################################
+
+add_subdirectory(lib/startx86)
+add_subdirectory(lib/libtypes)
+add_subdirectory(lib/libmemory)
+add_subdirectory(lib/libboot)
+add_subdirectory(lib/libpi)
+
 add_subdirectory(modules/bootloader)
+add_subdirectory(modules/blink)
 
-add_custom_target(build_all ALL DEPENDS bootloader pi piboot)
+add_subdirectory(piboot)
 
-add_custom_target(clean_out rm "${LIB_OUT_DIR}/*"
-            COMMAND rm "${EXE_OUT_DIR}/*"
-            COMMAND rm -rf "${IMG_OUT_DIR}/*"
-            COMMAND rm "${META_OUT_DIR}/*"
-        )
+########################################
+#> End Submodule Setup                <#
+########################################
+
+########################################
+# Metatarget Setup                     #
+########################################
+
+# Target to build all targets; added to default for GNU make.
+add_custom_target(build_all ALL DEPENDS pi)
+
+
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    add_dependencies(build_all bootloader)
+else ()
+    add_dependencies(build_all piboot)
+endif ()
+
+
+########################################
+#> End Metatarget Setup               <#
+########################################

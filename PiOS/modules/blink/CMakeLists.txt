@@ -21,8 +21,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(bootloader C ASM)
-set(MODULE_NAME bootloader)
+project(blink C ASM)
+set(MODULE_NAME blink)
 
 ########################################
 #> End Project Setup                  <#
@@ -33,23 +33,30 @@ set(MODULE_NAME bootloader)
 ########################################
 
 # Source Files
-set(SRC src/bootloader.c)
+set(SRC src/blink.c)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     list(APPEND SRC src/start.s)
 endif ()
 
 # Compile Options
-set(DEPENDENCIES pi boot start)  # Link to libpi and boot
-set(INCLUDE_DIRECTORIES include)
-
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(COMPILE_OPTIONS -nostdlib -nostartfiles -ffreestanding -fno-builtin)
+else ()
+    set(COMPILE_OPTIONS)
+endif ()
+
+set(INCLUDE_DIRECTORIES include)
+
+# Dependencies
+set(BOOTLOADER_DEPENDENCIES pi boot)  # Link to libpi and boot
+
+# Linker Options
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(LINKER_SCRIPT linker/memmap)
     get_filename_component(LINKER_SCRIPT_ABSOLUTE "${LINKER_SCRIPT}" REALPATH)
 
     set(LINKER_OPTIONS -T${LINKER_SCRIPT_ABSOLUTE} -nostdlib)
 else ()
-    set(COMPILE_OPTIONS)
     set(LINKER_OPTIONS)
 endif ()
 

@@ -8,33 +8,36 @@
 #include <timer.h>
 #include <rpi.h>
 #include <gpio.h>
-#include <libboot/include/simple-boot.h>
+#include <integer.h>
+#include <simple-boot.h>
+#include <uart.h>
+#include <mem-access.h>
 
 
-static void send_byte(unsigned char uc) {
+static void send_byte(uint8 uc) {
     uart_putc(uc);
 }
 
-static unsigned char get_byte(void) {
+static uint8 get_byte(void) {
     return uart_getc();
 }
 
-static unsigned get_uint(void) {
+static uint32 get_uint(void) {
     unsigned u = get_byte();
-    u |= get_byte() << 8;
-    u |= get_byte() << 16;
-    u |= get_byte() << 24;
+    u |= get_byte() << 8u;
+    u |= get_byte() << 16u;
+    u |= get_byte() << 24u;
     return u;
 }
 
-static void put_uint(unsigned u) {
-    send_byte((u >> 0) & 0xff);
-    send_byte((u >> 8) & 0xff);
-    send_byte((u >> 16) & 0xff);
-    send_byte((u >> 24) & 0xff);
+static void put_uint(uint32 u) {
+    send_byte((u >> 0u) & 0xffu);
+    send_byte((u >> 8u) & 0xffu);
+    send_byte((u >> 16u) & 0xffu);
+    send_byte((u >> 24u) & 0xffu);
 }
 
-static void die(int code) {
+static void die(uint32 code) {
     put_uint(code);
     reboot();
 }
@@ -50,30 +53,24 @@ static void die(int code) {
 //	8. jump to ARMBASE.
 //
 
-void notmain(void) {
+void module_main(void) {
     uart_init();
 
-    // XXX: cs107e has this delay; doesn't seem to be required if
-    // you drain the uart.
-    delay_ms(500);
-
-
-    /* XXX put your bootloader implementation here XXX */
-    unsigned lastMessage = get_uint();
+    uint32 lastMessage = get_uint();
     while (lastMessage != SOH);
 
-    unsigned numBytes = get_uint();
-    unsigned msgCrc = get_uint();
+    uint32 numBytes = get_uint();
+    uint32 msgCrc = get_uint();
 
     put_uint(SOH);
 
-    unsigned bytesCrc = crc32(&numBytes, 4);
+    uint32 bytesCrc = crc32(&numBytes, 4);
     put_uint(bytesCrc);
 
     put_uint(msgCrc);
 
-    unsigned bytesRead = 0;
-    unsigned lastData = get_uint();
+    uint32 bytesRead = 0;
+    uint32 lastData = get_uint();
     while (lastData != EOT) {
         PUT32(ARMBASE + bytesRead, lastData);
         bytesRead += 4;
@@ -82,7 +79,7 @@ void notmain(void) {
 
     if (bytesRead != numBytes) die(0xFF1);
 
-    if (crc32((void *) ARMBASE, bytesRead) != msgCrc) die(0xFF2);
+    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(0xFF2);
 
     put_uint(ACK);
 
