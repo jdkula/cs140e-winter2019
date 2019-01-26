@@ -17,8 +17,8 @@ SRC = my-uart.c aux.c helper.c
 # 	SUPPORT_OBJS = 
 
 #SUPPORT_OBJS=	libpi.support/gpio.o libpi.support/gpioextra.o libpi.support/uart.o
-SUPPORT_OBJS= libpi.support/gpio.o libpi.support/gpioextra.o
-
+#SUPPORT_OBJS= libpi.support/gpio.o libpi.support/gpioextra.o
+SUPPORT_OBJS=
 ###########################################################################
 # these are any .c files you want out of libpi.support/
 # for hw1 you'll probably just leave these.  You can also rewrite any
@@ -28,4 +28,5 @@ SUPPORT_SRC = libpi.support/reboot.c 	\
 		libpi.support/timer.c 	\
 		libpi.support/helpers.s \
 		libpi.support/mem-barrier.s 		\
-		libpi.support/printf.c
+		libpi.support/printf.c          \
+		libpi.support/gpio.c
