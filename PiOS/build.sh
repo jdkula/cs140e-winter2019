@@ -28,16 +28,14 @@ make
 # Return to original working directory
 cd ${ORIGINAL_DIR}
 
-mv out out-arm
-
 # Remove temporary directory.
 rm -rf /tmp/jdkula_pios_build_arm
 
 ### X86 ###
 # Clean and create temporary build directory
-rm -rf /tmp/jdkula_pios_build_arm
-mkdir /tmp/jdkula_pios_build_arm
-cd /tmp/jdkula_pios_build_arm
+rm -rf /tmp/jdkula_pios_build_x86
+mkdir /tmp/jdkula_pios_build_x86
+cd /tmp/jdkula_pios_build_x86
 
 # Generate project
 cmake ${PROJECT_DIR}
@@ -48,7 +46,5 @@ make
 # Return to original working directory
 cd ${ORIGINAL_DIR}
 
-mv out out-x86
-
 # Remove temporary directory.
-rm -rf /tmp/jdkula_pios_build_arm
+rm -rf /tmp/jdkula_pios_build_x86

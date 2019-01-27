@@ -6,7 +6,7 @@
 # Provides interfaces for Raspberry Pi hardware, like
 # GPIO, UART, timing, rebooting, and so on.
 #
-# This build file was last updated on January 25th, 2019.
+# This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
 # build.sh file present at the project root to build all.
 #
@@ -35,7 +35,6 @@ else ()
     set(INCLUDE_DIRECTORIES include-x86)
 endif ()
 
-
 ########################################
 #> End Build Variable Setup           <#
 ########################################
@@ -45,10 +44,10 @@ endif ()
 ########################################
 
 # Create static library target from predefined source
-add_library(types INTERFACE)
+add_library(libtypes INTERFACE)
 
 # Add include directories and share them with dependants.
-target_include_directories(types INTERFACE ${INCLUDE_DIRECTORIES})
+target_include_directories(libtypes INTERFACE ${INCLUDE_DIRECTORIES})
 
 ########################################
 #> End Library Setup                  <#

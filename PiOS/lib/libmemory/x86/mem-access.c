@@ -16,25 +16,25 @@
  */
 typedef struct {
     void *addr;
-    unsigned val;
+    uint32 val;
 } mem_t;
 
 mem_t MEM[MEMORY_CHUNKS];
-unsigned int chunksUsed = 0;
+uint32 chunksUsed = 0;
 
-void setBit(unsigned int* reg, unsigned char bitNum, unsigned char value) {
-    unsigned int currentValue = get32(reg);
-    unsigned int bitValue = (value << bitNum) & (1U << bitNum);
+void setBit(uint32* reg, uint8 bitNum, uint8 value) {
+    uint32 currentValue = get32(reg);
+    uint32 bitValue = (value << bitNum) & (1U << bitNum);
 
     currentValue = (currentValue & ~bitValue) | bitValue;
 
     put32(reg, currentValue);
 }
 
-unsigned char getBit(unsigned int* reg, unsigned char bitNum) {
-    unsigned int currentValue = get32(reg);
+uint8 getBit(uint32* reg, uint8 bitNum) {
+    uint32 currentValue = get32(reg);
 
-    return (unsigned char) ((currentValue >> bitNum) & 1U);
+    return (uint8) ((currentValue >> bitNum) & 1U);
 }
 
 // don't change print_write/print_read so we can compare to everyone.
@@ -45,9 +45,9 @@ static void print_read(mem_t *m) {
     printf("\tREAD:addr=%p, val=%u\n", m->addr, m->val);
 }
 
-void put32(void* addr, unsigned int data) {
+void put32(void* addr, uint32 data) {
 
-    for(unsigned int i = 0; i < chunksUsed; i++) {
+    for(uint32 i = 0; i < chunksUsed; i++) {
         if(MEM[i].addr == addr) {
             MEM[i].val = data;
             print_write(MEM + i);
@@ -62,9 +62,9 @@ void put32(void* addr, unsigned int data) {
 
 }
 
-unsigned int get32(void* addr) {
+uint32 get32(void* addr) {
 
-    for(unsigned int i = 0; i < chunksUsed; i++) {
+    for(uint32 i = 0; i < chunksUsed; i++) {
         if(MEM[i].addr == addr) {
             print_read(MEM + i);
             return MEM[i].val;
@@ -81,31 +81,36 @@ unsigned int get32(void* addr) {
     return MEM[chunksUsed - 1].val;
 }
 
-// *(unsigned *)addr = v;
-void PUT32(unsigned addr, unsigned v) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+
+// *(uint32 *)addr = v;
+void PUT32(uint32 addr, uint32 v) {
     return put32((void*) addr, v);
 }
 
-// *(unsigned short *)addr = v;
-void PUT16(unsigned addr, unsigned v) {
+// *(uint16 *)addr = v;
+void PUT16(uint32 addr, uint32 v) {
     return put32((void*) addr, v);
 }
 
-// *(unsigned char *)addr = v;
-void PUT8(unsigned addr, unsigned v) {
+// *(uint8 *)addr = v;
+void PUT8(uint32 addr, uint32 v) {
     return put32((void*) addr, v);
 }
 
-// *(unsigned *)addr
-unsigned GET32(unsigned addr) {
+// *(uint32 *)addr
+uint32 GET32(uint32 addr) {
     return get32((void*) addr);
 }
 
+#pragma GCC diagnostic pop
+
 // Get Program Counter
-unsigned GETPC() {
+uint32 GETPC() {
     return 0; // TODO: Unsure how to do this...
 }
 
-void BRANCHTO(unsigned addr) {
+void BRANCHTO(uint32 addr) {
     // TODO
 }

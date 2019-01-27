@@ -1,7 +1,9 @@
 #ifndef __RPI_H__
 #define __RPI_H__
 
-void dummy(unsigned);
+#include <integer.h>
+
+void dummy(uint32 unused);
 
 void reboot(void);
 

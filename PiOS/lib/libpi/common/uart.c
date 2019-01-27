@@ -39,7 +39,7 @@ int uart_getc(void) {
     return aux_uart_receive();
 }
 
-void uart_putc(unsigned c) {
+void uart_putc(uint32 c) {
     while (!aux_uart_tx_has_space());
-    aux_uart_transmit((unsigned char) c);
+    aux_uart_transmit((uint8) c);
 }

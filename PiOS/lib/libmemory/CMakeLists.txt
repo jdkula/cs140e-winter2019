@@ -5,11 +5,11 @@
 #
 # Provides interfaces for Raspberry Pi memory, like
 # get32, set32, etc. This prevents GCC from optimizing
-# memory code unexpectedly, and allows a drop-in test
+# memory code unexpectedly, and allows for a drop-in test
 # framework that can be run on the computer.
 # Also provides memory barriers.
 #
-# This build file was last updated on January 25th, 2019.
+# This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
 # build.sh file present at the project root to build all.
 #
@@ -22,7 +22,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(memory C ASM)
+project(libmemory C ASM)
+set(LIBRARY_NAME libmemory)
 
 ########################################
 #> End Project Setup                  <#
@@ -33,35 +34,26 @@ project(memory C ASM)
 ########################################
 
 # Source Files
+set(SRC common/mem-access.c)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    set(SRC
+    list(APPEND SRC
             arm/mem-access.c
             arm/mem-access.s
             arm/mem-barrier.s
             )
-
-    set(COMPILE_OPTIONS -nostdlib)
-    set(LINKER_OPTIONS -nostdlib)
 else ()
-    set(SRC
+    list(APPEND SRC
             x86/mem-access.c
             x86/mem-barrier.c
             )
-
-    set(COMPILE_OPTIONS)
-    set(LINKER_OPTIONS)
 endif ()
 
 
 # Compile Options
 set(INCLUDE_DIRECTORIES include-common)
 
-
 # Dependencies
-set(LIBMEMORY_DEPENDENCIES types)
-
-# Output Directories
-## Controlled by ${LIB_OUT_DIR} (see root CMakeLists.txt)
+set(DEPENDENCIES libtypes)
 
 ########################################
 #> End Build Variable Setup           <#
@@ -71,21 +63,7 @@ set(LIBMEMORY_DEPENDENCIES types)
 # Library Setup                        #
 ########################################
 
-# Create static library target from predefined source
-add_library(memory STATIC ${SRC})
-
-# Add include directories and share them with dependants.
-target_include_directories(memory PUBLIC ${INCLUDE_DIRECTORIES})
-
-# Commit compile and link options
-target_compile_options(memory PUBLIC ${COMPILE_OPTIONS})
-target_link_libraries(memory ${LIBMEMORY_DEPENDENCIES} ${LINKER_OPTIONS})
-
-# Commit output directory
-set_target_properties(memory
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
-        )
+include(${CMAKE_INCLUDE_DIR}/library.cmake)
 
 ########################################
 #> End Library Setup                  <#

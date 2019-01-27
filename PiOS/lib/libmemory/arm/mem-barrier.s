@@ -1,3 +1,11 @@
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: mem-barrier.s
+ * --------------
+ * Implements memory barriers in using ARM cache
+ *
+ */
+
 // https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
 .globl mb
 mb:
@@ -8,6 +16,7 @@ mb:
     mcr p15, 0, r0, c7, c5, 4   // Prefetch flush
     bx lr
 
+// Source: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0360f/I1014942.html
 /*
  * Data memory barrier
  *

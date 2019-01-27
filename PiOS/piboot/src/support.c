@@ -11,7 +11,7 @@
 #include "support.h"
 
 // read entire file into buffer.  return it, write totat bytes to <size>
-unsigned char* read_file(int *size, const char *name) {
+uint8* read_file(int *size, const char *name) {
   struct stat fileStat;
   if(stat(name, &fileStat) < 0) {
     panic("Stat failed");
@@ -19,7 +19,7 @@ unsigned char* read_file(int *size, const char *name) {
   off_t fileSize = fileStat.st_size;
 
 
-  unsigned char* buf = malloc(fileSize);
+  uint8* buf = malloc(fileSize);
 
   int fileFd = open(name, O_RDONLY);
   if(fileFd < 0) {

@@ -1,19 +1,23 @@
 #include <gpio.h>
 #include <timer.h>
+#include <integer.h>
+#include <debug.h>
+#include <rpi.h>
 
-/*
- * very simple bootloader.  more robust than xmodem.   (that code seems to
- * have bugs in terms of recovery with inopportune timeouts.)
- */
+int module_main (void ) {
+    gpio_set_output(26);
+    gpio_set_output(21);
+    gpio_set_output(20);
+    gpio_set_output(19);
+    gpio_set_output(16);
 
-void notmain ( void ) {
-    int led = 20;
+    uint8 times = 10;
 
-    gpio_set_output(led);
-    for(int i = 0; i < 100; i++) {
-        gpio_write(led, 1);
-        delay(1000000);
-        gpio_write(led, 0);
+    for(; times > 0; times--) {
+        debug_wave();
         delay(1000000);
     }
+
+    reboot();
+    return 0;
 }

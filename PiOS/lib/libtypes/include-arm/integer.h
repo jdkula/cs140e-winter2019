@@ -5,7 +5,7 @@
 #ifndef PIOS_INTEGER_H
 #define PIOS_INTEGER_H
 
-// We assume a 32-bit unsigned because of the Raspberry Pi.
+// We assume a 32-bit uint32 because of the Raspberry Pi.
 
 typedef long long int64;
 typedef unsigned long long uint64;

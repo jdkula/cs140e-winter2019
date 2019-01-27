@@ -1,9 +1,10 @@
 ##########
-# CS140E: Blink
+# CS140E: LibDebug
 # Jonathan Kula
 # Winter 2019
 #
-# A basic GPIO test program that blinks an LED at pin 20.
+# Provides some helper functions that trigger various
+# GPIO pins set to LEDs, and are easily disableable.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -14,39 +15,39 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+### ! ### LIBDEBUG CAN BE DISABLED BY UNCOMMENTING THE BELOW VALUE!
+#set(DEFINES DEBUG_OFF)
+
 ########################################
 # Project Setup                        #
 ########################################
 
-project(blink C ASM)
-set(MODULE_NAME blink)
+project(libdebug C)
+set(LIBRARY_NAME libdebug)
 
 ########################################
 #> End Project Setup                  <#
 ########################################
+
 
 ########################################
 # Build Variable Setup                 #
 ########################################
 
 # Source Files
-set(SRC src/blink.c)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(INSERT SRC 0 src/start.s)
+    set(SRC arm/debug.c)
+else ()
+    set(SRC x86/debug.c)
 endif ()
 
-# Compile Options
+set(INCLUDE_DIRECTORIES include-common)
 
-# Dependencies
-set(DEPENDENCIES libpi libdebug)
+set(DEPENDENCIES libpi libtypes)
 
-# Output Options
-## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)
-## See ${IMG_OUT_DIR} in root CMakeLists.txt
-set(IMAGE_OUTPUT_DIRECTORY "${IMG_OUT_DIR}/${MODULE_NAME}")
 
 ########################################
 #> End Build Variable Setup           <#
 ########################################
 
-include(${CMAKE_INCLUDE_DIR}/module.cmake)
+include(${CMAKE_INCLUDE_DIR}/library.cmake)

@@ -29,9 +29,10 @@ void gpio_set_output(unsigned pin) {
   volatile unsigned* fsel = gpio_fsel0 + offset;
 
   unsigned int current = get32(fsel);
-  unsigned int bits = 0b001 << pin;
+  unsigned int bits = 0b001 << (pin * 3);
+  unsigned int fill = 0b111 << (pin * 3);
 
-  current = (current & ~bits) | bits;
+  current = (current & ~fill) | bits;
 
   put32(fsel, current);
 }

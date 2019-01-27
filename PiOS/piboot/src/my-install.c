@@ -32,7 +32,7 @@
 // params:
 //	- <timeout> is in seconds (< 1 ok)
 // 	- <speed> is baud rate.
-int set_tty_to_8n1(int fd, unsigned speed, double timeout) {
+int set_tty_to_8n1(int fd, uint32 speed, double timeout) {
         struct termios tty;
         memset (&tty, 0, sizeof tty);
         if (tcgetattr (fd, &tty) != 0)
@@ -87,7 +87,7 @@ int set_tty_to_8n1(int fd, unsigned speed, double timeout) {
 // simple state machine to indicate when we've seen a special string
 // from the pi telling us to shutdown.
 static int done(char *s) {
-	static unsigned pos = 0;
+	static uint32 pos = 0;
 	const char exit_string[] = "DONE!!!";
 	const int n = sizeof exit_string - 1;
 
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 	
 	}
 	int prog_nbytes;
-        unsigned char *program = read_file(&prog_nbytes, name);
+        uint8 *program = read_file(&prog_nbytes, name);
 
 	// open tty
 	int fd = open_tty(&portname);

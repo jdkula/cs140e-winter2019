@@ -1,6 +1,11 @@
-
-;@-------------------------------------------------------------------------
-;@-------------------------------------------------------------------------
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: mem-access.s
+ * --------------
+ * Implements what is essentially pointer dereference
+ * and value assignment in assembly, so that
+ * GCC won't optimize it.
+ */
 
 .globl PUT32
 PUT32:

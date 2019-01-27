@@ -2,8 +2,6 @@
 
 .globl _start
 _start:
-    b skip
-skip:
-    mov sp,#0x08000
-    bl notmain
+    mov sp,#0x8000
+    bl module_main
 hang: b hang

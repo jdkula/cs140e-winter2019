@@ -4,6 +4,6 @@
 
 #include "rpi.h"
 
-void dummy(unsigned unused) {
+void dummy(uint32 unused) {
     // No-op
 }

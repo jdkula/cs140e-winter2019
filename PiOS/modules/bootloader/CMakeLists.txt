@@ -8,7 +8,7 @@
 # eliminates the need to switch out the kernel on the SD
 # card with each build, speeding up development.
 #
-# This build file was last updated on January 25th, 2019.
+# This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
 # build.sh file present at the project root to build all.
 #
@@ -35,23 +35,12 @@ set(MODULE_NAME bootloader)
 # Source Files
 set(SRC src/bootloader.c)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(APPEND SRC src/start.s)
+    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
 endif ()
 
 # Compile Options
-set(DEPENDENCIES pi boot start)  # Link to libpi and boot
+set(DEPENDENCIES libpi libboot libdebug)
 set(INCLUDE_DIRECTORIES include)
-
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    set(COMPILE_OPTIONS -nostdlib -nostartfiles -ffreestanding -fno-builtin)
-    set(LINKER_SCRIPT linker/memmap)
-    get_filename_component(LINKER_SCRIPT_ABSOLUTE "${LINKER_SCRIPT}" REALPATH)
-
-    set(LINKER_OPTIONS -T${LINKER_SCRIPT_ABSOLUTE} -nostdlib)
-else ()
-    set(COMPILE_OPTIONS)
-    set(LINKER_OPTIONS)
-endif ()
 
 
 # Output Options

@@ -1,28 +1,30 @@
-//
-// Created by jonak on 1/23/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: mem-access.c [ARM Implementation]
+ * --------------
+ * Implements get32 and put32 in terms of
+ * asm-defined functions that GCC won't optimize.
+ */
 
 #include "mem-access.h"
 
-void setBit(unsigned int* reg, unsigned char bitNum, unsigned char value) {
-    unsigned int currentValue = get32(reg);
-    unsigned int bitValue = (value << bitNum) & (1U << bitNum);
+/**
+ * Places [v]alues of varying widths in memory at the given [addr].
+ * These versions of the functions link to the assembly seen in the .s files.
+ */
+void PUT32(uint32 addr, uint32 v);
 
-    currentValue = (currentValue & ~bitValue) | bitValue;
+void PUT16(uint32 addr, uint32 v);
 
-    put32(reg, currentValue);
+void PUT8(uint32 addr, uint32 v);
+
+/** Gets the value stored at a given [addr]. */
+uint32 GET32(uint32 addr);
+
+void put32(void* addr, uint32 data) {
+    PUT32((uint32) addr, data);
 }
 
-unsigned char getBit(unsigned int* reg, unsigned char bitNum) {
-    unsigned int currentValue = get32(reg);
-
-    return (unsigned char) ((currentValue >> bitNum) & 1U);
-}
-
-void put32(void* addr, unsigned data) {
-    PUT32((unsigned) addr, data);
-}
-
-unsigned get32(void* addr) {
-    return GET32((unsigned) addr);
+uint32 get32(void* addr) {
+    return GET32((uint32) addr);
 }

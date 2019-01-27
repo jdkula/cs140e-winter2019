@@ -1,6 +1,8 @@
 #ifndef __JONAK_GPIO_H__
 #define __JONAK_GPIO_H__
 
+#include <integer.h>
+
 /*
  * Functions for controlling Raspberry Pi GPIO.
  * You will implement this interface in assignment 2.
@@ -98,7 +100,7 @@ void gpio_init(void);
  *
  * If `pin` or `function` is invalid, does nothing.
  */
-void gpio_set_function(unsigned char pin, unsigned char function);
+void gpio_set_function(uint8 pin, uint8 function);
 
 /*
  * Get the GPIO function for GPIO pin number `pin`.
@@ -108,7 +110,7 @@ void gpio_set_function(unsigned char pin, unsigned char function);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-unsigned gpio_get_function(unsigned char pin);
+uint32 gpio_get_function(uint8 pin);
 
 /*
  * Convenience functions for setting a pin to GPIO_FUNC_INPUT or
@@ -116,9 +118,9 @@ unsigned gpio_get_function(unsigned char pin);
  *
  * @param pin the GPIO pin number to set the function of
  */
-void gpio_set_input(unsigned char pin);
+void gpio_set_input(uint8 pin);
 
-void gpio_set_output(unsigned char pin);
+void gpio_set_output(uint8 pin);
 
 /*
  * Set GPIO pin number `pin` to high (1) or low (0). This
@@ -130,7 +132,7 @@ void gpio_set_output(unsigned char pin);
  *
  * If `pin` is invalid, does nothing.
  */
-void gpio_write(unsigned char pin, unsigned char val);
+void gpio_write(uint8 pin, uint8 val);
 
 /*
  * Get current level (1 for high, 0 for low) for GPIO pin number `pin`.
@@ -140,7 +142,7 @@ void gpio_write(unsigned char pin, unsigned char val);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-unsigned char gpio_read(unsigned char pin);
+uint8 gpio_read(uint8 pin);
 
 enum {
     GPIO_PUD_DISABLE = 0,
@@ -148,10 +150,10 @@ enum {
     GPIO_PUD_PULLUP = 2,
 };
 
-void gpio_set_pud(unsigned char pin, unsigned char pud);
+void gpio_set_pud(uint8 pin, uint8 pud);
 
-void gpio_set_pullup(unsigned char pin);
+void gpio_set_pullup(uint8 pin);
 
-void gpio_set_pulldown(unsigned char pin);
+void gpio_set_pulldown(uint8 pin);
 
 #endif // __JONAK_GPIO_H
