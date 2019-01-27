@@ -9,10 +9,11 @@
 #include <rpi.h>
 #include <gpio.h>
 #include <integer.h>
-#include <simple-boot.h>
+#include <crc32.h>
 #include <uart.h>
 #include <mem-access.h>
 #include <debug.h>
+#include <boot-messages.h>
 
 static void send_byte(uint8 uc) {
     uart_putc(uc);

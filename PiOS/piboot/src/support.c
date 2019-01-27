@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <simple-boot.h>
+#include <crc32.h>
 #include "demand.h"
 #include "support.h"
 

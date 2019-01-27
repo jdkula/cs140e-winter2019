@@ -1,5 +1,3 @@
-void mb(void);
+void data_memory_barrier(void);
 
-void dmb(void);
-
-void dsb(void);
+void data_sync_barrier(void);

@@ -31,7 +31,7 @@ set(LIBRARY_NAME libboot)
 ########################################
 
 # Source Files
-set(SRC common/simple-boot.c)
+set(SRC common/crc32.c)
 
 # Compile Options
 set(INCLUDE_DIRECTORIES include-common)

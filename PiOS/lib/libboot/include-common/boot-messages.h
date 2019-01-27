@@ -1,12 +1,13 @@
 /**
  * Jonathan Kula | CS140E | Winter Quarter 2019
- * File: simple-boot.h
+ * File: boot-messages.h
  * --------------
- * Provides prototypes and constants used in the
- * simple bootloader.
+ * Provides the messages used in the process of
+ * transmitting a boot image to the bootloader.
  */
 
-#include <integer.h>
+#ifndef PIOS_BOOT_MESSAGES_H
+#define PIOS_BOOT_MESSAGES_H
 
 enum {
     /** Location the sent payload gets stored. */
@@ -28,7 +29,7 @@ enum {
     SIZE_MISMATCH,
 
     /** Acknowledgement of Receipt */
-    ACK,   // client ACK
+    ACK,
 
     /** Acknowledgement with error -- indicates that the process should start over. */
     NAK,
@@ -37,9 +38,4 @@ enum {
     EOT
 };
 
-/**
- * crc32 implementation.
- * Moves around the above hash table according to
- * each byte of an input [buf] of a given [size].
- */
-uint32 crc32(const void* buf, uint32 size);
+#endif //PIOS_BOOT_MESSAGES_H

@@ -47,7 +47,7 @@ void gpio_set_function(uint8 pin, uint8 function) {
 
     pin = (uint8) (pin % 10U);
 
-    //dsb(); // data sync barrier
+    //data_sync_barrier(); // data sync barrier
     uint32 current = get32(fsel);
     uint32 bits = ((uint32) function) << (pin * 3);
     uint32 full = 0b111U << (pin * 3);
@@ -55,14 +55,14 @@ void gpio_set_function(uint8 pin, uint8 function) {
     current = (current & ~full) | bits;
 
     put32(fsel, current);
-    //dsb(); // data sync barrier
+    //data_sync_barrier(); // data sync barrier
 }
 
 uint32 gpio_get_function(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
     uint32* fsel = pin_shift(GPIO_FSEL0, &pin);
 
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 current = get32(fsel);
     uint32 bits = current >> (pin * 3);
 
@@ -86,7 +86,7 @@ void gpio_write(uint8 pin, uint8 val) {
 uint8 gpio_read(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
 
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 value = get32(GPIO_LEV0);
 
     return (uint8) ((value >> pin) & 0b1);
@@ -94,36 +94,36 @@ uint8 gpio_read(uint8 pin) {
 
 void gpio_detect_falling_edge(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 val = get32(GPIO_FEN0);
     val |= 1 << pin;
     put32(GPIO_FEN0, val);
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
 }
 
 void gpio_detect_rising_edge(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 val = get32(GPIO_REN0);
     val |= 1 << pin;
     put32(GPIO_FEN0, val);
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
 }
 
 uint32 gpio_check_event(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 val = get32(GPIO_EDS0);
     return (val & (1 << pin));
 }
 
 uint32 gpio_check_and_clear_event(uint8 pin) {
     //assert(_gpio_pin_valid(pin));
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     uint32 val = get32(GPIO_EDS0);
     uint32 mask = (1U << pin);
     put32(GPIO_EDS0, mask); // Writing a 1 clears the bit
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
     return (val & mask);
 }
 
@@ -148,7 +148,7 @@ void pin_pull(uint8 pin, uint32 pud) {
 
     put32(GPIO_UDCLK0, 0);
     // timer_wait_for(5);
-    dsb(); // data sync barrier
+    data_sync_barrier(); // data sync barrier
 }
 
 void gpio_set_pullup(uint8 pin) {

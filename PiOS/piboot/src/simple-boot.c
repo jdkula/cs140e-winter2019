@@ -11,7 +11,8 @@
 #include "demand.h"
 #include "support.h"
 
-#include <simple-boot.h>
+#include <crc32.h>
+#include <boot-messages.h>
 
 static void send_byte(int fd, uint8 b) {
     if (write(fd, &b, 1) < 0)

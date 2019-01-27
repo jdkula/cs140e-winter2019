@@ -9,8 +9,8 @@
 
 // use this if you need memory barriers.
 void dev_barrier(void) {
-    dmb();
-    dsb();
+    data_memory_barrier();
+    data_sync_barrier();
 }
 
 void uart_init(void) {
