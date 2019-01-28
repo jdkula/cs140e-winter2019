@@ -37,19 +37,20 @@ set(SRC
         common/reboot.c
         common/timer.c
         common/uart.c
+        common/mem-access.c
         )
 
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(APPEND SRC arm/dummy.s)
+    list(APPEND SRC arm/dummy.s arm/mem-access.c arm/mem-access.s arm/mem-barrier.s)
 else ()
-    list(APPEND SRC x86/dummy.c)
+    list(APPEND SRC x86/dummy.c x86/mem-access.c x86/mem-barrier.c)
 endif ()
 
 # Compile & Link Options
 set(INCLUDE_DIRECTORIES include-common)
 
 # Dependencies
-set(DEPENDENCIES libmemory libtypes)
+set(DEPENDENCIES libtypes)
 
 ########################################
 #> End Build Variable Setup           <#

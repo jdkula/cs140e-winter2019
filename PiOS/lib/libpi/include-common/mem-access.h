@@ -26,7 +26,7 @@ void BRANCHTO(uint32 addr);
  * Returns the output value, so this can be used
  * as part of expressions.
  */
-uint32 setBit(uint32* addr, uint8 bitNum, uint8 value);
+uint32 setBit(uint32* addr, uint8 bitNum, uint32 value);
 
 /**
  * Gets a single bit (at [bitNum], counting from least

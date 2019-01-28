@@ -75,7 +75,6 @@ endif ()
 add_subdirectory(lib/startx86)
 add_subdirectory(lib/libdebug)
 add_subdirectory(lib/libtypes)
-add_subdirectory(lib/libmemory)
 add_subdirectory(lib/libboot)
 add_subdirectory(lib/libpi)
 

@@ -8,11 +8,13 @@
  */
 
 #include <integer.h>
-#include "mem-access.h"
+#include "../include-common/mem-access.h"
 
-uint32 setBit(uint32* addr, uint8 bitNum, uint8 value) {
+uint32 setBit(uint32* addr, uint8 bitNum, uint32 value) {
+    value = (value) & 0b1U; // ensure value is a single bit.
+
     uint32 currentValue = get32(addr);
-    uint32 bitValue = (value << bitNum) & (1U << bitNum);
+    uint32 bitValue = value << bitNum;
 
     currentValue = (currentValue & ~bitValue) | bitValue;
 

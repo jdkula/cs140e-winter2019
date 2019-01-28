@@ -1,10 +1,20 @@
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: rpi.h
+ * --------------
+ * Provides access to other operations that relate
+ * to the Raspberry Pi as a system.
+ */
+
 #ifndef __RPI_H__
 #define __RPI_H__
 
 #include <integer.h>
 
-void dummy(uint32 unused);
-
+/** Reboots the Raspberry Pi. */
 void reboot(void);
 
-#endif
+/** Does nothing -- just uses a CPU cycle. */
+void dummy(uint32 unused);
+
+#endif // __RPI_H__

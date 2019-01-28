@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "mem-access.h"
+#include "../include-common/mem-access.h"
 
 /** Defines the max number of unique addresses that can store a value. */
 #define MEMORY_CHUNKS 65565
