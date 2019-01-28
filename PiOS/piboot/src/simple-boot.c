@@ -79,6 +79,8 @@ void simple_boot(int fd, const uint8 *buf, uint32 n) {
     expect("Pi Echoes Data CRC", fd, bufCrc);
     printf("Data CRC verified... %#010x\n", bufCrc);
 
+    sleep(2);
+
     const uint32 *intBuf = (const uint32 *) (buf);
     uint32 intBufSize = n / 4;
     printf("File info: %u bytes / %u chunks\n", n, intBufSize);

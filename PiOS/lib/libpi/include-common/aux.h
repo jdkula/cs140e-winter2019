@@ -16,7 +16,7 @@
 #include <boolean.h>
 
 /** Setting to enable the UART and UART registers. */
-void aux_uart_enable_set(uint8 enabled);
+void aux_uart_register_enable(uint8 enabled);
 
 /** Constants for aux_uart_enable_set. */
 enum {

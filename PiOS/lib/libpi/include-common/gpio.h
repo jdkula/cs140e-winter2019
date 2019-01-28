@@ -85,7 +85,11 @@ enum {
     GPIO_PIN_LAST =  53U, // BCM2835 p. 94 -- last function option is FSEL53.
 
     GPIO_TX = GPIO_PIN14, // As indicated on the Raspberry Pi
-    GPIO_RX = GPIO_PIN15
+    GPIO_RX = GPIO_PIN15,
+
+    // Source: https://raspberrypi.stackexchange.com/questions/67431/cant-turn-on-act-led-on-baremetal-pi3
+    GPIO_ACT = GPIO_PIN47,
+    GPIO_PWR = GPIO_PIN35
 };
 
 /**
@@ -105,7 +109,7 @@ enum {  // BCM2835 pp. 92-94 - table contains bit-to-function mappings.
     GPIO_FUNC_ALT4 = 0b011,
     GPIO_FUNC_ALT5 = 0b010,
 
-    GPIO_FUNC_UART = GPIO_FUNC_ALT5
+    GPIO_FUNC_UART = GPIO_FUNC_ALT5 // BCM2835AP §6.2 p. 102 - TXD1/RXD1 for pins 14 and 15.
 };
 
 /** This enum gives symbolic names for a GPIO pin on (HIGH) vs off (LOW). */

@@ -43,3 +43,9 @@ void debug_disable(uint8 pin) {
 #endif
 }
 
+void debug_delay(uint32 ticks) {
+#ifndef DEBUG_OFF
+    printf("[Debug] Delayed for %u ticks\n", ticks);
+#endif
+}
+

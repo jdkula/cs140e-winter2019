@@ -6,7 +6,7 @@
  * asm-defined functions that GCC won't optimize.
  */
 
-#include "../include-common/mem-access.h"
+#include "mem-access.h"
 
 /**
  * Places [v]alues of varying widths in memory at the given [addr].

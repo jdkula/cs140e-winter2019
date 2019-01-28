@@ -38,6 +38,7 @@ set(SRC
         common/timer.c
         common/uart.c
         common/mem-access.c
+        common/printf.c
         )
 
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")

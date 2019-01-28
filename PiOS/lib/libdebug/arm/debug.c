@@ -40,3 +40,9 @@ void debug_disable(uint8 pin) {
     gpio_set_function(pin, GPIO_FUNC_INPUT);
 #endif
 }
+
+void debug_delay(uint32 ticks) {
+#ifndef DEBUG_OFF
+    delay(ticks);
+#endif
+}

@@ -1,6 +1,10 @@
-//
-// Created by jonak on 1/26/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: start.c [x86 Only]
+ * --------------
+ * The counterpart to start.s -- runs module_main.
+ * Needed to properly build an executable on x86.
+ */
 
 int module_main();
 

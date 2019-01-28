@@ -1,6 +1,12 @@
-//
-// Created by jonak on 1/25/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: integer.h [X86 Implementation]
+ * --------------
+ * Provides a consistent definition of ints
+ * of various signededness and widths across platforms.
+ *
+ * We use stdint.h on x86 for maximum compatibility.
+ */
 
 #ifndef PIOS_INTEGER_H
 #define PIOS_INTEGER_H

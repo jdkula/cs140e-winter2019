@@ -1,6 +1,10 @@
-//
-// Created by jonak on 1/25/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: integer.h [ARM Implementation]
+ * --------------
+ * Provides a consistent definition of ints
+ * of various signededness and widths across platforms.
+ */
 
 #ifndef PIOS_INTEGER_H
 #define PIOS_INTEGER_H

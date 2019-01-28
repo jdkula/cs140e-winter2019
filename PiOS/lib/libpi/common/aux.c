@@ -40,7 +40,7 @@ static uint32* const AUX_ENABLES = (void*) (AUX_BASE + 0x4);
 static struct aux_mu_peripherals* const uart = (void*) (AUX_BASE + 0x40);
 
 
-void aux_uart_enable_set(uint8 enabled) {
+void aux_uart_register_enable(uint8 enabled) {
     setBit(AUX_ENABLES, 0, enabled); // BCM2835AP §2.1.1 p. 9 - Mini UART enable
 }
 
@@ -95,5 +95,5 @@ void aux_uart_transmit(uint8 byte) {
 }
 
 uint8 aux_uart_receive() {
-    return (uint8) get32(&uart->io); // BCM2835AP §2.2.2 p. 11 - When reading from this register, data retrieved from the RX FIFO.
+    return (uint8) get32(&uart->io); // BCM2835AP §2.2.2 p. 11 - When reading from this register, data is retrieved from the RX FIFO.
 }

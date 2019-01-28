@@ -25,5 +25,7 @@ void debug_enable(uint8 pin);
 /** Sets the given [pin]'s function to INPUT. */
 void debug_disable(uint8 pin);
 
+/** Delays for the given number of [ticks]. */
+void debug_delay(uint32 ticks);
 
 #endif //PIOS_DEBUG_H

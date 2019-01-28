@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 ### ! ### LIBDEBUG CAN BE DISABLED BY UNCOMMENTING THE BELOW VALUE!
-#set(DEFINES DEBUG_OFF)
+set(DEFINES DEBUG_OFF)
 
 ########################################
 # Project Setup                        #

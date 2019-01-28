@@ -1,7 +1,15 @@
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: reboot.c
+ * --------------
+ * Provides reboot functionality declared in rpi.h.
+ */
+
 #include <mem-access.h>
 #include <timer.h>
 #include "rpi.h"
 
+// Reboot Method Source: https://github.com/dwelch67/raspberrypi/blob/master/blinker06/wdog.c
 void reboot(void) {
     void* const PM_RSTC = (void*) 0x2010001c;
     void* const PM_WDOG = (void*) 0x20100024;

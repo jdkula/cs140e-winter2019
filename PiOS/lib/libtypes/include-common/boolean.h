@@ -1,6 +1,10 @@
-//
-// Created by jonak on 1/25/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: boolean.h
+ * --------------
+ * Provides a consistent definition of a boolean
+ * across the Pi and x86. Replaces stdbool.h.
+ */
 
 #ifndef PIOS_BOOLEAN_H
 #define PIOS_BOOLEAN_H

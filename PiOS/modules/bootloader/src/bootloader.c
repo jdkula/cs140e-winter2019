@@ -14,6 +14,7 @@
 #include <mem-access.h>
 #include <debug.h>
 #include <boot-messages.h>
+#include <printf.h>
 
 static void send_byte(uint8 uc) {
     uart_putc(uc);
@@ -56,24 +57,20 @@ static void die(uint32 code) {
 
 void module_main(void) {
     gpio_init();
-    debug_enable(26);
-    debug_enable(21);
-    debug_enable(20);
-    debug_enable(19);
-    debug_enable(16);
-    debug_on(26);
+
+    debug_enable(GPIO_ACT);
+    debug_enable(GPIO_PWR);
+    debug_enable(GPIO_PIN26);
+    debug_enable(GPIO_PIN20);
 
     uart_init();
 
     uint32 lastMessage = get_uint();
     while (lastMessage != SOH);
-    debug_on(20);
 
     uint32 numBytes = get_uint();
     uint32 msgCrc = get_uint();
 
-    debug_off(20);
-    debug_on(19);
     put_uint(SOH);
 
     uint32 bytesCrc = crc32(&numBytes, 4);
@@ -83,20 +80,24 @@ void module_main(void) {
 
     uint32 bytesRead = 0;
     uint32 lastData = get_uint();
-    debug_off(19);
-    debug_on(21);
+    //bytesRead += 4;
+
     while (lastData != EOT) {
         put32((void*) (ARMBASE + bytesRead), lastData);
         bytesRead += 4;
         lastData = get_uint();
+//        if(uart_errno == UART_ERR_TIMEOUT) {
+//            reboot();
+//            return;
+//        }
     }
 
-    debug_off(21);
+
+
     if (bytesRead != numBytes) die(0xFF1);
 
     if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(0xFF2);
 
-    debug_on(16);
     put_uint(ACK);
 
 
@@ -105,11 +106,6 @@ void module_main(void) {
     // disable that to make it a bit more clean.
     delay_ms(500);
 
-    debug_off(26);
-    debug_off(21);
-    debug_off(20);
-    debug_off(19);
-    debug_off(16);
     // run what client sent.
     BRANCHTO(ARMBASE);
     // should not get back here, but just in case.
