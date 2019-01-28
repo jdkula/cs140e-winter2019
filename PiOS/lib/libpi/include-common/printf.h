@@ -1,6 +1,10 @@
 #ifndef PRINTF_DEFS
 #define PRINTF_DEFS
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
+
 int printf(const char *format, ...);
 int snprintf(char *buf, int n, const char *fmt, ...);
 
@@ -12,6 +16,8 @@ void uart_init ( void );
 int strcmp(const char *_p, const char *q);
 void *memset(void *_p, int c, unsigned n) ;
 void reboot(void) __attribute__((noreturn));
+
+#pragma GCC diagnostic pop
 
 #ifndef NDEBUG
 #define debug(msg, args...) \
@@ -26,4 +32,5 @@ void reboot(void) __attribute__((noreturn));
 } while(0)
 
 #define assert(bool) do { if((bool) == 0) panic(#bool); } while(0)
+
 #endif

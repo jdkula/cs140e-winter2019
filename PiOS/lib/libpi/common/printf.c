@@ -23,7 +23,7 @@
 
 void puts(const char *msg);
 
-void putchar (int c) { uart_putc(c); } 
+void putchar (int c) { uart_putc(c, 0); }
 
 static int isdigit(unsigned char c) { return c >= '0' && c <= '9'; }
 

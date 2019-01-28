@@ -43,31 +43,29 @@ void uart_init(void) {
     data_sync_barrier();
 }
 
-uint8 uart_getc() {
+uint8 uart_getc(uint32 timeout_ticks) {
     // Do nothing until the RX buffer has data, or until we time out. If the timeout is 0, wait forever.
-//    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_rx_has_data(); timeout_ticks--);
-//    if (timeout_ticks == 1) {
-//        uart_errno = UART_ERR_TIMEOUT;
-//        return UART_ERROR;
-//    }
-    while (!aux_uart_rx_has_data());
+    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_rx_has_data(); timeout_ticks--);
+    if (timeout_ticks == 1) {
+        uart_errno = UART_ERR_TIMEOUT;
+        return UART_ERROR;
+    }
 
-//    uart_errno = UART_ERR_OK;
+    uart_errno = UART_ERR_OK;
     return aux_uart_receive();
 }
 
-void uart_putc(uint8 c) {
-//    // Do nothing until the TX buffer has space, or until we time out. If the timeout is 0, wait forever.
-//    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_tx_has_space(); timeout_ticks--);
-//    if (timeout_ticks == 1) {
-//        uart_errno = UART_ERR_TIMEOUT;
-//        return UART_ERROR;
-//    }
+uint8 uart_putc(uint8 c, uint32 timeout_ticks) {
+    // Do nothing until the TX buffer has space, or until we time out. If the timeout is 0, wait forever.
+    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_tx_has_space(); timeout_ticks--);
+    if (timeout_ticks == 1) {
+        uart_errno = UART_ERR_TIMEOUT;
+        return UART_ERROR;
+    }
 
-    while (!aux_uart_tx_has_space());
 
     aux_uart_transmit(c);
 
-//    uart_errno = UART_ERR_OK;
-//    return 0;
+    uart_errno = UART_ERR_OK;
+    return 0;
 }

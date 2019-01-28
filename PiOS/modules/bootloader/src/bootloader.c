@@ -17,11 +17,11 @@
 #include <printf.h>
 
 static void send_byte(uint8 uc) {
-    uart_putc(uc);
+    uart_putc(uc, 0);
 }
 
 static uint8 get_byte(void) {
-    return uart_getc();
+    return uart_getc(0);
 }
 
 static uint32 get_uint(void) {
@@ -60,13 +60,15 @@ void module_main(void) {
 
     debug_enable(GPIO_ACT);
     debug_enable(GPIO_PWR);
-    debug_enable(GPIO_PIN26);
-    debug_enable(GPIO_PIN20);
+    debug_on(GPIO_PWR);
 
     uart_init();
 
     uint32 lastMessage = get_uint();
     while (lastMessage != SOH);
+
+    debug_off(GPIO_PWR);
+    debug_on(GPIO_ACT);
 
     uint32 numBytes = get_uint();
     uint32 msgCrc = get_uint();
@@ -80,26 +82,25 @@ void module_main(void) {
 
     uint32 bytesRead = 0;
     uint32 lastData = get_uint();
-    //bytesRead += 4;
 
     while (lastData != EOT) {
-        put_uint(lastData);
         put32((void*) (ARMBASE + bytesRead), lastData);
         bytesRead += 4;
         lastData = get_uint();
-        if (lastData == 0x40404040) {
-            debug_on(GPIO_ACT);
+        if(uart_errno == UART_ERR_TIMEOUT) {
+            debug_off(GPIO_ACT);
+            debug_on(GPIO_PWR);
+            reboot();
+            return;
         }
-//        if(uart_errno == UART_ERR_TIMEOUT) {
-//            reboot();
-//            return;
-//        }
     }
 
 
     if (bytesRead != numBytes) die(SIZE_MISMATCH);
 
     if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(NAK);
+
+    debug_off(GPIO_ACT);
 
     put_uint(ACK);
 
@@ -108,6 +109,11 @@ void module_main(void) {
     // I believe it's b/c the code we call re-initializes the uart; could
     // disable that to make it a bit more clean.
     delay_ms(500);
+
+    debug_on(GPIO_PWR);
+    debug_off(GPIO_ACT);
+    debug_disable(GPIO_PWR);
+    debug_disable(GPIO_ACT);
 
     // run what client sent.
     BRANCHTO(ARMBASE);

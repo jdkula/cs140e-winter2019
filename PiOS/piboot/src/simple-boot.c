@@ -39,13 +39,13 @@ static uint32 get_uint(int fd) {
     u |= get_byte(fd) << 8;
     u |= get_byte(fd) << 16;
     u |= get_byte(fd) << 24;
-        printf("< %#010x\n", u);
+//    printf("< %#010x\n", u);
     return u;
 }
 
 void put_uint(int fd, uint32 u) {
     // mask not necessary.
-        printf("> %#010x\n", u);
+//    printf("> %#010x\n", u);
     send_byte(fd, (u >> 0) & 0xff);
     send_byte(fd, (u >> 8) & 0xff);
     send_byte(fd, (u >> 16) & 0xff);
@@ -54,7 +54,7 @@ void put_uint(int fd, uint32 u) {
 
 // simple utility function to check that a u32 read from the 
 // file descriptor matches <v>.
-void expect(const char *msg, int fd, uint32 v) {
+void expect(const char* msg, int fd, uint32 v) {
     uint32 x = get_uint(fd);
     if (x != v)
         panic("%s: expected %x, got %x\n", msg, v, x);
@@ -62,7 +62,7 @@ void expect(const char *msg, int fd, uint32 v) {
 
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
-void simple_boot(int fd, const uint8 *buf, uint32 n) {
+void simple_boot(int fd, const uint8* buf, uint32 n) {
     uint32 nCrc = crc32(&n, 4);
     uint32 bufCrc = crc32(buf, n);
 
@@ -79,19 +79,13 @@ void simple_boot(int fd, const uint8 *buf, uint32 n) {
     expect("Pi Echoes Data CRC", fd, bufCrc);
     printf("Data CRC verified... %#010x\n", bufCrc);
 
-    const uint32 *intBuf = (const uint32 *) (buf);
+    const uint32* intBuf = (const uint32*) (buf);
     uint32 intBufSize = n / 4;
     printf("File info: %u bytes / %u chunks\n", n, intBufSize);
 
-    uint32 sent = 0;
     for (int i = 0; i < intBufSize; i++) {
         put_uint(fd, intBuf[i]);
-        sent++;
-        uint32 echo = get_uint(fd);
-        if(echo != intBuf[i]) {
-            fprintf(stderr, "Echo failed: Sent %#010x, Recv %#010x\n", intBuf[i], echo);
-        }
-        printf("Sent %u/%u (%d%%) chunks\n", sent, intBufSize, (sent * 100) / intBufSize);
+        printf("Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
     }
 
     printf("\nSent all data...\n");
