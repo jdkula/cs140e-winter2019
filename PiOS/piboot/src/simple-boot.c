@@ -39,13 +39,13 @@ static uint32 get_uint(int fd) {
     u |= get_byte(fd) << 8;
     u |= get_byte(fd) << 16;
     u |= get_byte(fd) << 24;
-//        printf("< %#010x\n", u);
+        printf("< %#010x\n", u);
     return u;
 }
 
 void put_uint(int fd, uint32 u) {
     // mask not necessary.
-//        printf("> %#010x\n", u);
+        printf("> %#010x\n", u);
     send_byte(fd, (u >> 0) & 0xff);
     send_byte(fd, (u >> 8) & 0xff);
     send_byte(fd, (u >> 16) & 0xff);
@@ -79,8 +79,6 @@ void simple_boot(int fd, const uint8 *buf, uint32 n) {
     expect("Pi Echoes Data CRC", fd, bufCrc);
     printf("Data CRC verified... %#010x\n", bufCrc);
 
-    sleep(2);
-
     const uint32 *intBuf = (const uint32 *) (buf);
     uint32 intBufSize = n / 4;
     printf("File info: %u bytes / %u chunks\n", n, intBufSize);
@@ -89,7 +87,11 @@ void simple_boot(int fd, const uint8 *buf, uint32 n) {
     for (int i = 0; i < intBufSize; i++) {
         put_uint(fd, intBuf[i]);
         sent++;
-        printf("Sent %u/%u (%d%%) chunks\r", sent, intBufSize, (sent * 100) / intBufSize);
+        uint32 echo = get_uint(fd);
+        if(echo != intBuf[i]) {
+            fprintf(stderr, "Echo failed: Sent %#010x, Recv %#010x\n", intBuf[i], echo);
+        }
+        printf("Sent %u/%u (%d%%) chunks\n", sent, intBufSize, (sent * 100) / intBufSize);
     }
 
     printf("\nSent all data...\n");

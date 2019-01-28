@@ -83,9 +83,13 @@ void module_main(void) {
     //bytesRead += 4;
 
     while (lastData != EOT) {
+        put_uint(lastData);
         put32((void*) (ARMBASE + bytesRead), lastData);
         bytesRead += 4;
         lastData = get_uint();
+        if (lastData == 0x40404040) {
+            debug_on(GPIO_ACT);
+        }
 //        if(uart_errno == UART_ERR_TIMEOUT) {
 //            reboot();
 //            return;
@@ -93,10 +97,9 @@ void module_main(void) {
     }
 
 
+    if (bytesRead != numBytes) die(SIZE_MISMATCH);
 
-    if (bytesRead != numBytes) die(0xFF1);
-
-    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(0xFF2);
+    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(NAK);
 
     put_uint(ACK);
 
