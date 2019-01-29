@@ -111,7 +111,7 @@ void check_success(Q_t replay_log, char *argv[]) {
 int main(int argc, char *argv[]) { 
 	demand(argc > 1, no arguments?);
 
-	const int N = 1;
+	const int N = 1000;
 	srandom(0); 	// so everyone has the same.
 	struct Q q = read_input(stdin, 0);
 

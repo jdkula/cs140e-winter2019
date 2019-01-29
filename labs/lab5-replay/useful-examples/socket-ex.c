@@ -31,6 +31,15 @@ void parent(int fd, int pid) {
 
 	// read() of closed socket = EOF, which means ret == 0.  ret < 0
 	// is some other error.
+  fd_set set;
+  FD_ZERO(&set);
+  FD_SET(fd, &set);
+  struct timeval t;
+  t.tv_sec = 1;
+  t.tv_usec = 0;
+
+  select(fd + 1, &set, NULL, NULL, &t);
+
 	if((ret = read(fd, &val, 4)) != 0)
 		panic("expected EOF, got: %d\n", ret);
 
@@ -62,6 +71,7 @@ void child(int fd) {
 		printf("\tchild received val=%d\n", val);
 	}
 	printf("child done with loop\n");
+  *((volatile char*)(0x0));
 	exit(10);
 }
 
@@ -70,18 +80,19 @@ int main(void) {
         if(socketpair(PF_LOCAL, SOCK_STREAM, 0, sock) < 0)
                 sys_die(socketpair, failed);
 
-	int pid;
-	if((pid = fork()) < 0)
-		sys_die(fork, fork failed);
+  int pid;
+  if((pid = fork()) < 0)
+    sys_die(fork, fork failed);
 
-	if(pid != 0) {
-		if(close(sock[1]) < 0)
-			sys_die(close, impossible);
-		parent(sock[0], pid);
-	} else {
-		if(close(sock[0]) < 0)
-			sys_die(close, close failed?);
-		child(sock[1]);
-	} 
+  if(pid != 0) {
+    if(close(sock[1]) < 0)
+      sys_die(close, impossible);
+    parent(sock[0], pid);
+  } else {
+    if(close(sock[0]) < 0)
+      sys_die(close, close failed?);
+    child(sock[1]);
+  }
 	return 0;
+
 }

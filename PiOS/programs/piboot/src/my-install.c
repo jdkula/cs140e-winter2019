@@ -90,7 +90,7 @@ static void echo(int fd, const char* portname) {
     }
 }
 
-#ifndef IS_LIBRARY
+//#ifndef IS_LIBRARY
 // usage: my-install [-silent] [/<dev path>]  progname
 int main(int argc, char* argv[]) {
     const char* name = "kernel.img";
@@ -149,7 +149,8 @@ int main(int argc, char* argv[]) {
         echo(fd, portname);
     }
     fprintf(stderr, "my-install: Done!\n");
+    close(fd);
     return 0;
 }
 
-#endif
+//#endif

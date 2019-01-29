@@ -50,7 +50,7 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
 
     set(INCLUDE_DIRECTORIES include)
 
-    set(DEPENDENCIES libboot)
+    set(DEPENDENCIES libboot libpreprocessor)
 
     ## Output is controlled by ${EXE_OUT_DIR}
 

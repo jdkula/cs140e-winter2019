@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <boot-messages.h>
 
-#include "../../../lib/libpreprocessor/include-common/demand.h"
+#include <demand.h>
 #include "support.h"
 
 // read entire file into buffer.  return it, write totat bytes to <size>

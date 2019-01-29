@@ -11,8 +11,8 @@
 
 #include <crc32.h>
 #include <boot-messages.h>
+#include <demand.h>
 
-#include "../../../lib/libpreprocessor/include-common/demand.h"
 #include "support.h"
 #include "trace.h"
 
@@ -47,7 +47,7 @@ static uint32 get_uint(int fd) {
 
 void put_uint(int fd, uint32 u) {
     // mask not necessary.
-//    fprintf(stderr, "> %#010x\n", u);
+//    //fprintf(stderr, "> %#010x\n", u);
     send_byte(fd, (u >> 0) & 0xff);
     send_byte(fd, (u >> 8) & 0xff);
     send_byte(fd, (u >> 16) & 0xff);
@@ -68,8 +68,7 @@ void expect(const char* msg, int fd, uint32 v) {
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
 void simple_boot(int fd, const uint8* buf, uint32 n) {
-    trace_turn_on_raw();
-
+//    *((volatile char*)(0x0));
     uint32 nCrc = crc32(&n, 4);
     uint32 bufCrc = crc32(buf, n);
 
@@ -78,30 +77,30 @@ void simple_boot(int fd, const uint8* buf, uint32 n) {
     put_uint(fd, bufCrc);
 
     expect("Pi echoes SOH", fd, SOH);
-    fprintf(stderr, "SOH received...\n");
+    //fprintf(stderr, "SOH received...\n");
 
     expect("Pi Echoes Byte Number CRC", fd, nCrc);
-    fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
+    //fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
 
     expect("Pi Echoes Data CRC", fd, bufCrc);
-    fprintf(stderr, "Data CRC verified... %#010x\n", bufCrc);
+    //fprintf(stderr, "Data CRC verified... %#010x\n", bufCrc);
 
     put_uint(fd, ACK);  // We're good to go!
 
     const uint32* intBuf = (const uint32*) (buf);
     uint32 intBufSize = n / 4;
-    fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
+    //fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
 
     for (int i = 0; i < intBufSize; i++) {
         put_uint(fd, intBuf[i]);
-        fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
+        //fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
     }
 
-    fprintf(stderr, "\nSent all data...\n");
+    //fprintf(stderr, "\nSent all data...\n");
 
     put_uint(fd, EOT);
-    fprintf(stderr, "Sent EOT...\n");
+    //fprintf(stderr, "Sent EOT...\n");
 
     expect("Pi Sends ACK", fd, ACK);
-    fprintf(stderr, "Received ACK!\n");
+    //fprintf(stderr, "Received ACK!\n");
 }

@@ -40,24 +40,24 @@ static unsigned corrupt32(unsigned v) {
  *		c. return endpoint.
  */
 
-#define safe_sys(...) if((__VA_ARGS__) < 0) { sys_die(__VA_ARGS__, somehow failed); }
+#define SAFE_SYS(...) if((__VA_ARGS__) < 0) { sys_die(__VA_ARGS__, somehow failed); }
 
 endpoint_t mk_endpoint_proc(const char* name, Q_t q, char* argv[]) {
     int pid;
     int sock[2];
 
-    safe_sys(socketpair(PF_LOCAL, SOCK_STREAM, 0, sock));
+    SAFE_SYS(socketpair(PF_LOCAL, SOCK_STREAM, 0, sock));
 
-    safe_sys(pid = fork());
+    SAFE_SYS(pid = fork());
 
     if (pid == 0) {
-        safe_sys(dup2(sock[1], TRACE_FD_REPLAY));
-        safe_sys(close(sock[0]));
+        SAFE_SYS(dup2(sock[1], TRACE_FD_REPLAY));
+        SAFE_SYS(close(sock[0]));
 
-        safe_sys(execvp(argv[0], argv));
+        SAFE_SYS(execvp(argv[0], argv));
     }
 
-    safe_sys(close(sock[1]));
+    SAFE_SYS(close(sock[1]));
 
 
     // this should sort-of follow your handoff code except you're using
@@ -79,19 +79,24 @@ static int proc_exit_code(endpoint_t* this) {
                 fail.);
     }
     if (!WIFEXITED(status)) {
-        return -1; // did not exit normally
+        err("Subprocess crashed.");
     }
     return WEXITSTATUS(status);
 }
 
-static void write_exact(endpoint_t* this, void* buf, int nbytes) {
+static void write_exact(endpoint_t* this, void* buf, int nbytes, int can_fail_p) {
     int n;
-    if ((n = write(this->fd, buf, nbytes)) < 0)
-        panic("i/o error writing to <%s> = <%s>\n",
-              this->name, strerror(errno));
-    demand(n == nbytes, something
-            is
-            wrong);
+    if ((n = write(this->fd, buf, nbytes)) < 0) {
+        if(!can_fail_p) {
+            panic("i/o error writing to <%s> = <%s>\n",
+                  this->name, strerror(errno));
+        }
+    }
+    if(!can_fail_p) {
+        demand(n == nbytes, something
+                is
+                wrong);
+    }
 }
 
 /*
@@ -109,7 +114,7 @@ int has_data(endpoint_t* this, unsigned timeout_secs) {
     FD_SET(this->fd, &rfds);
 
     int select_ret;
-    safe_sys(select_ret = select(this->fd + 1, &rfds, NULL, NULL, &t));
+    SAFE_SYS(select_ret = select(this->fd + 1, &rfds, NULL, NULL, &t));
 
     return select_ret != 0;
 }
@@ -127,14 +132,15 @@ int has_data(endpoint_t* this, unsigned timeout_secs) {
  *
  * Make sure you handle the case that the read() blocks!!
  */
-static int is_eof(endpoint_t* end) {
-    if (!has_data(end, timeout_secs))
+static int is_eof(endpoint_t* end, int can_fail_p) {
+    if (!has_data(end, timeout_secs) && !can_fail_p)
         err("process <%s> should have exited after 1 sec\n", end->name);
 
     char buf[1];
-    ssize_t read_return;
-    safe_sys(read_return = read(end->fd, buf, 1));
-    if (read_return != 0) panic("We didn't hit EOF!");
+    ssize_t read_return = read(end->fd, buf, 1);
+    if(read_return < 0 && !can_fail_p) {
+        sys_die(read, "Failed to get EOF!");
+    }
     return 1;
 }
 
@@ -157,10 +163,10 @@ static int read_exact(endpoint_t* e, void* buf, int n, int can_fail_p) {
 
         if (this_read < 0) {
             if (can_fail_p) return 0;
-            else err("Read failed!!");
+            else sys_die(read, "Read failed!!");
         }
 
-        if(this_read == 0) break;
+        if(this_read == 0) sys_die(read, "Read was short!");
         bytes_read += this_read;
     }
 
@@ -178,6 +184,8 @@ void replay(endpoint_t* end, int corrupt_op) {
     int can_fail_p = 0;
     int status = 0;
 
+    //signal(SIGPIPE, SIG_IGN);
+
     E_t* e = Q_start(&end->replay_log);
     for (int n = 0; e; e = Q_next(e), n++) {
         // note("about to do op= <%s:%d:%x>\n", op_to_s(e->op), e->cnt, e->val);
@@ -191,24 +199,25 @@ void replay(endpoint_t* end, int corrupt_op) {
         switch (e->op) {
             case OP_READ8: {
                 char data = e->val;
-                write_exact(end, &data, 1);
+                write_exact(end, &data, 1, can_fail_p);
                 break;
             }
 
                 // replay'd process is GET32'ing, so we write to socket.
             case OP_READ32: {
                 unsigned value = e->val;
-                if(n == corrupt_op)
+                if(n == corrupt_op) {
+                    can_fail_p = 1;
                     value = corrupt32(value);
-                write_exact(end, &value, 4);
+                }
+                write_exact(end, &value, 4, can_fail_p);
                 break;
             }
                 // replay'd process is PUT32'ing, so we read from socket.
             case OP_WRITE32:
                 assert(n != corrupt_op);
                 read_exact(end, &v, 4, can_fail_p);
-                fprintf(stderr, "Got %d, expected %d\n", v, e->val);
-                assert(v == e->val);
+                if(!can_fail_p) assert(v == e->val);
                 break;
             default:
                 panic("invalid op <%d>\n", e->op);
@@ -224,10 +233,12 @@ void replay(endpoint_t* end, int corrupt_op) {
         goto error;
     }
 
-    if (!is_eof(end))
+    if (!is_eof(end, can_fail_p))
         panic("expected eof: got nothing\n");
     else
         note("successful EOF\n");
+
+//    sleep(1);
 
     // We didn't corrupt anything: should exit with 0.
     // NOTE: if the process is in an infinite loop we will get stuck.
@@ -235,7 +246,12 @@ void replay(endpoint_t* end, int corrupt_op) {
         err("process exited with %d, expected 0\n", status);
     else
         note("SUCCESS: process exited with %d\n", status);
+
+    //usleep(100);
+
     return;
+
+
 
     error:
     // hit an error case.
