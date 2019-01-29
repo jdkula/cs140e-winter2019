@@ -18,11 +18,11 @@
 #include <pios-macros.h>
 
 static void send_byte(uint8 uc) {
-    uart_putc(uc, 1000000);
+    uart_putc(uc, 0);
 }
 
 static uint8 get_byte(void) {
-    return uart_getc(1000000);
+    return uart_getc(0);
 }
 
 static uint32 get_uint(void) {
@@ -61,7 +61,7 @@ void bootloader_main(void) {
 
     gpio_set_output(GPIO_ACT);              // Enable ACT & PWR
     gpio_set_output(GPIO_PWR);
-    gpio_write(GPIO_PWR, HIGH);             // PWR on while waiting...
+    gpio_write(GPIO_PWR, LOW);             // PWR on while waiting...
 
     uart_init();                        // Enable UART
 
@@ -78,6 +78,10 @@ void bootloader_main(void) {
     uint32 nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
     put_uint(nCrc);                     // ...and send it back to verify.
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
+
+    if(get_uint() == NAK) {             // If the UNIX
+        die(NAK);
+    }
 
     uint32 bytesRead = 0;               // Get ready to read!
     uint32 lastData = get_uint();
@@ -98,7 +102,7 @@ void bootloader_main(void) {
     }
 
 
-    if (bytesRead != numBytes) die(SIZE_MISMATCH);
+    if (bytesRead != numBytes) die(NAK);
 
     if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(NAK);
 

@@ -35,6 +35,8 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             src/fatal.c
             src/simple-boot.c
             src/support.c
+            src/trace.c
+            src/tty.c
             )
 
     # Compile options
@@ -72,6 +74,16 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set_target_properties(piboot
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${EXE_OUT_DIR}"
+            )
+
+    add_library(piboot.lib STATIC ${SRC})
+
+    target_compile_options(piboot.lib PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(piboot.lib ${DEPENDENCIES})
+    target_include_directories(piboot.lib PUBLIC ${INCLUDE_DIRECTORIES})
+    set_target_properties(piboot.lib
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
             )
 
     ########################################

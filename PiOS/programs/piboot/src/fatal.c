@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "demand.h"
+#include "../../../lib/libpreprocessor/include-common/demand.h"
 
 void FFatal(const char *file, int line, const char *fmt, ...) {
         va_list args;

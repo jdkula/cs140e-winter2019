@@ -84,8 +84,10 @@ add_subdirectory(lib/libpreprocessor)
 add_subdirectory(modules/bootloader)
 add_subdirectory(modules/blink)
 
-# Pi Bootloader Client
-add_subdirectory(piboot)
+# Unix Programs
+add_subdirectory(programs/piboot)
+add_subdirectory(programs/handoff)
+add_subdirectory(programs/replay)
 
 # Tests
 add_subdirectory(test/memory-test)
@@ -103,7 +105,7 @@ add_custom_target(build_all ALL DEPENDS libpi bootloader blink)
 
 # Also make the bootloader client if we're compiling for x86
 if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    add_dependencies(build_all piboot)
+    add_dependencies(build_all piboot piboot.lib replay handoff)
 endif ()
 
 

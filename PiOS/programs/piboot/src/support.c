@@ -5,13 +5,13 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <boot-messages.h>
 
-#include <crc32.h>
-#include "demand.h"
+#include "../../../lib/libpreprocessor/include-common/demand.h"
 #include "support.h"
 
 // read entire file into buffer.  return it, write totat bytes to <size>
-uint8* read_file(int *size, const char *name) {
+unsigned char* read_file(int *size, const char *name) {
   struct stat fileStat;
   if(stat(name, &fileStat) < 0) {
     panic("Stat failed");
@@ -19,7 +19,7 @@ uint8* read_file(int *size, const char *name) {
   off_t fileSize = fileStat.st_size;
 
 
-  uint8* buf = malloc(fileSize);
+  unsigned char* buf = malloc(fileSize);
 
   int fileFd = open(name, O_RDONLY);
   if(fileFd < 0) {

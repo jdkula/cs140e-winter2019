@@ -30,7 +30,7 @@ add_library(${LIBRARY_NAME} STATIC ${SRC})
 target_include_directories(${LIBRARY_NAME} PUBLIC ${INCLUDE_DIRECTORIES})
 
 # Add target defines.
-target_compile_definitions(${LIBRARY_NAME} PRIVATE ${DEFINES})
+target_compile_definitions(${LIBRARY_NAME} PRIVATE ${DEFINES} IS_LIBRARY)
 
 # Commit compile and link options
 target_compile_options(${LIBRARY_NAME} PUBLIC ${COMPILE_OPTIONS})
