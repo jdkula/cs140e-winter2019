@@ -116,15 +116,21 @@ int main(int argc, char* argv[]) {
     unsigned char* program = read_file(&prog_nbytes, name);
 
     // open tty
-    int fd;
-    if ((fd = trace_get_fd()) < 0) {
-        fd = open_tty(&portname);
+    int* fds;
+    int writeFd;
+    int readFd;
+    if ((fds = trace_get_fd()) == NULL) {
+        fprintf(stderr, "Didn't get FDs...\n");
+        readFd = writeFd = open_tty(&portname);
 
         // set it to be 8n1  and 115200 baud
-        fd = set_tty_to_8n1(fd, B115200, 1);
+        readFd = writeFd = set_tty_to_8n1(readFd, B115200, 1);
 
         // giving the pi side a chance to get going.
         sleep(1);
+    } else {
+        readFd = fds[0];
+        writeFd = fds[1];
     }
 
     // XXX: it appears that sometimes garbage is left in the tty connection.
@@ -143,13 +149,14 @@ int main(int argc, char* argv[]) {
 #endif
     fprintf(stderr, "my-install: about to boot\n");
 
-    simple_boot(fd, program, prog_nbytes);
+    simple_boot(readFd, writeFd, program, prog_nbytes);
     if (print_p) {
         fprintf(stderr, "my-install: going to echo\n");
-        echo(fd, portname);
+        echo(readFd, portname);
     }
     fprintf(stderr, "my-install: Done!\n");
-    close(fd);
+    close(readFd);
+    close(writeFd);
     return 0;
 }
 

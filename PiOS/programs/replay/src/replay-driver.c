@@ -27,18 +27,20 @@
 // Need to change echo if you want this to happen.  It's feasible ---
 // just do GET8.
 
-endpoint_t mk_endpoint(const char *name, Q_t q, int fd, int pid) {
+endpoint_t mk_endpoint(const char *name, Q_t q, int read_fd, int write_fd, int pid) {
 	return (endpoint_t) 
 	{ 
 		.name = strdup(name), 
 		.replay_log = q,
-		.fd = fd,
+		.read_fd = read_fd,
+		.write_fd = write_fd,
 		.pid = pid
 	};
 }
 
 static void destroy_end(endpoint_t *e) {
-	close(e->fd);
+	close(e->read_fd);
+	close(e->write_fd);
 	kill(e->pid, SIGKILL);
 }
 
@@ -111,13 +113,15 @@ void check_success(Q_t replay_log, char *argv[]) {
 int main(int argc, char *argv[]) { 
 	demand(argc > 1, no arguments?);
 
-	const int N = 1000;
+	const int N = 500;
 	srandom(0); 	// so everyone has the same.
 	struct Q q = read_input(stdin, 0);
 
 	// run the successful attempt N times --- should be the same.
 	for(int i = 0; i < N; i++)
 		check_success(q, argv);
+
+	fprintf(stderr, "==== NOW CHECKING CRASHES ====\n");
 
 	// now try failures.  we iterate these N times as well, should
 	// get the same fails.

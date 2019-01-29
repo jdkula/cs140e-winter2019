@@ -2,7 +2,7 @@
 #define __TRACE_H__
 
 
-enum { TRACE_FD_REPLAY = 11, TRACE_FD_HANDOFF };
+enum { TRACE_FD_REPLAY_READ = 11, TRACE_FD_REPLAY_WRITE = 12, TRACE_FD_HANDOFF };
 
 enum {
         TRACE_PUT32=1111,
@@ -14,7 +14,7 @@ enum {
 void trace_turn_on_raw(void);
 
 // -1 if not active, otherwise the current trace fd.
-int trace_get_fd(void);
+int* trace_get_fd(void);
 
 // these emit only if some form of tracing is active.
 

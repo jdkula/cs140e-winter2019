@@ -38,7 +38,8 @@ struct E *Q_pop(struct Q *q);
 typedef struct endpoint {
         const char *name;  	// name of process.
         int pid;		// its pid
-        int fd;			// the bi-directional socket used to talk w/ it
+        int read_fd;
+        int write_fd;
         Q_t replay_log;		// the replay log we read in from input.
 } endpoint_t;
 
@@ -55,7 +56,7 @@ typedef struct endpoint {
         exit(1);                                \
 } while(0)
 
-endpoint_t mk_endpoint(const char *name, Q_t q, int fd, int pid);
+endpoint_t mk_endpoint(const char *name, Q_t q, int read_fd, int write_fd, int pid);
 
 // Your code
 endpoint_t mk_endpoint_proc(const char *name, Q_t q, char *argv[]);

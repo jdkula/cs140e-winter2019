@@ -40,30 +40,37 @@ static unsigned corrupt32(unsigned v) {
  *		c. return endpoint.
  */
 
-#define SAFE_SYS(...) if((__VA_ARGS__) < 0) { sys_die(__VA_ARGS__, somehow failed); }
+#define SAFE_SYS(...) if((__VA_ARGS__) < 0) { sys_die(#__VA_ARGS__, somehow failed); }
 
 endpoint_t mk_endpoint_proc(const char* name, Q_t q, char* argv[]) {
     int pid;
-    int sock[2];
+    int inpipes[2];
+    int outpipes[2];
 
-    SAFE_SYS(socketpair(PF_LOCAL, SOCK_STREAM, 0, sock));
+    SAFE_SYS(pipe(inpipes));
+    SAFE_SYS(pipe(outpipes));
 
     SAFE_SYS(pid = fork());
 
     if (pid == 0) {
-        SAFE_SYS(dup2(sock[1], TRACE_FD_REPLAY));
-        SAFE_SYS(close(sock[0]));
+        SAFE_SYS(dup2(inpipes[1], TRACE_FD_REPLAY_WRITE));
+        SAFE_SYS(dup2(outpipes[0], TRACE_FD_REPLAY_READ));
+        SAFE_SYS(close(inpipes[1]));
+        SAFE_SYS(close(outpipes[0]));
+        SAFE_SYS(close(outpipes[1]));
+        SAFE_SYS(close(inpipes[0]));
 
         SAFE_SYS(execvp(argv[0], argv));
     }
 
-    SAFE_SYS(close(sock[1]));
+    SAFE_SYS(close(inpipes[1]));
+    SAFE_SYS(close(outpipes[0]));
 
 
     // this should sort-of follow your handoff code except you're using
     // sockets.
 
-    return mk_endpoint(name, q, sock[0], pid);
+    return mk_endpoint(name, q, inpipes[0], outpipes[1], pid);
 }
 
 /*
@@ -85,8 +92,8 @@ static int proc_exit_code(endpoint_t* this) {
 }
 
 static void write_exact(endpoint_t* this, void* buf, int nbytes, int can_fail_p) {
-    int n;
-    if ((n = write(this->fd, buf, nbytes)) < 0) {
+    ssize_t n;
+    if ((n = write(this->write_fd, buf, nbytes)) < 0) {
         if(!can_fail_p) {
             panic("i/o error writing to <%s> = <%s>\n",
                   this->name, strerror(errno));
@@ -111,10 +118,10 @@ int has_data(endpoint_t* this, unsigned timeout_secs) {
 
     fd_set rfds;
     FD_ZERO(&rfds);
-    FD_SET(this->fd, &rfds);
+    FD_SET(this->read_fd, &rfds);
 
     int select_ret;
-    SAFE_SYS(select_ret = select(this->fd + 1, &rfds, NULL, NULL, &t));
+    SAFE_SYS(select_ret = select(this->read_fd + 1, &rfds, NULL, NULL, &t));
 
     return select_ret != 0;
 }
@@ -137,7 +144,7 @@ static int is_eof(endpoint_t* end, int can_fail_p) {
         err("process <%s> should have exited after 1 sec\n", end->name);
 
     char buf[1];
-    ssize_t read_return = read(end->fd, buf, 1);
+    ssize_t read_return = read(end->read_fd, buf, 1);
     if(read_return < 0 && !can_fail_p) {
         sys_die(read, "Failed to get EOF!");
     }
@@ -159,14 +166,13 @@ static int read_exact(endpoint_t* e, void* buf, int n, int can_fail_p) {
     size_t bytes_read = 0;
 
     while (bytes_read < n && has_data(e, timeout_secs)) {
-        ssize_t this_read = read(e->fd, char_buf + bytes_read, n - bytes_read);
+        ssize_t this_read = read(e->read_fd, char_buf + bytes_read, n - bytes_read);
 
-        if (this_read < 0) {
+        if (this_read <= 0) {
             if (can_fail_p) return 0;
             else sys_die(read, "Read failed!!");
         }
 
-        if(this_read == 0) sys_die(read, "Read was short!");
         bytes_read += this_read;
     }
 
@@ -208,6 +214,7 @@ void replay(endpoint_t* end, int corrupt_op) {
                 unsigned value = e->val;
                 if(n == corrupt_op) {
                     can_fail_p = 1;
+                    fprintf(stderr, "Corrupting now...\n");
                     value = corrupt32(value);
                 }
                 write_exact(end, &value, 4, can_fail_p);
@@ -217,7 +224,10 @@ void replay(endpoint_t* end, int corrupt_op) {
             case OP_WRITE32:
                 assert(n != corrupt_op);
                 read_exact(end, &v, 4, can_fail_p);
-                if(!can_fail_p) assert(v == e->val);
+                if(v != e->val) {
+                    if(can_fail_p) goto error;
+                    else err("Read data mismatch");
+                }
                 break;
             default:
                 panic("invalid op <%d>\n", e->op);
@@ -237,8 +247,6 @@ void replay(endpoint_t* end, int corrupt_op) {
         panic("expected eof: got nothing\n");
     else
         note("successful EOF\n");
-
-//    sleep(1);
 
     // We didn't corrupt anything: should exit with 0.
     // NOTE: if the process is in an infinite loop we will get stuck.
