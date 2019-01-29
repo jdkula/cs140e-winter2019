@@ -22,8 +22,8 @@
 #include <unistd.h>
 #include <termios.h>
 #include <boot-messages.h>
+#include <demand.h>
 
-#include "../../../lib/libpreprocessor/include-common/demand.h"
 #include "support.h"
 #include "trace.h"
 #include "tty.h"
@@ -117,20 +117,20 @@ int main(int argc, char* argv[]) {
 
     // open tty
     int* fds;
-    int writeFd;
-    int readFd;
+    int write_fd;
+    int read_fd;
     if ((fds = trace_get_fd()) == NULL) {
         fprintf(stderr, "Didn't get FDs...\n");
-        readFd = writeFd = open_tty(&portname);
+        read_fd = write_fd = open_tty(&portname);
 
         // set it to be 8n1  and 115200 baud
-        readFd = writeFd = set_tty_to_8n1(readFd, B115200, 1);
+        read_fd = write_fd = set_tty_to_8n1(read_fd, B115200, 1);
 
         // giving the pi side a chance to get going.
         sleep(1);
     } else {
-        readFd = fds[0];
-        writeFd = fds[1];
+        read_fd = fds[0];
+        write_fd = fds[1];
     }
 
     // XXX: it appears that sometimes garbage is left in the tty connection.
@@ -149,14 +149,14 @@ int main(int argc, char* argv[]) {
 #endif
     fprintf(stderr, "my-install: about to boot\n");
 
-    simple_boot(readFd, writeFd, program, prog_nbytes);
+    simple_boot(read_fd, write_fd, program, prog_nbytes);
     if (print_p) {
         fprintf(stderr, "my-install: going to echo\n");
-        echo(readFd, portname);
+        echo(read_fd, portname);
     }
     fprintf(stderr, "my-install: Done!\n");
-    close(readFd);
-    close(writeFd);
+    close(read_fd);
+    close(write_fd);
     return 0;
 }
 

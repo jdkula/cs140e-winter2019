@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-#include "../../../lib/libpreprocessor/include-common/demand.h"
+#include <demand.h>
 
 // XXX: if anyone figures out a cleaner way to do this, lmk.   I don't
 // have a mac, so stopped as soon as we had something that worked on 

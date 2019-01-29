@@ -9,8 +9,8 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <fcntl.h>
-
 #include <demand.h>
+
 #include "replay.h"
 #include "trace.h"
 
@@ -40,31 +40,29 @@ static unsigned corrupt32(unsigned v) {
  *		c. return endpoint.
  */
 
-#define SAFE_SYS(...) if((__VA_ARGS__) < 0) { sys_die(#__VA_ARGS__, somehow failed); }
-
 endpoint_t mk_endpoint_proc(const char* name, Q_t q, char* argv[]) {
     int pid;
-    int inpipes[2];
-    int outpipes[2];
+    int inpipes[2];  // Pipe going from the child to Replay
+    int outpipes[2]; // Pipe going from Replay to the child
 
-    SAFE_SYS(pipe(inpipes));
-    SAFE_SYS(pipe(outpipes));
+    safe_sys(pipe(inpipes));
+    safe_sys(pipe(outpipes));
 
-    SAFE_SYS(pid = fork());
+    safe_sys(pid = fork());
 
     if (pid == 0) {
-        SAFE_SYS(dup2(inpipes[1], TRACE_FD_REPLAY_WRITE));
-        SAFE_SYS(dup2(outpipes[0], TRACE_FD_REPLAY_READ));
-        SAFE_SYS(close(inpipes[1]));
-        SAFE_SYS(close(outpipes[0]));
-        SAFE_SYS(close(outpipes[1]));
-        SAFE_SYS(close(inpipes[0]));
+        safe_sys(dup2(inpipes[1], TRACE_FD_REPLAY_WRITE));
+        safe_sys(dup2(outpipes[0], TRACE_FD_REPLAY_READ));
+        safe_sys(close(inpipes[1]));
+        safe_sys(close(outpipes[0]));
+        safe_sys(close(outpipes[1]));
+        safe_sys(close(inpipes[0]));
 
-        SAFE_SYS(execvp(argv[0], argv));
+        safe_sys(execvp(argv[0], argv));
     }
 
-    SAFE_SYS(close(inpipes[1]));
-    SAFE_SYS(close(outpipes[0]));
+    safe_sys(close(inpipes[1]));
+    safe_sys(close(outpipes[0]));
 
 
     // this should sort-of follow your handoff code except you're using
@@ -86,7 +84,7 @@ static int proc_exit_code(endpoint_t* this) {
                 fail.);
     }
     if (!WIFEXITED(status)) {
-        err("Subprocess crashed.");
+        return -1;
     }
     return WEXITSTATUS(status);
 }
@@ -94,12 +92,12 @@ static int proc_exit_code(endpoint_t* this) {
 static void write_exact(endpoint_t* this, void* buf, int nbytes, int can_fail_p) {
     ssize_t n;
     if ((n = write(this->write_fd, buf, nbytes)) < 0) {
-        if(!can_fail_p) {
+        if (!can_fail_p) {
             panic("i/o error writing to <%s> = <%s>\n",
                   this->name, strerror(errno));
         }
     }
-    if(!can_fail_p) {
+    if (!can_fail_p) {
         demand(n == nbytes, something
                 is
                 wrong);
@@ -121,7 +119,7 @@ int has_data(endpoint_t* this, unsigned timeout_secs) {
     FD_SET(this->read_fd, &rfds);
 
     int select_ret;
-    SAFE_SYS(select_ret = select(this->read_fd + 1, &rfds, NULL, NULL, &t));
+    safe_sys(select_ret = select(this->read_fd + 1, &rfds, NULL, NULL, &t));
 
     return select_ret != 0;
 }
@@ -145,7 +143,7 @@ static int is_eof(endpoint_t* end, int can_fail_p) {
 
     char buf[1];
     ssize_t read_return = read(end->read_fd, buf, 1);
-    if(read_return < 0 && !can_fail_p) {
+    if (read_return < 0 && !can_fail_p) {
         sys_die(read, "Failed to get EOF!");
     }
     return 1;
@@ -170,7 +168,8 @@ static int read_exact(endpoint_t* e, void* buf, int n, int can_fail_p) {
 
         if (this_read <= 0) {
             if (can_fail_p) return 0;
-            else sys_die(read, "Read failed!!");
+            else
+                sys_die(read, "Read failed!!");
         }
 
         bytes_read += this_read;
@@ -212,7 +211,7 @@ void replay(endpoint_t* end, int corrupt_op) {
                 // replay'd process is GET32'ing, so we write to socket.
             case OP_READ32: {
                 unsigned value = e->val;
-                if(n == corrupt_op) {
+                if (n == corrupt_op) {
                     can_fail_p = 1;
                     fprintf(stderr, "Corrupting now...\n");
                     value = corrupt32(value);
@@ -224,9 +223,10 @@ void replay(endpoint_t* end, int corrupt_op) {
             case OP_WRITE32:
                 assert(n != corrupt_op);
                 read_exact(end, &v, 4, can_fail_p);
-                if(v != e->val) {
-                    if(can_fail_p) goto error;
-                    else err("Read data mismatch");
+                if (v != e->val) {
+                    if (can_fail_p) goto error;
+                    else
+                        err("Read data mismatch");
                 }
                 break;
             default:
@@ -258,7 +258,6 @@ void replay(endpoint_t* end, int corrupt_op) {
     //usleep(100);
 
     return;
-
 
 
     error:

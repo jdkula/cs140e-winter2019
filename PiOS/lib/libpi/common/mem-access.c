@@ -8,7 +8,7 @@
  */
 
 #include <integer.h>
-#include "../include-common/mem-access.h"
+#include "mem-access.h"
 
 uint32 setBit(uint32* addr, uint8 bitNum, uint32 value) {
     value = (value) & 0b1U; // ensure value is a single bit.

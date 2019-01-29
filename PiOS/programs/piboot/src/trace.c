@@ -6,7 +6,7 @@
 
 #include <assert.h>
 #include <signal.h>
-#include "../../../lib/libpreprocessor/include-common/demand.h"
+#include <demand.h>
 #include "trace.h"
 
 static int trace_fd_read = -1;

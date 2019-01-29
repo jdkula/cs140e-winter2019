@@ -7,6 +7,6 @@
 
 #include <integer.h>
 
-void simple_boot(int readFd, int writeFd, const uint8 *buf, uint32 n);
+void simple_boot(int read_fd, int write_fd, const uint8 *buf, uint32 n);
 
 #endif //PIOS_SIMPLE_BOOT_H

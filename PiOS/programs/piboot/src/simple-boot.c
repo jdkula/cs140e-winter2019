@@ -49,7 +49,7 @@ static uint32 get_uint(int fd) {
 
 void put_uint(int fd, uint32 u) {
     // mask not necessary.
-//    //fprintf(stderr, "> %#010x\n", u);
+//    fprintf(stderr, "> %#010x\n", u);
     send_byte(fd, (u >> 0) & 0xff);
     send_byte(fd, (u >> 8) & 0xff);
     send_byte(fd, (u >> 16) & 0xff);
@@ -59,50 +59,49 @@ void put_uint(int fd, uint32 u) {
 
 // simple utility function to check that a u32 read from the 
 // file descriptor matches <v>.
-void expect(const char* msg, int readFd, int writeFd, uint32 v) {
-    uint32 x = get_uint(readFd);
+void expect(const char* msg, int read_fd, int write_fd, uint32 v) {
+    uint32 x = get_uint(read_fd);
     if (x != v) {
-        put_uint(writeFd, NAK);
+        put_uint(write_fd, NAK);
         panic("%s: expected %x, got %x\n", msg, v, x);
     }
 }
 
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
-void simple_boot(int readFd, int writeFd, const uint8* buf, uint32 n) {
-//    *((volatile char*)(0x0));
+void simple_boot(int read_fd, int write_fd, const uint8* buf, uint32 n) {
     uint32 nCrc = crc32(&n, 4);
     uint32 bufCrc = crc32(buf, n);
 
-    put_uint(writeFd, SOH);
-    put_uint(writeFd, n);
-    put_uint(writeFd, bufCrc);
+    put_uint(write_fd, SOH);
+    put_uint(write_fd, n);
+    put_uint(write_fd, bufCrc);
 
-    expect("Pi echoes SOH", readFd, writeFd, SOH);
-    //fprintf(stderr, "SOH received...\n");
+    expect("Pi echoes SOH", read_fd, write_fd, SOH);
+    fprintf(stderr, "SOH received...\n");
 
-    expect("Pi Echoes Byte Number CRC", readFd, writeFd, nCrc);
-    //fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
+    expect("Pi Echoes Byte Number CRC", read_fd, write_fd, nCrc);
+    fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
 
-    expect("Pi Echoes Data CRC", readFd, writeFd, bufCrc);
-    //fprintf(stderr, "Data CRC verified... %#010x\n", bufCrc);
+    expect("Pi Echoes Data CRC", read_fd, write_fd, bufCrc);
+    fprintf(stderr, "Data CRC verified... %#010x\n", bufCrc);
 
-    put_uint(writeFd, ACK);  // We're good to go!
+    put_uint(write_fd, ACK);  // We're good to go!
 
     const uint32* intBuf = (const uint32*) (buf);
     uint32 intBufSize = n / 4;
-    //fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
+    fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
 
     for (int i = 0; i < intBufSize; i++) {
-        put_uint(writeFd, intBuf[i]);
-        //fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
+        put_uint(write_fd, intBuf[i]);
+        fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
     }
 
-    //fprintf(stderr, "\nSent all data...\n");
+    fprintf(stderr, "\nSent all data...\n");
 
-    put_uint(writeFd, EOT);
-    //fprintf(stderr, "Sent EOT...\n");
+    put_uint(write_fd, EOT);
+    fprintf(stderr, "Sent EOT...\n");
 
-    expect("Pi Sends ACK", readFd, writeFd, ACK);
-    //fprintf(stderr, "Received ACK!\n");
+    expect("Pi Sends ACK", read_fd, write_fd, ACK);
+    fprintf(stderr, "Received ACK!\n");
 }

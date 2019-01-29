@@ -39,7 +39,7 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             -g
             -lm)
 
-    set(INCLUDE_DIRECTORIES include)
+    set(INCLUDE_DIRECTORIES)
 
     set(DEPENDENCIES libpreprocessor piboot.lib)
 

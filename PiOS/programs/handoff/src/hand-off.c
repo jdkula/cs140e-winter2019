@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <termios.h>
+#include <pios-macros.h>
 
 #include "trace.h"
 #include "tty.h"
@@ -17,9 +18,7 @@
 // synchronously wait for <pid> to exit.  Return its exit code.
 static int exit_code(int pid) {
     int status;
-    if(waitpid(pid, &status, 0) < 0) {
-        sys_die(waitpid, should never fail.);
-    }
+    safe_sys(waitpid(pid, &status, 0));
     if(!WIFEXITED(status)) {
         return -1; // did not exit normally
     }
@@ -40,21 +39,13 @@ static int exit_code(int pid) {
 void run(int fd, char *argv[]) {
 	int pid = 0;
 
-	if((pid = fork()) < 0) {
-	    sys_die(fork, should never fail.);
-	}
+	safe_sys(pid = fork());
 
 	if(pid == 0) {
-	    if(dup2(fd, TRACE_FD_HANDOFF) < 0) {
-	        sys_die(dup2, did not work!);
-	    }
-	    if(close(fd) < 0) {
-	        sys_die(close, somehow failed);
-	    }
+	    safe_sys(dup2(fd, TRACE_FD_HANDOFF));
+	    safe_sys(close(fd));
+	    safe_sys(execvp(argv[0], argv));
 
-	    if(execvp(argv[0], argv) < 0) {
-	        sys_die(execvp, failed somehow);
-	    }
 	    return;
 	}
 

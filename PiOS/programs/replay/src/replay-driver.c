@@ -113,15 +113,13 @@ void check_success(Q_t replay_log, char *argv[]) {
 int main(int argc, char *argv[]) { 
 	demand(argc > 1, no arguments?);
 
-	const int N = 500;
+	const int N = 1000000;
 	srandom(0); 	// so everyone has the same.
 	struct Q q = read_input(stdin, 0);
 
 	// run the successful attempt N times --- should be the same.
 	for(int i = 0; i < N; i++)
 		check_success(q, argv);
-
-	fprintf(stderr, "==== NOW CHECKING CRASHES ====\n");
 
 	// now try failures.  we iterate these N times as well, should
 	// get the same fails.
