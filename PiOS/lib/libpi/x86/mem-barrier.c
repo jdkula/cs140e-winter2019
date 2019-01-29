@@ -3,17 +3,19 @@
  * File: mem-barrier.c [X86 Implementation]
  * --------------
  * Since our faux memory model already has sequential
- * consistency, we just have no-op functions here so
- * there are no linker errors. The compiler should just
- * completely eliminate these functions during compilation.
+ * consistency, we just implement event handlers here
+ * so that they can be taken into account in test harnesses.
  */
 
 #include "mem-barrier.h"
+#include "mem-x86-extensions.h"
+
+memory_barrier_handler_t mem_on_barrier = 0;
 
 void data_memory_barrier(void) {
-    // No-op
+    if(mem_on_barrier != 0) mem_on_barrier();
 }
 
 void data_sync_barrier(void) {
-    // No-op
+    if(mem_on_barrier != 0) mem_on_barrier();
 }

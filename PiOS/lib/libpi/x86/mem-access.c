@@ -9,32 +9,29 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include-common/mem-access.h"
+#include "mem-access.h"
+#include "mem-x86-extensions.h"
 
-/** Defines the max number of unique addresses that can store a value. */
-#define MEMORY_CHUNKS 65565
-
-/**
- * Defines a memory entry;
- * addr: Where in the Raspberry Pi's memory the value would have gone.
- * val: The value stored there.
- */
-typedef struct {
-    void* addr;
-    uint32 val;
-} mem_t;
-
-/** The representation of memory. */
-mem_t MEM[MEMORY_CHUNKS];
+/** The faux representation of memory. */
+mem_t ram_emulated[MEMORY_CHUNKS];
 uint32 chunksUsed = 0;
 
-/** Prints each read and write so solutions can be compared across students. */
-static void print_write(mem_t* m) {
-    printf("\tWRITE:addr=%p, val=%u\n", m->addr, m->val);
+/** Event handler storage. A value of NULL disables the handler. */
+memory_operation_handler_t mem_on_write = NULL;
+memory_operation_handler_t mem_on_read = NULL;
+
+/** Invokes the on-write handler if it's defined. */
+static void on_write(mem_t* info) {
+    if(mem_on_write != NULL) {
+        mem_on_write(info);
+    }
 }
 
-static void print_read(mem_t* m) {
-    printf("\tREAD:addr=%p, val=%u\n", m->addr, m->val);
+/** Invokes the on-read handler if it's defined. */
+static void on_read(mem_t* info) {
+    if(mem_on_read != NULL) {
+        mem_on_read(info);
+    }
 }
 
 void put32(void* addr, uint32 data) {
@@ -45,39 +42,38 @@ void put32(void* addr, uint32 data) {
 
     // Search through the array, searching for something already stored.
     for (uint32 i = 0; i < chunksUsed; i++) {
-        if (MEM[i].addr == addr) {
-            MEM[i].val = data;
-            print_write(MEM + i);
+        if (ram_emulated[i].addr == addr) {
+            ram_emulated[i].val = data;
+            on_write(ram_emulated + i);
             return;
         }
     }
 
     // Otherwise, go ahead and create a new entry.
-    MEM[chunksUsed].addr = addr;
-    MEM[chunksUsed].val = data;
-    print_write(MEM + chunksUsed);
+    ram_emulated[chunksUsed].addr = addr;
+    ram_emulated[chunksUsed].val = data;
+    on_write(ram_emulated + chunksUsed);
     chunksUsed++;
-
 }
 
 uint32 get32(void* addr) {
 
     // Search to see if we've already stored a value for this address.
     for (uint32 i = 0; i < chunksUsed; i++) {
-        if (MEM[i].addr == addr) {
-            print_read(MEM + i);
-            return MEM[i].val;
+        if (ram_emulated[i].addr == addr) {
+            on_read(ram_emulated + i);
+            return ram_emulated[i].val;
         }
     }
 
     // If not, create a new chunk and initialize it randomly.
-    MEM[chunksUsed].addr = (void*) addr;
-    MEM[chunksUsed].val = random();
-    //print_write(MEM + chunksUsed);
+    ram_emulated[chunksUsed].addr = (void*) addr;
+    ram_emulated[chunksUsed].val = random();
+    //print_write(ram_emulated + chunksUsed);
     chunksUsed++;
 
-    print_read(MEM + chunksUsed - 1);
-    return MEM[chunksUsed - 1].val;
+    on_read(ram_emulated + chunksUsed - 1);
+    return ram_emulated[chunksUsed - 1].val;
 }
 
 // Get Program Counter

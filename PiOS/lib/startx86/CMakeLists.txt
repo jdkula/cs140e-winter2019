@@ -34,16 +34,35 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     ########################################
 
     # Source Files
-    set(SRC x86/start.c)
+    get_filename_component(START_FULL x86/start.c REALPATH)
 
-    set(INCLUDE_DIRECTORIES include-common)
-
+    set(DEPENDENCIES libpreprocessor)
 
     ########################################
     #> End Build Variable Setup           <#
     ########################################
 
-    include(${CMAKE_INCLUDE_DIR}/library.cmake)
+    ########################################
+    # Library Setup                        #
+    ########################################
+
+    add_library(${LIBRARY_NAME} INTERFACE)
+
+    target_sources(${LIBRARY_NAME} INTERFACE ${START_FULL})
+
+    # Add include directories and share them with dependants.
+    target_include_directories(${LIBRARY_NAME} INTERFACE ${INCLUDE_DIRECTORIES})
+
+    # Link libraries
+    target_link_libraries(${LIBRARY_NAME} INTERFACE ${DEPENDENCIES})
+
+    # Commit compile and link options
+    target_compile_options(${LIBRARY_NAME} INTERFACE ${COMPILE_OPTIONS})
+
+
+    ########################################
+    #> End Library Setup                  <#
+    ########################################
 
 
 else ()

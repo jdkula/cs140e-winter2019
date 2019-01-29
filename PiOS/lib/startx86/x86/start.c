@@ -6,8 +6,14 @@
  * Needed to properly build an executable on x86.
  */
 
-int module_main();
+#include <pios-macros.h>
+
+#ifndef MODULE_NAME
+#error "MODULE_NAME must be defined for startx86"
+#endif
+
+extern int MODULE_MAIN();
 
 int main() {
-    return module_main();
+    return MODULE_MAIN();
 }

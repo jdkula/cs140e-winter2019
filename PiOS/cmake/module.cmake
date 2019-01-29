@@ -1,5 +1,5 @@
 ##########
-# CS140E: Library CMake Snippet
+# CS140E: Module CMake Snippet
 # Jonathan Kula
 # Winter 2019
 #
@@ -9,7 +9,7 @@
 #
 # This file should be included in the project's CMakeLists.txt
 # This file expends the following environment variables to be present:
-# MODULE_NAME - The name of the library
+# MODULE_NAME - The name of the module
 # SRC - List of source files
 # SYSTEM_INCLUDE_DIRECTORIES [optional] - List of directories to include as system includes.
 # INCLUDE_DIRECTORIES [optional] - List of directories to include
@@ -27,23 +27,22 @@
 
 get_filename_component(LINKER_SCRIPT_ABSOLUTE "${LINKER_SCRIPT}" REALPATH)
 
-message(STATUS "+-+-+-+-+ Building ${MODULE_NAME} +-+-+-+-+")
-message(STATUS "+ MODULE_NAME - ${MODULE_NAME}")
-message(STATUS "+ SRC - ${SRC}")
-message(STATUS "+ SYSTEM_INCLUDE_DIRECTORIES - ${SYSTEM_INCLUDE_DIRECTORIES}")
-message(STATUS "+ INCLUDE_DIRECTORIES - ${INCLUDE_DIRECTORIES}")
-message(STATUS "+ DEFINES - ${DEFINES}")
-message(STATUS "+ COMPILE_OPTIONS - ${COMPILE_OPTIONS}")
-message(STATUS "+ LINK_OPTIONS - ${LINK_OPTIONS}")
-message(STATUS "+ LINKER_SCRIPT - ${LINKER_SCRIPT}")
-message(STATUS "+ LINKER_SCRIPT_ABSOLUTE - ${LINKER_SCRIPT_ABSOLUTE}")
-message(STATUS "+ DEPENDENCIES - ${DEPENDENCIES}")
-message(STATUS "+ EXE_OUT_DIR - ${EXE_OUT_DIR}")
-message(STATUS "+ IMAGE_OUTPUT_DIRECTORY - ${IMAGE_OUTPUT_DIRECTORY}")
-message(STATUS "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")
+#message(STATUS "+-+-+-+-+ Building ${MODULE_NAME} +-+-+-+-+")
+#message(STATUS "+ MODULE_NAME - ${MODULE_NAME}")
+#message(STATUS "+ SRC - ${SRC}")
+#message(STATUS "+ SYSTEM_INCLUDE_DIRECTORIES - ${SYSTEM_INCLUDE_DIRECTORIES}")
+#message(STATUS "+ INCLUDE_DIRECTORIES - ${INCLUDE_DIRECTORIES}")
+#message(STATUS "+ DEFINES - ${DEFINES}")
+#message(STATUS "+ COMPILE_OPTIONS - ${COMPILE_OPTIONS}")
+#message(STATUS "+ LINK_OPTIONS - ${LINK_OPTIONS}")
+#message(STATUS "+ LINKER_SCRIPT - ${LINKER_SCRIPT}")
+#message(STATUS "+ LINKER_SCRIPT_ABSOLUTE - ${LINKER_SCRIPT_ABSOLUTE}")
+#message(STATUS "+ DEPENDENCIES - ${DEPENDENCIES}")
+#message(STATUS "+ EXE_OUT_DIR - ${EXE_OUT_DIR}")
+#message(STATUS "+ IMAGE_OUTPUT_DIRECTORY - ${IMAGE_OUTPUT_DIRECTORY}")
+#message(STATUS "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")
 
 if (EXISTS "${LINKER_SCRIPT_ABSOLUTE}")
-    message(STATUS "LINKER SCRIPT IN USE FOR ${MODULE_NAME} AT ${LINKER_SCRIPT_ABSOLUTE}")
     list(APPEND LINK_OPTIONS "-T${LINKER_SCRIPT_ABSOLUTE}")
 endif ()
 
@@ -62,6 +61,11 @@ add_executable(${MODULE_NAME}.exec ${SRC})
 target_compile_options(${MODULE_NAME}.exec PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(${MODULE_NAME}.exec SYSTEM PUBLIC ${SYSTEM_INCLUDE_DIRECTORIES})
 target_include_directories(${MODULE_NAME}.exec PUBLIC ${INCLUDE_DIRECTORIES})
+
+if (NOT "${DEFINES}" MATCHES ".*MODULE_NAME.*")
+    list(APPEND DEFINES "MODULE_NAME=${MODULE_NAME}")
+endif ()
+
 target_compile_definitions(${MODULE_NAME}.exec PRIVATE ${DEFINES})
 
 # Link dependencies and add linker arguments (target_link_options only supported in CMake >3.13)

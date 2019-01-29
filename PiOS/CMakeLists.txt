@@ -77,6 +77,8 @@ add_subdirectory(lib/libdebug)
 add_subdirectory(lib/libtypes)
 add_subdirectory(lib/libboot)
 add_subdirectory(lib/libpi)
+add_subdirectory(lib/libtest)
+add_subdirectory(lib/libpreprocessor)
 
 # Pi Modules
 add_subdirectory(modules/bootloader)
@@ -84,6 +86,9 @@ add_subdirectory(modules/blink)
 
 # Pi Bootloader Client
 add_subdirectory(piboot)
+
+# Tests
+add_subdirectory(test/memory-test)
 
 ########################################
 #> End Submodule Setup                <#

@@ -3,5 +3,5 @@
 .globl _start
 _start:
     mov sp,#0x8000
-    bl module_main
+    bl blink_main
 hang: b hang

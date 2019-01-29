@@ -41,4 +41,5 @@ void put32(void* addr, uint32 data);
 /** Gets whatever data is at the given [addr]. */
 uint32 get32(void* addr);
 
+
 #endif //PIOS_MEM_ACCESS_H

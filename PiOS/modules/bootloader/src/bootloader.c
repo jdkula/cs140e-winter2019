@@ -15,13 +15,14 @@
 #include <debug.h>
 #include <boot-messages.h>
 #include <printf.h>
+#include <pios-macros.h>
 
 static void send_byte(uint8 uc) {
-    uart_putc(uc, 0);
+    uart_putc(uc, 1000000);
 }
 
 static uint8 get_byte(void) {
-    return uart_getc(0);
+    return uart_getc(1000000);
 }
 
 static uint32 get_uint(void) {
@@ -55,41 +56,42 @@ static void die(uint32 code) {
 //	8. jump to ARMBASE.
 //
 
-void module_main(void) {
-    gpio_init();
+void bootloader_main(void) {
+    gpio_init();                            // Initialize diagnostic gpio.
 
-    debug_enable(GPIO_ACT);
-    debug_enable(GPIO_PWR);
-    debug_on(GPIO_PWR);
+    gpio_set_output(GPIO_ACT);              // Enable ACT & PWR
+    gpio_set_output(GPIO_PWR);
+    gpio_write(GPIO_PWR, HIGH);             // PWR on while waiting...
 
-    uart_init();
+    uart_init();                        // Enable UART
 
-    uint32 lastMessage = get_uint();
-    while (lastMessage != SOH);
+    while (get_uint() != SOH);          // Wait until SOH. Discard other input.
 
-    debug_off(GPIO_PWR);
-    debug_on(GPIO_ACT);
+    gpio_write(GPIO_PWR, LOW);              // Swap PWR and ACT to indicate we're taking in data.
+    gpio_write(GPIO_ACT, HIGH);
 
-    uint32 numBytes = get_uint();
-    uint32 msgCrc = get_uint();
+    uint32 numBytes = get_uint();       // Take in the number of bytes.
+    uint32 msgCrc = get_uint();         // Take in the message checksum.
 
-    put_uint(SOH);
+    put_uint(SOH);                      // Let the client know we've got the message
 
-    uint32 bytesCrc = crc32(&numBytes, 4);
-    put_uint(bytesCrc);
+    uint32 nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
+    put_uint(nCrc);                     // ...and send it back to verify.
+    put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
-    put_uint(msgCrc);
-
-    uint32 bytesRead = 0;
+    uint32 bytesRead = 0;               // Get ready to read!
     uint32 lastData = get_uint();
 
     while (lastData != EOT) {
+        IGNORE(-Wint-to-pointer-cast);
         put32((void*) (ARMBASE + bytesRead), lastData);
+        POP();
         bytesRead += 4;
         lastData = get_uint();
         if(uart_errno == UART_ERR_TIMEOUT) {
-            debug_off(GPIO_ACT);
-            debug_on(GPIO_PWR);
+            gpio_write(GPIO_ACT, LOW);
+            gpio_write(GPIO_PWR, HIGH);
+            delay(100000);
             reboot();
             return;
         }
