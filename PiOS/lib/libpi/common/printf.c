@@ -20,6 +20,7 @@
 #	include <ctype.h>
 
 #else
+#include <demand.h>
 #	include "uart.h"
 #	include "printf.h"
 

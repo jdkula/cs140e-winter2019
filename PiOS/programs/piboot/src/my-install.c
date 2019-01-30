@@ -120,7 +120,6 @@ int main(int argc, char* argv[]) {
     int write_fd;
     int read_fd;
     if ((fds = trace_get_fd()) == NULL) {
-        fprintf(stderr, "Didn't get FDs...\n");
         read_fd = write_fd = open_tty(&portname);
 
         // set it to be 8n1  and 115200 baud

@@ -23,7 +23,7 @@ CMAKE_MINOR=$(echo ${CMAKE_VER} | cut -d'.' -f2 - )
 CMAKE_OK=$?
 
 if [[ ${CMAKE_STAT} -ne 0 ]] || [[ ${CMAKE_OK} -ne 0 ]]; then
-    if [[ ! -f /tmp/jdkula_pios_cmake/.has_cmake ]]; then
+    if [[ ! -f /tmp/jdkula_pios_cmake/.has_cmake ]] && [[ $(uname -a) == *"Ubuntu"* ]]; then
         echo "CMake wasn't found. Downloading to /tmp/jdkula_pios_cmake."
         rm -rf /tmp/jdkula_pios_cmake
         mkdir /tmp/jdkula_pios_cmake
@@ -31,6 +31,9 @@ if [[ ${CMAKE_STAT} -ne 0 ]] || [[ ${CMAKE_OK} -ne 0 ]]; then
         wget -q --show-progress https://github.com/Kitware/CMake/releases/download/v3.13.3/cmake-3.13.3-Linux-x86_64.tar.gz -O cmake.tar.gz
         tar --strip-components=1 -xvzf cmake.tar.gz > /dev/null
         touch .has_cmake
+    else
+        echo "CMake >=3.10 wasn't found, and we don't know how to automatically download it. Please add it to PATH to build."
+        exit 1
     fi
     export CMAKE=/tmp/jdkula_pios_cmake/bin/cmake
 else

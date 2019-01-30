@@ -25,20 +25,22 @@ project(PiOS C ASM)
 # Output Base Directory
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(BASE_OUT_DIR out-arm)
+    file(MAKE_DIRECTORY "./${BASE_OUT_DIR}/img")    # Kernel image files (bootloader/kernel.img, etc.)
+    get_filename_component(IMG_OUT_DIR ${BASE_OUT_DIR}/img REALPATH)
 else ()
     set(BASE_OUT_DIR out-x86)
+    file(MAKE_DIRECTORY "./${BASE_OUT_DIR}/test")   # Test executables
+    get_filename_component(TEST_OUT_DIR ${BASE_OUT_DIR}/test REALPATH)
 endif ()
 
 # Output Directory Setup
 file(MAKE_DIRECTORY "./${BASE_OUT_DIR}")
 file(MAKE_DIRECTORY "./${BASE_OUT_DIR}/lib")    # Library files (.a, .so, etc.)
 file(MAKE_DIRECTORY "./${BASE_OUT_DIR}/bin")    # Binary files (piboot, etc.)
-file(MAKE_DIRECTORY "./${BASE_OUT_DIR}/img")    # Kernel image files (bootloader/kernel.img, etc.)
 
 # Resolve absolute pathes to these directories
 get_filename_component(LIB_OUT_DIR ${BASE_OUT_DIR}/lib REALPATH)
 get_filename_component(EXE_OUT_DIR ${BASE_OUT_DIR}/bin REALPATH)
-get_filename_component(IMG_OUT_DIR ${BASE_OUT_DIR}/img REALPATH)
 
 set(CMAKE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 
@@ -56,7 +58,7 @@ if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(LINK_OPTIONS -nostdlib)
     set(COMPILE_OPTIONS -nostdlib -nostartfiles -ffreestanding -fno-builtin)
 
-# X86 Options
+    # X86 Options
 else ()
     set(LINKER_SCRIPT linker/script-x86)
     set(LINK_OPTIONS)
@@ -72,7 +74,6 @@ endif ()
 ########################################
 
 # Libraries
-add_subdirectory(lib/startx86)
 add_subdirectory(lib/libdebug)
 add_subdirectory(lib/libtypes)
 add_subdirectory(lib/libboot)
@@ -94,21 +95,4 @@ add_subdirectory(test/memory-test)
 
 ########################################
 #> End Submodule Setup                <#
-########################################
-
-########################################
-# Metatarget Setup                     #
-########################################
-
-# Target to build all targets; added to default for GNU make.
-add_custom_target(build_all ALL DEPENDS libpi bootloader blink)
-
-# Also make the bootloader client if we're compiling for x86
-if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    add_dependencies(build_all piboot piboot.lib replay handoff)
-endif ()
-
-
-########################################
-#> End Metatarget Setup               <#
 ########################################

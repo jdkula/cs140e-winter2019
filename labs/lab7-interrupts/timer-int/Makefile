@@ -21,6 +21,7 @@ LPI = $(LPATH)/libpi.a
 LIBPI = $(LPI_INC) 
 OBJS = $(SRC:.c=.o)  interrupts-asm.o interrupts-c.o cstart.o  timer-interrupt.o
 
+include ./PiOS.mk
 
 ASFLAGS = $(FPFLAGS)
 
@@ -35,7 +36,7 @@ kernel.img : memmap start.o $(OBJS)
 	arm-none-eabi-objcopy $(NAME).elf -O binary kernel.img
 
 run:
-	my-install kernel.img
+	$(PIBOOT) kernel.img
 
 clean :
 	rm -f *.o *.bin *.elf *.list *.img *~ Makefile.bak

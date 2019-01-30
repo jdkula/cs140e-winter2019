@@ -55,7 +55,7 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
 endif ()
 
 # Dependencies
-set(DEPENDENCIES libtypes)
+set(DEPENDENCIES libtypes libpreprocessor)
 
 ########################################
 #> End Build Variable Setup           <#

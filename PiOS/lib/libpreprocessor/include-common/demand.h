@@ -1,8 +1,13 @@
 #ifndef __DEMAND_H__
 #define __DEMAND_H__
 
+#ifdef __linux__
 #include <stdio.h>
 #include <stdlib.h>
+#else
+#define fprintf(ignored, ...) printf(__VA_ARGS__)
+#define exit(...) reboot()
+#endif
 
 #define _XSTRING(x) #x
 
@@ -30,16 +35,25 @@
         exit(1);                                                        \
 } while(0)
 
+#ifdef __linux__
 #define panic(msg...) do {                        \
         fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); \
         fprintf(stderr, ##msg);                        \
         exit(1);                                                        \
 } while(0)
-
-#define debug(msg...) do {                        \
-        fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); \
-        fprintf(stderr, ##msg);                        \
+#else
+#define panic(msg, args...) do { 					\
+	(printf)("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
+	reboot();							\
 } while(0)
+#endif
+
+#ifndef NDEBUG
+#define debug(msg, args...) \
+	(printf)("%s:%s:%d:" msg, __FILE__, __FUNCTION__, __LINE__, ##args)
+#else
+#define debug(msg, args...) do { } while(0)
+#endif
 
 
 #define safe_sys(...) if((__VA_ARGS__) < 0) { sys_die(_XSTRING(__VA_ARGS__), failed); }
@@ -49,4 +63,12 @@
 #define AssertNow(x) switch(1) { case (x): case 0: ; }
 
 #define unimplemented() panic("implement this function!\n");
+
+#ifndef __linux__
+#define assert(bool) do { if((bool) == 0) panic(#bool); } while(0)
+
+#undef fprintf
+#undef exit
+#endif
+
 #endif /* __DEMAND_H__ */

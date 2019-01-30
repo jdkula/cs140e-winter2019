@@ -17,7 +17,7 @@
 # LINK_OPTIONS [optional] - List of options to give to the linker
 # LINKER_SCRIPT [optional] - A linker script to use (if existient).
 # DEPENDENCIES [optional] - List of libraries to link to.
-# EXE_OUT_DIR - Location to place the output executable file.
+# TEST_OUT_DIR - Location to place the output executable file.
 # IMAGE_OUTPUT_DIRECTORY - Location to place the output .img, .hex, and .list files.
 
 ########################################
@@ -40,11 +40,11 @@ if (NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     # Set other properties
     set_target_properties(${MODULE_NAME}.test
             PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${EXE_OUT_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${TEST_OUT_DIR}"
             )
 
     # Ensure output directory exists
-    file(MAKE_DIRECTORY "${IMAGE_OUTPUT_DIRECTORY}")
+    file(MAKE_DIRECTORY "${TEST_OUT_DIR}")
 endif ()
 
 

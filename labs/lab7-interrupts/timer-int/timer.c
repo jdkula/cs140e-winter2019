@@ -8,6 +8,10 @@
 
 */
 #include "rpi.h"
+#include "timer.h"
+#include "uart.h"
+#include "demand.h"
+#include "printf.h"
 #include "timer-interrupt.h"
 
 // Q: if you make not volatile?
