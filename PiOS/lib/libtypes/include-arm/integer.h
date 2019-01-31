@@ -23,5 +23,6 @@ typedef unsigned short uint16;
 typedef char int8;
 typedef unsigned char uint8;
 
+typedef unsigned size_t;
 
 #endif //PIOS_INTEGER_H

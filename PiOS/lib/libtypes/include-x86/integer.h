@@ -12,6 +12,7 @@
 #define PIOS_INTEGER_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef int64_t int64;
 typedef uint64_t uint64;

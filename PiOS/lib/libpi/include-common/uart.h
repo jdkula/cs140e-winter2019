@@ -25,12 +25,12 @@ void uart_init(void);
  * Gets a character from the peer, blocking until something is recieved or the timeout is reached.
  * Pass a timeout of 0 to wait forever. This function will wait for [timeout_ticks]-1 ticks.
  */
-uint8 uart_getc(uint32 timeout_ticks);
+uint8 uart_getc();
 
 /**
  * Sends a character to the peer, blocking until something is recieved or the timeout is reached.
  * Pass a timeout of 0 to wait forever. This function will wait for [timeout_ticks]-1 ticks.
  */
-uint8 uart_putc(uint8 c, uint32 timeout_ticks);
+uint8 uart_putc(uint8 c);
 
 #endif

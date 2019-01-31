@@ -18,11 +18,11 @@
 #include <pios-macros.h>
 
 static void send_byte(uint8 uc) {
-    uart_putc(uc, 0);
+    uart_putc(uc);
 }
 
 static uint8 get_byte(void) {
-    return uart_getc(0);
+    return uart_getc();
 }
 
 static uint32 get_uint(void) {
