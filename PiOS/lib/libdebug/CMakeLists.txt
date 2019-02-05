@@ -35,11 +35,8 @@ set(LIBRARY_NAME libdebug)
 ########################################
 
 # Source Files
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    set(SRC arm/debug.c)
-else ()
-    set(SRC x86/debug.c)
-endif ()
+
+list_add_sources_multiarch(SRC debug.c)
 
 set(INCLUDE_DIRECTORIES include-common)
 

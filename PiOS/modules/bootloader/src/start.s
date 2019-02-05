@@ -6,5 +6,5 @@ _start:
 .space 0x200000-0x8004,0
 skip:
     mov sp,#0x08000000
-    bl bootloader_main
+    bl notmain
 hang: b hang

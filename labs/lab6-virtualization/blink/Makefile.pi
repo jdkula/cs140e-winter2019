@@ -5,4 +5,4 @@ include $(PI)/template.mk
 
 # run natively.
 run:
-	my-install  $(NAME).bin
+	piboot  $(NAME).bin

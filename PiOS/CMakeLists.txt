@@ -48,6 +48,8 @@ set(CMAKE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 #> End Project Setup                  <#
 ########################################
 
+include(${CMAKE_INCLUDE_DIR}/macros.cmake)
+
 ########################################
 # Default Option Definitions           #
 ########################################

@@ -23,13 +23,37 @@
 #include <termios.h>
 #include <boot-messages.h>
 #include <demand.h>
+#include <sys/wait.h>
 
 #include "support.h"
 #include "trace.h"
 #include "tty.h"
 
+static int exit_code(int pid) {
+    int status;
+    safe_sys(waitpid(pid, &status, 0));
+    if(!WIFEXITED(status)) {
+        return -1; // did not exit normally
+    }
+    return WEXITSTATUS(status);
+}
+
+
 void handoff_to(int read_fd, int write_fd, char* argv[]) {
-    unimplemented();
+    int pid = 0;
+
+    safe_sys(pid = fork());
+
+    if(pid == 0) {
+        safe_sys(dup2(read_fd, TRACE_FD_HANDOFF));
+        safe_sys(close(read_fd));
+        safe_sys(execvp(argv[0], argv));
+
+        return;
+    }
+
+    fprintf(stderr, "child %d: exited with: %d\n", pid, exit_code(pid));
+
 }
 
 // simple state machine to indicate when we've seen a special string

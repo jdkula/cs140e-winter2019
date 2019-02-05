@@ -5,5 +5,5 @@ _start:
     b skip
 skip:
     mov sp,#0x08000000
-    bl vmm_main
+    bl notmain
 hang: b hang

@@ -9,7 +9,7 @@
 
 const uint8 THE_PIN = GPIO_ACT;
 
-int blink_main (void ) {
+int notmain (void ) {
     gpio_set_output(THE_PIN);
 
     uint8 times = 10;

@@ -31,21 +31,33 @@ set(LIBRARY_NAME libpi)
 ########################################
 
 # Source Files
-set(SRC
-        common/aux.c
+list_add_sources_multiarch(SRC
+        aux.c
+        gpio.c
+        reboot.c
+        timer.c
+        uart.c
+        mem-access.c
+        printf.c
+        dummy.s
+        dummy.c
+        mem-access.c
+        mem-access.s
+        mem-barrier.c
+        mem-barrier.s
+        mem-x86-extensions.c)
+
+set(SRC_VMM
         common/gpio.c
         common/reboot.c
         common/timer.c
         common/uart.c
         common/mem-access.c
-        common/printf.c
-        )
-
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(APPEND SRC arm/dummy.s arm/mem-access.c arm/mem-access.s arm/mem-barrier.s)
-else ()
-    list(APPEND SRC x86/dummy.c x86/mem-access.c x86/mem-barrier.c x86/mem-x86-extensions.c)
-endif ()
+        x86/mem-x86-extensions.c
+        x86/mem-access.c
+        x86/mem-barrier.c
+        vmm/aux.c
+        vmm/vmm.c)
 
 # Compile & Link Options
 set(INCLUDE_DIRECTORIES include-common)

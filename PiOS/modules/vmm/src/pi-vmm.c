@@ -32,7 +32,7 @@ void put_uint(unsigned u) {
 }
 
 // probably should put reply's and CRC32
-int vmm_main(void) {
+int notmain(void) {
     uart_init();
     delay_ms(100);
 

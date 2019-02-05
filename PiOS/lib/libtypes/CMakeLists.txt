@@ -1,10 +1,9 @@
 ##########
-# CS140E: LibPi
+# CS140E: LibTypes
 # Jonathan Kula
 # Winter 2019
 #
-# Provides interfaces for Raspberry Pi hardware, like
-# GPIO, UART, timing, rebooting, and so on.
+# Provides consistient typing between the Pi and Computer.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the

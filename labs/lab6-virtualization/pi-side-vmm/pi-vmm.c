@@ -37,5 +37,18 @@ int notmain ( void ) {
         unsigned addr;
         while(1) {
 		/* have loop to handle requests, including OP_REBOOT */
+          unsigned op = get_uint();
+
+          if(op == OP_READ32) {
+            unsigned address = get_uint();
+            put_uint(get32(address));
+          } else if(op == OP_WRITE32) {
+            unsigned address = get_uint();
+            unsigned value = get_uint();
+            put32(address, value);
+          } else if(op == OP_DONE || op == OP_ERROR || op == OP_REBOOT) {
+            reboot();
+          }
+
 	}
 }

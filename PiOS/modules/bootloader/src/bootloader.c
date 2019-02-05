@@ -56,7 +56,7 @@ static void die(uint32 code) {
 //	8. jump to ARMBASE.
 //
 
-void bootloader_main(void) {
+void notmain(void) {
     gpio_init();                            // Initialize diagnostic gpio.
 
     gpio_set_output(GPIO_ACT);              // Enable ACT & PWR

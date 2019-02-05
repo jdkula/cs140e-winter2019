@@ -11,7 +11,7 @@
 #include "pi-vmm-ops.h"
 #include "vmm.h"
 
-enum { TRACE_FD_REPLAY = 11, TRACE_FD_HANDOFF };
+enum { TRACE_FD_REPLAY_READ = 11, TRACE_FD_REPLAY_WRITE, TRACE_FD_HANDOFF };
 
 static int pi_fd = TRACE_FD_HANDOFF;
 
@@ -57,7 +57,7 @@ void put_uint(unsigned u) {
 
 void rpi_reboot(void) {
 	printf("in reboot\n");
-	unimplemented();
+  put_uint(OP_REBOOT);
 	printf("done\n");
 	exit(0);
 }
@@ -68,7 +68,9 @@ void rpi_clean_reboot(void) {
 
 void rpi_PUT32(unsigned addr, unsigned v) {
 //	printf("need to send to the pi PUT32(<%x,%x>)\n", addr, v);
-	unimplemented();
+  put_uint(OP_WRITE32);
+  put_uint(addr);
+  put_uint(v);
 }
 void rpi_put32(volatile void *addr, unsigned v) {
 	rpi_PUT32((unsigned long)addr, v);
@@ -76,7 +78,9 @@ void rpi_put32(volatile void *addr, unsigned v) {
 
 unsigned rpi_GET32(unsigned addr) {
 //	printf("need to send to the pi GET32(<%x>)\n", addr);
-	unimplemented();
+  put_uint(OP_READ32);
+  put_uint(addr);
+  return get_uint();
 }
 unsigned rpi_get32(const volatile void *addr) {
 	return rpi_GET32((unsigned long)addr);
@@ -92,10 +96,13 @@ unsigned rpi_get32(const volatile void *addr) {
  * and you have to figure out what they are doing and what you 
  * should do in response.
  */
-void rpi_uart_init(void) {}
+void rpi_uart_init(void) {
+}
 
-int rpi_uart_getc(void);
+int rpi_uart_getc(void) {
+  return fgetc(stdin);
+}
 
 void rpi_uart_putc(unsigned c) {
-	unimplemented();
+  putc(c, stdout);
 }

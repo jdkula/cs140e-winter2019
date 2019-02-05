@@ -19,6 +19,8 @@ enum {
 	/* single 32-bit value: any error. */
 	OP_ERROR,
 
-	OP_READY
+	OP_READY,
+
+  OP_REBOOT
 };
 #endif
