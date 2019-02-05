@@ -12,7 +12,7 @@ PI_VMM = ../unix-side-vmm/
 
 
 CC = gcc
-CFLAGS = -Wall -g -Og -std=gnu99 -I$(LPI) -DFAKE_PI
+CFLAGS = -Wall -g -O -std=gnu99 -I$(LPI) -DFAKE_PI
 
 LPI= $(LIBPI_PATH)
 
@@ -20,7 +20,8 @@ all: $(NAME).fake
 
 %.fake.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-	objcopy $@ --prefix-symbols="rpi_"
+
+	# objcopy $@ --prefix-symbols="rpi_"
 
 $(NAME).fake:  $(NAME).fake.o $(PI_VMM)/fake-libpi.a
 	$(CC) $(CFLAGS) $(NAME).fake.o -o $@ $(PI_VMM)/fake-libpi.a
