@@ -28,13 +28,8 @@ project(libtypes C)
 # Build Variable Setup                 #
 ########################################
 
-set(INCLUDE_DIRECTORIES include-common)
+set(INCLUDE_DIRECTORIES include)
 
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(APPEND INCLUDE_DIRECTORIES include-arm)
-else ()
-    list(APPEND INCLUDE_DIRECTORIES include-x86)
-endif ()
 
 ########################################
 #> End Build Variable Setup           <#

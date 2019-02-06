@@ -34,11 +34,11 @@ if (NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     ########################################
 
     # Source Files
-    set(SRC x86/test-memory.c x86/test-memory-handlers.c)
+    set(SRC sysspec/x86/test-memory.c sysspec/x86/test-memory-handlers.c)
 
-    set(INCLUDE_DIRECTORIES include-x86)
+    set(INCLUDE_DIRECTORIES include)
 
-    set(DEPENDENCIES libpi libtypes)
+    set(DEPENDENCIES libpi-emu libtypes)
 
 
     ########################################

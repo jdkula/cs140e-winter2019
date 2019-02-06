@@ -5,8 +5,6 @@
 #include "rpi.h"
 #include "rpi-interrupts.h"
 
-#include "printf.h"
-#include "demand.h"
 /*
  * Copy in interrupt vector table and FIQ handler _table and _table_end
  * are symbols defined in the interrupt assembly file, at the beginning

@@ -105,6 +105,11 @@ else ()
     # This allows testing frameworks to link with the module.
 
     set(LIBRARY_NAME ${MODULE_NAME}.lib)
+    list(FIND DEPENDENCIES libpi libpi_idx)
+    if (libpi_idx GREATER_EQUAL 0)
+        list(REMOVE_ITEM DEPENDENCIES libpi)
+        list(INSERT DEPENDENCIES ${libpi_idx} libpi-vmm)
+    endif ()
     include(${CMAKE_INCLUDE_DIR}/library.cmake)
 
     ########################################

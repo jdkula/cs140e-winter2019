@@ -33,7 +33,7 @@ set(MODULE_NAME memory)
 set(SRC x86/main.c)
 
 # Compile Options
-set(DEPENDENCIES libpi libboot libdebug libtest libpreprocessor)
+set(DEPENDENCIES libpi-emu libboot libdebug libtest libpreprocessor)
 set(INCLUDE_DIRECTORIES include)
 
 

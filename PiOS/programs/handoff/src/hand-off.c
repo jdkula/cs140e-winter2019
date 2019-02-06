@@ -9,9 +9,9 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <pios-macros.h>
+#include <x86/tty.h>
 
 #include "trace.h"
-#include "tty.h"
 #include "support.h"
 #include "demand.h"
 

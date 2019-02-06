@@ -9,11 +9,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <termios.h>
+#include <x86/tty.h>
 
 #include "demand.h"
 #include "support.h"
 #include "trace.h"
-#include "tty.h"
 
 // simple state machine to indicate when we've seen a special string
 // from the pi telling us to shutdown.

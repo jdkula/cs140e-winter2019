@@ -25,21 +25,6 @@ static uint8 get_byte(void) {
     return uart_getc();
 }
 
-static uint32 get_uint(void) {
-    uint32 u = get_byte();
-    u |= get_byte() << 8u;
-    u |= get_byte() << 16u;
-    u |= get_byte() << 24u;
-    return u;
-}
-
-static void put_uint(uint32 u) {
-    send_byte((u >> 0u) & 0xffu);
-    send_byte((u >> 8u) & 0xffu);
-    send_byte((u >> 16u) & 0xffu);
-    send_byte((u >> 24u) & 0xffu);
-}
-
 static void die(uint32 code) {
     put_uint(code);
     reboot();

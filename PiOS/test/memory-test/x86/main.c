@@ -4,10 +4,10 @@
 
 
 #include <stdio.h>
-#include <mem-x86-extensions.h>
+#include <x86/mem-x86-extensions.h>
 #include <mem-access.h>
-#include <test-memory.h>
-#include <test-memory-handlers.h>
+#include <x86/test-memory.h>
+#include <x86/test-memory-handlers.h>
 #include <mem-barrier.h>
 #include <pios-macros.h>
 

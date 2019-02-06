@@ -19,6 +19,15 @@
 // alignment.
 #define roundup(x,n) (((x)+((n)-1))&(~((n)-1)))
 
+extern char __heap_start__;
+extern char __bss_start__;
+extern char __bss_end__;
+
+volatile char* bss_end;
+volatile char* bss_start;
+volatile char* heap_start;
+volatile char* const text_start = (void*) 0x8000;
+
 /*
  * return a memory block of at least size <nbytes>
  *	- use to allocate gprof code histogram table.
@@ -26,7 +35,9 @@
  * 	- should be just a few lines of code.
  */
 void *kmalloc(unsigned nbytes) {
-	unimplemented();
+  volatile void* here = heap_start;
+  heap_start += nbytes;
+  return (void*) here;
 }
 
 /*
@@ -34,8 +45,18 @@ void *kmalloc(unsigned nbytes) {
  * 	- should be just a few lines of code.
  */
 void kmalloc_init(void) {
-	unimplemented();
+  bss_start = &__bss_start__;
+  bss_end = &__bss_end__;
+  heap_start = &__heap_start__;
+  //printk("bss start/end | heap = %p/%p | %p\n", bss_start, bss_end, heap_start);
+  //for(volatile char* p = bss_start; p < heap_start; p++) {
+  //  *p = 0;
+  //}
 }
+
+
+unsigned* gprof_table;
+unsigned num_entries;
 
 /***************************************************************************
  * gprof implementation:
@@ -47,21 +68,55 @@ void kmalloc_init(void) {
 
 // allocate table.
 //    few lines of code
-static unsigned gprof_init(void) {
-	unimplemented();
+static void gprof_init(void) {
+  kmalloc_init();
+  unsigned size = roundup((bss_start - text_start), 4);
+  gprof_table = kmalloc(size);
+  num_entries = size / 4;
+
+  printk("Table is at %p, of size %u\n", gprof_table, num_entries);
+
+  for(unsigned* p = gprof_table; p < (gprof_table + num_entries); p++) {
+    *p = 0;
+    //printk("Clearing %p. \n", p);
+  }
 }
+
+unsigned char skip_flag = 0;
 
 // increment histogram associated w/ pc.
 //    few lines of code
 static void gprof_inc(unsigned pc) {
-	unimplemented();
+  //printk("Incrementing %p.\n", pc);
+  if(skip_flag == 1) {
+    //printk("Skipping.\n");
+    return;
+  }
+  if(pc < (unsigned) text_start || pc > (unsigned) bss_end) {
+    //printk("Out of bounds instruction: %p\n", pc);
+    return;
+  }
+
+  unsigned idx = (pc - (unsigned) text_start) / 4;
+
+  //printk("++%u++", idx);
+
+  gprof_table[idx] = gprof_table[idx] + 1;
 }
 
 // print out all samples whose count > min_val
 //
 // make sure sampling does not pick this code up!
 static void gprof_dump(unsigned min_val) {
-	unimplemented();
+  skip_flag = 1;
+  dsb();
+  for(unsigned i = 0; i < num_entries; i++) {
+    if(gprof_table[i] > min_val) {
+      printk("%p -> %u\n", text_start + (i * 4), gprof_table[i]);
+    }
+  }
+  skip_flag = 0;
+  dsb();
 }
 
 
@@ -114,7 +169,6 @@ void notmain() {
 
 	// could combine some of these.
         gprof_init();
-	kmalloc_init();
 
 	// Q: if you don't do?
 	printk("gonna enable ints globally!\n");
@@ -123,12 +177,14 @@ void notmain() {
 
 	// enable_cache(); 	// Q: what happens if you enable cache?
         unsigned iter = 0;
-        while(cnt<200) {
+        while(cnt<2000) {
                 printk("iter=%d: cnt = %d, period = %dusec, %x\n",
                                 iter,cnt, period,period);
                 iter++;
                 if(iter % 10 == 0)
                         gprof_dump(2);
         }
+
+        gprof_dump(2);
 	clean_reboot();
 }

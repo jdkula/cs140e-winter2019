@@ -3,7 +3,7 @@
 # Jonathan Kula
 # Winter 2019
 #
-# Provides common code and the interface used by the
+# Provides src code and the interface used by the
 # bootloader module and PiBoot, the client of the bootloader module.
 #
 # This build file was last updated on January 27th, 2019.
@@ -34,7 +34,7 @@ set(LIBRARY_NAME libboot)
 list_add_sources_multiarch(SRC crc32.c)
 
 # Compile Options
-set(INCLUDE_DIRECTORIES include-common)
+set(INCLUDE_DIRECTORIES include)
 
 # Dependencies
 set(DEPENDENCIES libtypes)

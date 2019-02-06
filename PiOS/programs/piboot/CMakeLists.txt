@@ -36,7 +36,6 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             src/simple-boot.c
             src/support.c
             src/trace.c
-            src/tty.c
             )
 
     # Compile options
@@ -50,7 +49,7 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
 
     set(INCLUDE_DIRECTORIES include)
 
-    set(DEPENDENCIES libboot libpreprocessor)
+    set(DEPENDENCIES libboot libpreprocessor libtty)
 
     ## Output is controlled by ${EXE_OUT_DIR}
 

@@ -82,6 +82,7 @@ add_subdirectory(lib/libboot)
 add_subdirectory(lib/libpi)
 add_subdirectory(lib/libtest)
 add_subdirectory(lib/libpreprocessor)
+add_subdirectory(lib/libtty)
 
 # Pi Modules
 add_subdirectory(modules/bootloader)
@@ -93,10 +94,11 @@ add_subdirectory(programs/piboot)
 add_subdirectory(programs/handoff)
 add_subdirectory(programs/replay)
 add_subdirectory(programs/echo)
-add_subdirectory(programs/vmm)
+#add_subdirectory(programs/vmm)
 
 # Tests
 add_subdirectory(test/memory-test)
+add_subdirectory(test/blink-test)
 
 ########################################
 #> End Submodule Setup                <#

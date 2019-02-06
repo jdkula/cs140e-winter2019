@@ -29,7 +29,7 @@ set(LIBRARY_NAME libpreprocessor)
 # Build Variable Setup                 #
 ########################################
 
-set(INCLUDE_DIRECTORIES include-common)
+set(INCLUDE_DIRECTORIES include)
 
 ########################################
 #> End Build Variable Setup           <#

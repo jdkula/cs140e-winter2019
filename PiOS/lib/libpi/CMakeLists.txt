@@ -31,46 +31,116 @@ set(LIBRARY_NAME libpi)
 ########################################
 
 # Source Files
-list_add_sources_multiarch(SRC
-        aux.c
-        gpio.c
-        reboot.c
-        timer.c
-        uart.c
-        mem-access.c
-        printf.c
-        dummy.s
-        dummy.c
-        mem-access.c
-        mem-access.s
-        mem-barrier.c
-        mem-barrier.s
-        mem-x86-extensions.c)
+set(SRC_ARM
+        src/aux.c
+        src/gpio.c
+        src/mem-access.c
+        src/printf.c
+        src/reboot.c
+        src/timer.c
+        src/uart.c
+        sysspec/arm/dummy.s
+        sysspec/arm/mem-access.c
+        sysspec/arm/mem-access.s
+        sysspec/arm/mem-barrier.s)
+
+set(SRC_EMU
+        src/aux.c
+        src/gpio.c
+        src/mem-access.c
+        src/printf.c
+        src/reboot.c
+        src/timer.c
+        src/uart.c
+        sysspec/x86/dummy.c
+        sysspec/x86/aux-x86-extensions.c
+        sysspec/x86/mem-x86-extensions.c
+        sysspec/x86/emu/mem-access.c
+        sysspec/x86/emu/mem-barrier.c)
 
 set(SRC_VMM
-        common/gpio.c
-        common/reboot.c
-        common/timer.c
-        common/uart.c
-        common/mem-access.c
-        x86/mem-x86-extensions.c
-        x86/mem-access.c
-        x86/mem-barrier.c
-        vmm/aux.c
-        vmm/vmm.c)
+        src/gpio.c
+        src/reboot.c
+        src/timer.c
+        src/uart.c
+        src/mem-access.c
+        sysspec/x86/aux-x86-extensions.c
+        sysspec/x86/dummy.c
+        sysspec/x86/vmm/aux.c
+        sysspec/x86/vmm/vmm.c
+        sysspec/x86/vmm/vmm-memory.c)
 
 # Compile & Link Options
-set(INCLUDE_DIRECTORIES include-common)
-
-if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(APPEND INCLUDE_DIRECTORIES include-x86)
-endif ()
+set(INCLUDE_DIRECTORIES include)
 
 # Dependencies
 set(DEPENDENCIES libtypes libpreprocessor)
+set(DEPENDENCIES_VMM ${DEPENDENCIES} libtty)
 
 ########################################
 #> End Build Variable Setup           <#
 ########################################
 
-include(${CMAKE_INCLUDE_DIR}/library.cmake)
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    add_library(${LIBRARY_NAME} STATIC ${SRC_ARM})
+
+    # Add include directories and share them with dependants.
+    target_include_directories(${LIBRARY_NAME} PUBLIC ${INCLUDE_DIRECTORIES})
+
+    # Add target defines.
+    target_compile_definitions(${LIBRARY_NAME} PRIVATE ${DEFINES} IS_LIBRARY)
+
+    # Commit compile and link options
+    target_compile_options(${LIBRARY_NAME} PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(${LIBRARY_NAME} ${DEPENDENCIES} ${LINK_OPTIONS})
+
+    # Commit output directory
+    set_target_properties(${LIBRARY_NAME}
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            PREFIX ""
+            )
+else ()
+    # Create static library target from predefined source
+    add_library(${LIBRARY_NAME}-emu STATIC ${SRC_EMU})
+
+    # Add include directories and share them with dependants.
+    target_include_directories(${LIBRARY_NAME}-emu PUBLIC ${INCLUDE_DIRECTORIES})
+
+    # Add target defines.
+    target_compile_definitions(${LIBRARY_NAME}-emu PRIVATE ${DEFINES} IS_LIBRARY)
+
+    # Commit compile and link options
+    target_compile_options(${LIBRARY_NAME}-emu PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(${LIBRARY_NAME}-emu ${DEPENDENCIES} ${LINK_OPTIONS})
+
+    # Commit output directory
+    set_target_properties(${LIBRARY_NAME}-emu
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            PREFIX ""
+            )
+
+    # Create static library target from predefined source
+    add_library(${LIBRARY_NAME}-vmm STATIC ${SRC_VMM})
+
+    # Add include directories and share them with dependants.
+    target_include_directories(${LIBRARY_NAME}-vmm PUBLIC ${INCLUDE_DIRECTORIES})
+
+    # Add target defines.
+    target_compile_definitions(${LIBRARY_NAME}-vmm PRIVATE ${DEFINES} IS_LIBRARY)
+
+    # Commit compile and link options
+    target_compile_options(${LIBRARY_NAME}-vmm PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(${LIBRARY_NAME}-vmm ${DEPENDENCIES_VMM} ${LINK_OPTIONS})
+
+    # Commit output directory
+    set_target_properties(${LIBRARY_NAME}-vmm
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
+            PREFIX ""
+            )
+endif ()

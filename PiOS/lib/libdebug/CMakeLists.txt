@@ -38,9 +38,13 @@ set(LIBRARY_NAME libdebug)
 
 list_add_sources_multiarch(SRC debug.c)
 
-set(INCLUDE_DIRECTORIES include-common)
+set(INCLUDE_DIRECTORIES include)
 
-set(DEPENDENCIES libpi libtypes)
+set(DEPENDENCIES libtypes)
+
+if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
+    list(APPEND DEPENDENCIES libpi)
+endif ()
 
 
 ########################################

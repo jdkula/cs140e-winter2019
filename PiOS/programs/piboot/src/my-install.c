@@ -24,10 +24,10 @@
 #include <boot-messages.h>
 #include <demand.h>
 #include <sys/wait.h>
+#include <x86/tty.h>
 
 #include "support.h"
 #include "trace.h"
-#include "tty.h"
 
 static int exit_code(int pid) {
     int status;
