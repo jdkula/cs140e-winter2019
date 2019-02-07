@@ -34,12 +34,12 @@ set(MODULE_NAME bootloader)
 
 # Source Files
 set(SRC src/bootloader.c)
-#if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-#    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
-#endif ()
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
+endif ()
 
 # Compile Options
-set(DEPENDENCIES libpi libboot libdebug libpreprocessor libstart)
+set(DEPENDENCIES libpi libboot libdebug libpreprocessor)
 set(INCLUDE_DIRECTORIES include)
 
 

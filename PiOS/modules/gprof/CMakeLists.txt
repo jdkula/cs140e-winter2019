@@ -1,12 +1,10 @@
 ##########
-# CS140E: VMM
+# CS140E: gprof
 # Jonathan Kula
 # Winter 2019
 #
-# This kernel works with the PiBoot executable to load
-# arbitrary kernel images using a UART connection; this
-# eliminates the need to switch out the kernel on the SD
-# card with each build, speeding up development.
+# A simple test program using interrupts to periodically
+# poll where the program is at.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -21,8 +19,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(vmm C ASM)
-set(MODULE_NAME vmm)
+project(gprof C ASM)
+set(MODULE_NAME gprof)
 
 ########################################
 #> End Project Setup                  <#
@@ -33,12 +31,12 @@ set(MODULE_NAME vmm)
 ########################################
 
 # Source Files
-set(SRC src/pi-vmm.c)
+set(SRC src/gprof.c)
 
 # Compile Options
-set(DEPENDENCIES libpi libpreprocessor libstart)
-set(INCLUDE_DIRECTORIES include)
 
+# Dependencies
+set(DEPENDENCIES libpi libdebug libstart)
 
 # Output Options
 ## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)

@@ -39,4 +39,6 @@ unsigned get_uint(void);
 /** Sends an integer to the peer. */
 void put_uint(unsigned u);
 
+/** Sends a sentinel over the UART to indicate the Pi is shutting down, then reboots. */
+void clean_reboot(void);
 #endif

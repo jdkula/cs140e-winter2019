@@ -6,8 +6,8 @@
  *	- implement functions so that given a pc value, you can increment
  *	  its associated count
  */
+#include <compat/dawson.h>
 #include "rpi.h"
-#include "timer-interrupt.h"
 
 
 /**********************************************************************
@@ -177,7 +177,7 @@ void notmain() {
 
 	// enable_cache(); 	// Q: what happens if you enable cache?
         unsigned iter = 0;
-        while(cnt<200) {
+        while(cnt<2000) {
                 printk("iter=%d: cnt = %d, period = %dusec, %x\n",
                                 iter,cnt, period,period);
                 iter++;
