@@ -1,12 +1,9 @@
 ##########
-# CS140E: Bootloader
+# CS140E: LibStart
 # Jonathan Kula
 # Winter 2019
 #
-# This kernel works with the PiBoot executable to load
-# arbitrary kernel images using a UART connection; this
-# eliminates the need to switch out the kernel on the SD
-# card with each build, speeding up development.
+# Provides start functionality for RPI modules.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -17,39 +14,40 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+
 ########################################
 # Project Setup                        #
 ########################################
 
-project(bootloader C ASM)
-set(MODULE_NAME bootloader)
+project(libstart C)
+set(LIBRARY_NAME libstart)
 
 ########################################
 #> End Project Setup                  <#
 ########################################
+
 
 ########################################
 # Build Variable Setup                 #
 ########################################
 
 # Source Files
-set(SRC src/bootloader.c)
-#if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-#    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
-#endif ()
 
-# Compile Options
-set(DEPENDENCIES libpi libboot libdebug libpreprocessor libstart)
+list_add_sources_multiarch(SRC cstart.c start.s)
+
+if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
+    set(DEPENDENCIES libpi)
+else ()
+    set(DEPENDENCIES)
+endif ()
+
 set(INCLUDE_DIRECTORIES include)
-
-
-# Output Options
-## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)
-## See ${IMG_OUT_DIR} in root CMakeLists.txt
-set(IMAGE_OUTPUT_DIRECTORY "${IMG_OUT_DIR}/${MODULE_NAME}")
 
 ########################################
 #> End Build Variable Setup           <#
 ########################################
 
-include(${CMAKE_INCLUDE_DIR}/module.cmake)
+add_library(${LIBRARY_NAME} INTERFACE)
+
+target_link_libraries(${LIBRARY_NAME} INTERFACE ${DEPENDENCIES})
+target_sources(${LIBRARY_NAME} INTERFACE ${SRC})

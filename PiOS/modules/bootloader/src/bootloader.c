@@ -17,14 +17,6 @@
 #include <printf.h>
 #include <pios-macros.h>
 
-static void send_byte(uint8 uc) {
-    uart_putc(uc);
-}
-
-static uint8 get_byte(void) {
-    return uart_getc();
-}
-
 static void die(uint32 code) {
     put_uint(code);
     reboot();
@@ -64,7 +56,7 @@ void notmain(void) {
     put_uint(nCrc);                     // ...and send it back to verify.
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
-    if(get_uint() == NAK) {             // If the UNIX
+    if(get_uint() == NAK) {             // If the UNIX side doesn't like what we sent, reboot.
         die(NAK);
     }
 
@@ -87,9 +79,9 @@ void notmain(void) {
     }
 
 
-    if (bytesRead != numBytes) die(NAK);
+    if (bytesRead != numBytes) die(SIZE_MISMATCH);
 
-    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(NAK);
+    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(BAD_CKSUM);
 
     debug_off(GPIO_ACT);
 

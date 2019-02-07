@@ -42,33 +42,26 @@ static unsigned corrupt32(unsigned v) {
 
 endpoint_t mk_endpoint_proc(const char* name, Q_t q, char* argv[]) {
     int pid;
-    int inpipes[2];  // Pipe going from the child to Replay
-    int outpipes[2]; // Pipe going from Replay to the child
+    int sock[2];
 
-    safe_sys(pipe(inpipes));
-    safe_sys(pipe(outpipes));
+    safe_sys(socketpair(PF_LOCAL, SOCK_STREAM, 0, sock));
 
     safe_sys(pid = fork());
 
     if (pid == 0) {
-        safe_sys(dup2(inpipes[1], TRACE_FD_REPLAY_WRITE));
-        safe_sys(dup2(outpipes[0], TRACE_FD_REPLAY_READ));
-        safe_sys(close(inpipes[1]));
-        safe_sys(close(outpipes[0]));
-        safe_sys(close(outpipes[1]));
-        safe_sys(close(inpipes[0]));
+        safe_sys(dup2(sock[1], TRACE_FD_REPLAY));
+        safe_sys(close(sock[0]));
 
         safe_sys(execvp(argv[0], argv));
     }
 
-    safe_sys(close(inpipes[1]));
-    safe_sys(close(outpipes[0]));
+    safe_sys(close(sock[1]));
 
 
     // this should sort-of follow your handoff code except you're using
     // sockets.
 
-    return mk_endpoint(name, q, inpipes[0], outpipes[1], pid);
+    return mk_endpoint(name, q, sock[0], pid);
 }
 
 /*
@@ -91,7 +84,7 @@ static int proc_exit_code(endpoint_t* this) {
 
 static void write_exact(endpoint_t* this, void* buf, int nbytes, int can_fail_p) {
     ssize_t n;
-    if ((n = write(this->write_fd, buf, nbytes)) < 0) {
+    if ((n = write(this->fd, buf, nbytes)) < 0) {
         if (!can_fail_p) {
             panic("i/o error writing to <%s> = <%s>\n",
                   this->name, strerror(errno));
@@ -116,10 +109,10 @@ int has_data(endpoint_t* this, unsigned timeout_secs) {
 
     fd_set rfds;
     FD_ZERO(&rfds);
-    FD_SET(this->read_fd, &rfds);
+    FD_SET(this->fd, &rfds);
 
     int select_ret;
-    safe_sys(select_ret = select(this->read_fd + 1, &rfds, NULL, NULL, &t));
+    safe_sys(select_ret = select(this->fd + 1, &rfds, NULL, NULL, &t));
 
     return select_ret != 0;
 }
@@ -142,8 +135,8 @@ static int is_eof(endpoint_t* end, int can_fail_p) {
         err("process <%s> should have exited after 1 sec\n", end->name);
 
     char buf[1];
-    ssize_t read_return = read(end->read_fd, buf, 1);
-    if (read_return < 0 && !can_fail_p) {
+    ssize_t read_return = read(end->fd, buf, 1);
+    if (read_return < 0 && !can_fail_p && errno != ECONNRESET) {
         sys_die(read, "Failed to get EOF!");
     }
     return 1;
@@ -164,7 +157,7 @@ static int read_exact(endpoint_t* e, void* buf, int n, int can_fail_p) {
     size_t bytes_read = 0;
 
     while (bytes_read < n && has_data(e, timeout_secs)) {
-        ssize_t this_read = read(e->read_fd, char_buf + bytes_read, n - bytes_read);
+        ssize_t this_read = read(e->fd, char_buf + bytes_read, n - bytes_read);
 
         if (this_read <= 0) {
             if (can_fail_p) return 0;

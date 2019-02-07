@@ -16,15 +16,15 @@ const char *op_to_s(int op);
 // the replay log.
 // trivial Q operations.  should use the STL, but i don't want to assume C++.
 typedef struct E {
-        struct E *next;
-        int op;
-        unsigned cnt;
-        unsigned val;
+    struct E *next;
+    int op;
+    unsigned cnt;
+    unsigned val;
 } E_t;
 
 typedef struct Q {
-        struct E *head, *tail;
-	unsigned nreads, nwrites;
+    struct E *head, *tail;
+    unsigned nreads, nwrites;
 } Q_t;
 
 struct Q mk_Q(void);
@@ -36,11 +36,10 @@ struct E *Q_pop(struct Q *q);
 // simple endpoint.  name of process, its pid, the socket fd we use to 
 // talk to/fro with.
 typedef struct endpoint {
-        const char *name;  	// name of process.
-        int pid;		// its pid
-        int read_fd;
-        int write_fd;
-        Q_t replay_log;		// the replay log we read in from input.
+    const char *name;  	// name of process.
+    int pid;		// its pid
+    int fd;			// the bi-directional socket used to talk w/ it
+    Q_t replay_log;		// the replay log we read in from input.
 } endpoint_t;
 
 
@@ -56,11 +55,10 @@ typedef struct endpoint {
         exit(1);                                \
 } while(0)
 
-endpoint_t mk_endpoint(const char *name, Q_t q, int read_fd, int write_fd, int pid);
+endpoint_t mk_endpoint(const char *name, Q_t q, int fd, int pid);
 
 // Your code
 endpoint_t mk_endpoint_proc(const char *name, Q_t q, char *argv[]);
 void replay(endpoint_t *end, int corrupt_op);
 
 #endif
-

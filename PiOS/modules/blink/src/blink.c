@@ -21,7 +21,7 @@ int notmain(void) {
         delay(1000000);
     }
 
-    printf("DONE!!!\n");
+    printk("DONE!!!\n");
 
     reboot();
     return 0;

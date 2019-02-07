@@ -43,7 +43,7 @@
 } while(0)
 #else
 #define panic(msg, args...) do { 					\
-	(printf)("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
+	printf("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
 	reboot();							\
 } while(0)
 #endif

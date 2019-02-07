@@ -83,6 +83,7 @@ add_subdirectory(lib/libpi)
 add_subdirectory(lib/libtest)
 add_subdirectory(lib/libpreprocessor)
 add_subdirectory(lib/libtty)
+add_subdirectory(lib/libstart)
 
 # Pi Modules
 add_subdirectory(modules/bootloader)

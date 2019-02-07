@@ -91,7 +91,7 @@ void put_uint(uint32 u) {
 
 // Works with our UART receivers, which quit upon seeing the string "DONE!!!"
 void clean_reboot(void) {
-    printf("DONE!!!\n");
+    printk("DONE!!!\n");
     data_sync_barrier();
     reboot();
 }

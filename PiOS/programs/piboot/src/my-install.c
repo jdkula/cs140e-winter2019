@@ -21,77 +21,53 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <termios.h>
-#include <boot-messages.h>
-#include <demand.h>
-#include <sys/wait.h>
-#include <x86/tty.h>
 
+#include <x86/tty.h>
+#include <simple-boot.h>
+
+#include "demand.h"
 #include "support.h"
 #include "trace.h"
 
-static int exit_code(int pid) {
-    int status;
-    safe_sys(waitpid(pid, &status, 0));
-    if(!WIFEXITED(status)) {
-        return -1; // did not exit normally
-    }
-    return WEXITSTATUS(status);
-}
-
-
-void handoff_to(int read_fd, int write_fd, char* argv[]) {
-    int pid = 0;
-
-    safe_sys(pid = fork());
-
-    if(pid == 0) {
-        safe_sys(dup2(read_fd, TRACE_FD_HANDOFF));
-        safe_sys(close(read_fd));
-        safe_sys(execvp(argv[0], argv));
-
-        return;
-    }
-
-    fprintf(stderr, "child %d: exited with: %d\n", pid, exit_code(pid));
-
+void handoff_to(int fd, char *argv[]) {
+    unimplemented();
 }
 
 // simple state machine to indicate when we've seen a special string
 // from the pi telling us to shutdown.
-static int done(unsigned char* s) {
+static int done(unsigned char *s) {
     static unsigned pos = 0;
-    const char exit_string[] = "DONE!!!";
+    const char exit_string[] = "DONE!!!\n";
     const int n = sizeof exit_string - 1;
 
-    for (; *s; s++) {
+    for(; *s; s++) {
         assert(pos < n);
-        if (*s != exit_string[pos++]) {
+        if(*s != exit_string[pos++]) {
             pos = 0;
-            return done(s + 1); // check remainder
+            return done(s+1); // check remainder
         }
         // maybe should check if "DONE!!!" is last thing printed?
-        if (pos == sizeof exit_string - 1)
+        if(pos == sizeof exit_string - 1)
             return 1;
     }
     return 0;
 }
 
 #include <errno.h>
-#include <simple-boot.h>
 
 // read and echo the characters from the tty until it closes (pi rebooted)
 // or we see a string indicating a clean shutdown.
-static void echo(int fd, const char* portname) {
-    while (1) {
-        unsigned char buf[4096];
-        int n = read(fd, buf, sizeof buf - 1);
-        if (n > 0)
+static void echo(int fd, const char *portname) {
+    while(1) {
+        unsigned char buf [4096];
+        int n = read (fd, buf, sizeof buf - 1);
+        if(n>0)
             trace_read_bytes(buf, n);
-        if (!n) {
+        if(!n) {
             struct stat s;
             // change this to fstat.
             // if(stat(portname, &s) < 0) {
-            if (fstat(fd, &s) < 0) {
+            if(fstat(fd, &s) < 0) {
                 fprintf(stderr, "read EOF\n");
                 perror("fstat");
                 fprintf(stderr,
@@ -100,8 +76,8 @@ static void echo(int fd, const char* portname) {
             }
             // gonna have to override this if you want to test.
             usleep(1000);
-        } else if (n < 0) {
-            fprintf(stderr, "ERROR: got %s res=%d\n", strerror(n), n);
+        } else if(n < 0) {
+            fprintf(stderr, "ERROR: got %s res=%d\n", strerror(n),n);
             fprintf(stderr, "pi connection closed.  cleaning up\n");
             exit(0);
         } else {
@@ -109,7 +85,7 @@ static void echo(int fd, const char* portname) {
             // XXX printf does not flush until newline!
             fprintf(stderr, "%s", buf);
 
-            if (done(buf)) {
+            if(done(buf)) {
                 fprintf(stderr, "\nSaw done\n");
                 fprintf(stderr, "\nbootloader: pi exited.  cleaning up\n");
                 exit(0);
@@ -118,28 +94,27 @@ static void echo(int fd, const char* portname) {
     }
 }
 
-//#ifndef IS_LIBRARY
 // usage: my-install [-silent] [/<dev path>]  progname
-int main(int argc, char* argv[]) {
-    const char* name = "kernel.img";
-    if (argc > 1) {
+int main(int argc, char *argv[]) {
+    const char *name = "kernel.img";
+    if(argc > 1) {
         argc--;
         name = argv[argc];
     }
 
-    char** exec_args = 0;
-    const char* portname = 0;
+    char **exec_args = 0;
+    const char *portname = 0;
     int print_p = 1;
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-silent") == 0)
+    for(int i = 1; i < argc; i++) {
+        if(strcmp(argv[i], "-silent") == 0)
             print_p = 0;
-        else if (strcmp(argv[i], "-trace") == 0)
+        else if(strcmp(argv[i], "-trace") == 0)
             trace_turn_on_raw();
-        else if (argv[i][0] == '/')
+        else if(argv[i][0] == '/')
             portname = argv[i];
-        else if (strcmp(argv[i], "-exec") == 0) {
-            assert((i + 1) < argc);
-            exec_args = &argv[i + 1];
+        else if(strcmp(argv[i], "-exec") == 0) {
+            assert((i+1) < argc);
+            exec_args = &argv[i+1];
             argv[argc] = 0;
             break;
         } else
@@ -147,23 +122,18 @@ int main(int argc, char* argv[]) {
 
     }
     int prog_nbytes;
-    unsigned char* program = read_file(&prog_nbytes, name);
+    unsigned char *program = read_file(&prog_nbytes, name);
 
     // open tty
-    int* fds;
-    int write_fd;
-    int read_fd;
-    if ((fds = trace_get_fd()) == NULL) {
-        read_fd = write_fd = open_tty(&portname);
+    int fd;
+    if((fd = trace_get_fd()) < 0) {
+        fd = open_tty(&portname);
 
         // set it to be 8n1  and 115200 baud
-        read_fd = write_fd = set_tty_to_8n1(read_fd, B115200, 1);
+        fd = set_tty_to_8n1(fd, B115200, 1);
 
         // giving the pi side a chance to get going.
         sleep(1);
-    } else {
-        read_fd = fds[0];
-        write_fd = fds[1];
     }
 
     // XXX: it appears that sometimes garbage is left in the tty connection.
@@ -176,23 +146,21 @@ int main(int argc, char* argv[]) {
     // give the pi time to boot up.
 #if 0
     char ignore[1024];
-    int nbytes;
-    while((nbytes = read(fd, ignore, sizeof ignore)) > 0)
-        fprintf(stderr, "getting %d bytes: <%s>\n",nbytes, ignore);
+	int nbytes;
+	while((nbytes = read(fd, ignore, sizeof ignore)) > 0)
+		fprintf(stderr, "getting %d bytes: <%s>\n",nbytes, ignore);
 #endif
     fprintf(stderr, "my-install: about to boot\n");
 
-    simple_boot(read_fd, write_fd, program, prog_nbytes);
-    if (exec_args) {
-        handoff_to(read_fd, write_fd, exec_args);
-    } else if (print_p) {
+    simple_boot(fd, program, prog_nbytes);
+    if(exec_args) {
+        handoff_to(fd,exec_args);
+    } else if(print_p) {
         fprintf(stderr, "my-install: going to echo\n");
-        echo(read_fd, portname);
+        echo(fd, portname);
     }
     fprintf(stderr, "my-install: Done!\n");
-    close(read_fd);
-    close(write_fd);
     return 0;
 }
 
-//#endif
+

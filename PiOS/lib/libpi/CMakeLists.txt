@@ -42,7 +42,8 @@ set(SRC_ARM
         sysspec/arm/dummy.s
         sysspec/arm/mem-access.c
         sysspec/arm/mem-access.s
-        sysspec/arm/mem-barrier.s)
+        sysspec/arm/mem-barrier.s
+        sysspec/arm/stdlib.c)
 
 set(SRC_EMU
         src/aux.c

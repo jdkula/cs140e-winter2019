@@ -31,14 +31,11 @@ set(MODULE_NAME blink)
 
 # Source Files
 set(SRC src/blink.c)
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(INSERT SRC 0 src/start.s)
-endif ()
 
 # Compile Options
 
 # Dependencies
-set(DEPENDENCIES libpi libdebug)
+set(DEPENDENCIES libpi libdebug libstart)
 
 # Output Options
 ## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)

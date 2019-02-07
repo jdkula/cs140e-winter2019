@@ -3,7 +3,7 @@
 
 
 enum {
-    TRACE_FD_REPLAY_READ = 11, TRACE_FD_REPLAY_WRITE, TRACE_FD_HANDOFF
+    TRACE_FD_REPLAY = 11, TRACE_FD_HANDOFF
 };
 
 enum {
@@ -16,7 +16,7 @@ enum {
 void trace_turn_on_raw(void);
 
 // -1 if not active, otherwise the current trace fd.
-int* trace_get_fd(void);
+int trace_get_fd(void);
 
 // these emit only if some form of tracing is active.
 
