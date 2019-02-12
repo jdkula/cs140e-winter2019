@@ -16,27 +16,33 @@ memory_operation_handler_t mem_on_write = NULL;
 memory_operation_handler_t mem_on_read = NULL;
 
 /** Invokes the on-write handler if it's defined. */
-static void on_write(mem_t* info) {
-    if(mem_on_write != NULL) {
+static void on_write(mem_t info) {
+    if (mem_on_write != NULL) {
         mem_on_write(info);
     }
 }
 
 /** Invokes the on-read handler if it's defined. */
-static void on_read(mem_t* info) {
-    if(mem_on_read != NULL) {
+static void on_read(mem_t info) {
+    if (mem_on_read != NULL) {
         mem_on_read(info);
     }
 }
 
 void put32(void* addr, uint32 data) {
-
+    put_uint(OP_WRITE32);
+    put_uint((unsigned) addr);
+    put_uint((unsigned) data);
+    mem_t info = {.val = data, .addr = addr};
+    on_write(info);
 }
 
 uint32 get32(void* addr) {
     put_uint(OP_READ32);
     put_uint((unsigned) addr);
-    return get_uint();
+    uint32 data = get_uint();
+    mem_t info = {.val = data, .addr = addr};
+    on_read(info);
 }
 
 // Get Program Counter

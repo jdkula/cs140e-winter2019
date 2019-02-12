@@ -22,3 +22,5 @@ void delay_us(uint32 us);
 /** Delays program execution for a given number of [ms]. */
 void delay_ms(uint32 ms);
 
+void timer_interrupt_init(unsigned ncycles);
+

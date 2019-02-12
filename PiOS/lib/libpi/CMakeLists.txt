@@ -32,6 +32,9 @@ set(LIBRARY_NAME libpi)
 
 # Source Files
 set(SRC_ARM
+        sysspec/arm/interrupts.s
+        src/interrupts.c
+        src/arm.c
         src/aux.c
         src/gpio.c
         src/mem-access.c
@@ -53,6 +56,8 @@ set(SRC_EMU
         src/reboot.c
         src/timer.c
         src/uart.c
+        src/interrupts.c
+        src/arm.c
         sysspec/x86/dummy.c
         sysspec/x86/aux-x86-extensions.c
         sysspec/x86/mem-x86-extensions.c
@@ -65,6 +70,8 @@ set(SRC_VMM
         src/timer.c
         src/uart.c
         src/mem-access.c
+#        src/interrupts.c
+#        src/arm.c
         sysspec/x86/aux-x86-extensions.c
         sysspec/x86/dummy.c
         sysspec/x86/vmm/aux.c

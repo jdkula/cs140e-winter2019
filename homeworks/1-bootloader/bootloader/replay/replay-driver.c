@@ -28,13 +28,13 @@
 // just do GET8.
 
 endpoint_t mk_endpoint(const char *name, Q_t q, int fd, int pid) {
-	return (endpoint_t) 
-	{ 
-		.name = strdup(name), 
-		.replay_log = q,
-		.fd = fd,
-		.pid = pid
-	};
+	return (endpoint_t)
+			{
+					.name = strdup(name),
+					.replay_log = q,
+					.fd = fd,
+					.pid = pid
+			};
 }
 
 static void destroy_end(endpoint_t *e) {
@@ -44,13 +44,13 @@ static void destroy_end(endpoint_t *e) {
 
 
 
-/* 
+/*
  * systematically corrupt one operation at a time and see that the unix
  * side fails.  [extend this to the pi side!].
  *
  * NOTE:
  *	- we only want to corrupt bytes in the protocol --- the other bytes
- *	are unchecked by the bootloader code, so corrupting them 
+ *	are unchecked by the bootloader code, so corrupting them
  *	will not lead to errors we care about.
  *
  * 	- the most general way to do this is to have the checked program
@@ -58,7 +58,7 @@ static void destroy_end(endpoint_t *e) {
  *	for the bytes it cares about.
  *
  *	- to minimize touching the bootloader (and for expediency) we do
- *	do a gross hack: the protocol uses WRITE32/READ32, the non-checked 
+ *	do a gross hack: the protocol uses WRITE32/READ32, the non-checked
  *	reads are READ8 (which it just echos to the screen).  So
  *	we just march down corrupting READ32s.
  */
@@ -67,11 +67,11 @@ void check_crashes(Q_t replay_log, char *argv[]) {
 	// if the child dies while we are writing a socket, we will actually
 	// (sometimes) get a SIGPIPE.
 	if(signal(SIGPIPE, SIG_IGN) < 0)
-                sys_die(signal, cannot catch);
+		sys_die(signal, cannot catch);
 
 	E_t *e = Q_start(&replay_log);
 	for(int n = 0; e; e = Q_next(e), n++)  {
-		// once we hit a READ8 we know we are done with the 
+		// once we hit a READ8 we know we are done with the
 		// protocol.
 		if(e->op == OP_READ8)
 			break;
@@ -79,13 +79,13 @@ void check_crashes(Q_t replay_log, char *argv[]) {
 		// on these.
 		if(e->op == OP_WRITE32)
 			continue;
-		
+
 		demand(e->op == OP_READ32, invalid op);
 		note("ATTEMPT: going to corrupt op %d\n", n);
 
 		// create a new process.
-		endpoint_t end = 
-			mk_endpoint_proc("unix.side", replay_log, &argv[1]);
+		endpoint_t end =
+				mk_endpoint_proc("unix.side", replay_log, &argv[1]);
 
 		// check it.
 		replay(&end, n);
@@ -108,10 +108,10 @@ void check_success(Q_t replay_log, char *argv[]) {
  *	./a.out < hello.trace.txt > t.txt
  *  	diff hello.trace.txt t.txt
  */
-int main(int argc, char *argv[]) { 
+int main(int argc, char *argv[]) {
 	demand(argc > 1, no arguments?);
 
-	const int N = 1;
+	const int N = 1000;
 	srandom(0); 	// so everyone has the same.
 	struct Q q = read_input(stdin, 0);
 
@@ -122,13 +122,13 @@ int main(int argc, char *argv[]) {
 	// now try failures.  we iterate these N times as well, should
 	// get the same fails.
 	//
-	// NOTE: you can externalize the reads and writes and then 
+	// NOTE: you can externalize the reads and writes and then
 	// check against everyone else.
 	for(int i = 0; i < N; i++)
 		check_crashes(q, argv);
 
 #if 0
-	for(struct E *e = Q_start(&end.replay_log); e; e = Q_next(e)) 
+	for(struct E *e = Q_start(&end.replay_log); e; e = Q_next(e))
 		fprintf(stderr, "%s:%d:%x\n", op_to_s(e->op), e->cnt, e->val);
 	struct E *e;
 

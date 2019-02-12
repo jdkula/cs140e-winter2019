@@ -62,7 +62,7 @@ void timer_interrupt_init(unsigned ncycles) {
                 RPI_ARMTIMER_CTRL_23BIT |
                 RPI_ARMTIMER_CTRL_ENABLE |
                 RPI_ARMTIMER_CTRL_INT_ENABLE |
-                RPI_ARMTIMER_CTRL_PRESCALE_256;
+                RPI_ARMTIMER_CTRL_PRESCALE_1;
 
   //              RPI_ARMTIMER_CTRL_PRESCALE_256;
 

@@ -13,10 +13,19 @@
  */
 #include "rpi.h"
 
+#define ECHO 5
+#define TRIG 20
+#define LED  21
+
 void notmain(void) {
         uart_init();
 
 	printk("starting sonar!\n");
+
+  gpio_set_pulldown(ECHO);
+
+  gpio_set_input(ECHO);
+  gpio_set_output(TRIG);
 
 
 	// put your code here.  
@@ -34,6 +43,37 @@ void notmain(void) {
 	// 	4. use the code in gpioextra.h and then replace it with your
 	//	own (using the broadcom pdf in the docs/ directory).
 	// 
+  
+  int cnt = 0;
+  while(cnt < 5000) {
+    gpio_write(TRIG, 1);
+    delay_us(11);
+    gpio_write(TRIG, 0);
+
+    unsigned timeout = timer_get_time() + 1000000;
+    while(gpio_read(ECHO) == 0 && timer_get_time() < timeout);
+
+    int start = timer_get_time();
+
+    while(gpio_read(ECHO) != 0 && timer_get_time() < timeout);
+
+    if(timer_get_time() >= timeout) {
+      printk("echo lost...\n");
+      continue;
+    }
+
+    int duration = timer_get_time() - start;
+
+    int wholepart = duration / 148;
+
+    int decpart = ((duration * 100) / 148) - (wholepart * 100);
+
+    printk("GOT - %d.%d\n", wholepart, decpart);
+    cnt++;
+    delay_ms(100);
+  }
+
+
 	// troubleshooting:
 	//	1. readings can be noisy --- you may need to require multiple
 	//	high (or low) readings before you decide to trust the 

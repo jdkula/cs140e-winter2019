@@ -1,6 +1,6 @@
-CFLAGS = -Wall -Og -g -ggdb
+CFLAGS = -Wall -Og -g -ggdb -I../shared-code
 CC = gcc
-SRC = my-install.c fatal.c simple-boot.c  support.c
+SRC = my-install.c fatal.c simple-boot.c support.c trace.c tty.c
 OBJS = $(SRC:.c=.o)
 
 all : my-install 

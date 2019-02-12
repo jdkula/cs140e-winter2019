@@ -25,7 +25,7 @@ typedef struct {
 } mem_t;
 
 /** Event handler typedefs */
-typedef void (*memory_operation_handler_t)(const mem_t* m);
+typedef void (*memory_operation_handler_t)(mem_t m);
 typedef void (*memory_barrier_handler_t)();
 
 /** Event handler locations. Set to a function to call it on that event; set to NULL/0 to disable. */

@@ -1,0 +1,2 @@
+These files are copies of pi-side/libpi.small/{uart.c, uart.h, gpio.c, gpio.h, aux.c, aux.h, etc.}.
+I replaced the gpio/uart/etc. files in libpi.small -- the current Makefiles use this code. Feel free to verify.

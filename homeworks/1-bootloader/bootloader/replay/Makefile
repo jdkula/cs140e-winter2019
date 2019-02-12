@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g -std=gnu99 -I../unix-side
+CFLAGS = -Wall -g -std=gnu99 -I../unix-side -I../shared-code
 OBJS = ../unix-side/support.o ../unix-side/tty.o
 
 RUN = ../unix-side/my-install ../test-binaries/hello.bin

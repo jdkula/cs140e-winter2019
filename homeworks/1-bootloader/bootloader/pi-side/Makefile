@@ -1,5 +1,5 @@
 CC= arm-none-eabi-gcc
-CFLAGS = -I$(LIBPI)/.. -I. -Wall -Og -nostdlib -nostartfiles -ffreestanding 
+CFLAGS = -I$(LIBPI)/.. -I$(LIBPI) -I$(LIBPI)/../../shared-code -I. -Wall -Og -nostdlib -nostartfiles -ffreestanding 
 
 LIBPI = libpi.small
 

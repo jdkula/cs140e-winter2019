@@ -16,10 +16,4 @@ unsigned GET32(unsigned addr);
 // set pc value to <addr>
 void BRANCHTO ( unsigned int addr);
 
-
-// uart functions
-void uart_init ( void );
-int uart_getc ( void );
-void uart_putc ( unsigned int c );
-
 #endif

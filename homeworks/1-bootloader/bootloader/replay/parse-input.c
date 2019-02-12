@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <demand.h>
 
-#include "demand.h"
 #include "replay.h"
 
 static char *pop_field(char **line) {

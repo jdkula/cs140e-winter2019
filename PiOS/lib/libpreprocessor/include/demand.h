@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #else
-#define fprintf(ignored, ...) printf(__VA_ARGS__)
+#include "printf.h"
+#define fprintf(ignored, ...) printk(__VA_ARGS__)
 #define exit(...) reboot()
 #endif
 
@@ -43,7 +44,7 @@
 } while(0)
 #else
 #define panic(msg, args...) do { 					\
-	printf("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
+	printk("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
 	reboot();							\
 } while(0)
 #endif

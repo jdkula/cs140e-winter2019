@@ -74,29 +74,29 @@ static void queue_commit() {
 }
 
 /** Catches write events and queues/commits appropriately. */
-static void on_write(const mem_t* info) {
+static void on_write(mem_t info) {
     if(commit_mode != COMMIT_WRITE) {
         queue_commit();
         commit_mode = COMMIT_WRITE;
     }
 
-    mem_t* last_op = queue_locate(info);
+    mem_t* last_op = queue_locate(&info);
     if(last_op == NULL) {
-        queue_insert(info);
+        queue_insert(&info);
     } else {
-        last_op->val = info->val;
+        last_op->val = info.val;
     }
 
     if(test_on_write != NULL) test_on_write(info);
 }
 
 /** Catches read events and queues/commits appropriately. */
-static void on_read(const mem_t* info) {
+static void on_read(mem_t info) {
     if(commit_mode != COMMIT_READ) {
         queue_commit();
         commit_mode = COMMIT_READ;
     }
-    queue_insert(info);
+    queue_insert(&info);
 
     if(test_on_read != NULL) test_on_read(info);
 }

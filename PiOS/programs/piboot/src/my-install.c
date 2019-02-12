@@ -24,13 +24,37 @@
 
 #include <x86/tty.h>
 #include <simple-boot.h>
+#include <sys/wait.h>
 
 #include "demand.h"
 #include "support.h"
 #include "trace.h"
 
-void handoff_to(int fd, char *argv[]) {
-    unimplemented();
+static int exit_code(int pid) {
+    int status;
+    safe_sys(waitpid(pid, &status, 0));
+    if(!WIFEXITED(status)) {
+        return -1; // did not exit normally
+    }
+    return WEXITSTATUS(status);
+}
+
+
+void handoff_to(int tty_fd, char* argv[]) {
+    int pid = 0;
+
+    safe_sys(pid = fork());
+
+    if(pid == 0) {
+        safe_sys(dup2(tty_fd, TRACE_FD_HANDOFF));
+        safe_sys(close(tty_fd));
+        safe_sys(execvp(argv[0], argv));
+
+        return;
+    }
+
+    fprintf(stderr, "child %d: exited with: %d\n", pid, exit_code(pid));
+
 }
 
 // simple state machine to indicate when we've seen a special string

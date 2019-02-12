@@ -50,9 +50,9 @@ int set_tty_to_8n1(int fd, unsigned speed, double timeout) {
 	tty.c_cflag &= ~CSIZE;	 	
 	// Set the data bits = 8
 	tty.c_cflag |=  CS8; 		
-	// No Hardware flow Control 
+	// No Hardware flow control
 	tty.c_cflag &= ~CRTSCTS;
-	// Enable receiver,Ignore Modem Control lines 
+	// Enable receiver,Ignore Modem control lines
 	tty.c_cflag |= CREAD | CLOCAL; 	
 		
 	// Disable XON/XOFF flow control both i/p and o/p
