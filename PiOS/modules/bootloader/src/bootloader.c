@@ -17,7 +17,7 @@
 #include <printf.h>
 #include <pios-macros.h>
 
-static void die(uint32 code) {
+static void die(uint32_t code) {
     put_uint(code);
     reboot();
 }
@@ -47,12 +47,12 @@ void notmain(void) {
     gpio_write(GPIO_PWR, LOW);              // Swap PWR and ACT to indicate we're taking in data.
     gpio_write(GPIO_ACT, HIGH);
 
-    uint32 numBytes = get_uint();       // Take in the number of bytes.
-    uint32 msgCrc = get_uint();         // Take in the message checksum.
+    uint32_t numBytes = get_uint();       // Take in the number of bytes.
+    uint32_t msgCrc = get_uint();         // Take in the message checksum.
 
     put_uint(SOH);                      // Let the client know we've got the message
 
-    uint32 nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
+    uint32_t nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
     put_uint(nCrc);                     // ...and send it back to verify.
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
@@ -60,8 +60,8 @@ void notmain(void) {
         die(NAK);
     }
 
-    uint32 bytesRead = 0;               // Get ready to read!
-    uint32 lastData = get_uint();
+    uint32_t bytesRead = 0;               // Get ready to read!
+    uint32_t lastData = get_uint();
 
     while (lastData != EOT) {
         IGNORE(-Wint-to-pointer-cast);

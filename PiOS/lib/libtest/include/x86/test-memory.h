@@ -13,7 +13,7 @@
 
 void test_mem_init();
 
-typedef void (*on_commit_t)(const mem_t* committed, uint32 size, uint8 commit_type);
+typedef void (*on_commit_t)(const mem_t* committed, uint32_t size, uint8_t commit_type);
 
 extern memory_operation_handler_t test_on_read;
 extern memory_operation_handler_t test_on_write;

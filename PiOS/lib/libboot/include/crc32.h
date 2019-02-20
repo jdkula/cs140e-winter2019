@@ -12,4 +12,4 @@
  * Moves around the above hash table according to
  * each byte of an input [buf] of a given [size].
  */
-uint32 crc32(const void* buf, uint32 size);
+uint32_t crc32(const void* buf, uint32_t size);

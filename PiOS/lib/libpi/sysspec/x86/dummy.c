@@ -8,6 +8,6 @@
 #include "rpi.h"
 
 // We don't need to wait in x86-compiled projects, so we'll just let the compiler take this away...
-void dummy(uint32 unused) {
+void dummy(uint32_t unused) {
     // No-op
 }

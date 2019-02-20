@@ -19,31 +19,31 @@
 #include <integer.h>
 #include "../../include/debug.h"
 
-void debug_on(uint8 pin) {
+void debug_on(uint8_t pin) {
 #ifndef DEBUG_OFF
     printf("[Debug] pin %d turned on\n", pin);
 #endif
 }
 
-void debug_off(uint8 pin) {
+void debug_off(uint8_t pin) {
 #ifndef DEBUG_OFF
     printf("[Debug] pin %d turned off\n", pin);
 #endif
 }
 
-void debug_enable(uint8 pin) {
+void debug_enable(uint8_t pin) {
 #ifndef DEBUG_OFF
     printf("[Debug] pin %d enabled for debugging\n", pin);
 #endif
 }
 
-void debug_disable(uint8 pin) {
+void debug_disable(uint8_t pin) {
 #ifndef DEBUG_OFF
     printf("[Debug] pin %d disabled for debugging\n", pin);
 #endif
 }
 
-void debug_delay(uint32 ticks) {
+void debug_delay(uint32_t ticks) {
 #ifndef DEBUG_OFF
     printf("[Debug] Delayed for %u ticks\n", ticks);
 #endif

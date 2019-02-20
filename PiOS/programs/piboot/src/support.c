@@ -12,7 +12,7 @@
 #include "support.h"
 
 // read entire file into buffer.  return it, write totat bytes to <size>
-uint8* read_file(int* size, const char* name) {
+uint8_t* read_file(int* size, const char* name) {
     struct stat fileStat;
     if (stat(name, &fileStat) < 0) {
         panic("Stat failed");
@@ -34,12 +34,12 @@ uint8* read_file(int* size, const char* name) {
     return buf;
 }
 
-unsigned char* align_file(uint32* size, const uint8* file, unsigned align_to) {
+unsigned char* align_file(uint32_t* size, const uint8_t* file, unsigned align_to) {
     int oldsize = *size;
     unsigned align_addition = (align_to - (*size % align_to));
     *size += align_addition == align_to ? 0 : align_addition;
 
-    uint8* new = malloc(*size);
+    uint8_t* new = malloc(*size);
 
     memcpy(new, file, oldsize);
 

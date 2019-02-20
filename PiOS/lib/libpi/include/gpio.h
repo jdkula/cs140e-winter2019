@@ -20,7 +20,7 @@ enum {
     GPIO_ERR_INVALID_EVENT,     // Indicates an invalid event was used.
     GPIO_ERR_INVALID_FUNCTION,  // Indicates an invalid function was used.
 };
-extern int8 gpio_errno;
+extern int8_t gpio_errno;
 
 /**
  * These enumerated values establish symbolic names for each of the GPIO pins.
@@ -138,7 +138,7 @@ void gpio_reset(void);
  *
  * If `pin` or `function` is invalid, does nothing.
  */
-uint8 gpio_set_function(uint8 pin, uint8 function);
+uint8_t gpio_set_function(uint8_t pin, uint8_t function);
 
 /**
  * Get the GPIO function for GPIO pin number `pin`.
@@ -148,7 +148,7 @@ uint8 gpio_set_function(uint8 pin, uint8 function);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-uint32 gpio_get_function(uint8 pin);
+uint32_t gpio_get_function(uint8_t pin);
 
 /**
  * Convenience functions for setting a pin to GPIO_FUNC_INPUT or
@@ -157,9 +157,9 @@ uint32 gpio_get_function(uint8 pin);
  * @param pin the GPIO pin number to set the function of
  * @return 0 on success, GPIO_ERROR otherwise.
  */
-uint8 gpio_set_input(uint8 pin);
+uint8_t gpio_set_input(uint8_t pin);
 
-uint8 gpio_set_output(uint8 pin);
+uint8_t gpio_set_output(uint8_t pin);
 
 /**
  * Set GPIO pin number `pin` to high (1) or low (0). This
@@ -172,7 +172,7 @@ uint8 gpio_set_output(uint8 pin);
  *
  * If `pin` is invalid, does nothing.
  */
-uint8 gpio_write(uint8 pin, uint8 val);
+uint8_t gpio_write(uint8_t pin, uint8_t val);
 
 /**
  * Get current level (1 for high, 0 for low) for GPIO pin number `pin`.
@@ -182,13 +182,13 @@ uint8 gpio_write(uint8 pin, uint8 val);
  *
  * If `pin` is invalid, returns GPIO_INVALID_REQUEST.
  */
-uint8 gpio_read(uint8 pin);
+uint8_t gpio_read(uint8_t pin);
 
 /**
  * Sets event detection (of the given [event]) on the
  * given [pin] to be either disabled or [enabled].
  */
-uint8 gpio_set_detect_event(uint8 pin, uint8 event, bool enabled);
+uint8_t gpio_set_detect_event(uint8_t pin, uint8_t event, bool enabled);
 
 enum {
     GPIO_EVENT_RISING_EDGE = 0,
@@ -203,10 +203,10 @@ enum {
 };
 
 /** Returns true if an event has occurred on the given [pin]. */
-bool gpio_check_event(uint8 pin);
+bool gpio_check_event(uint8_t pin);
 
 /** Returns true if an event has occurred on the given [pin]. Also clears the event. */
-bool gpio_check_and_clear_event(uint8 pin);
+bool gpio_check_and_clear_event(uint8_t pin);
 
 /** Constants for gpio_set_pud -- symbolic representations of the pull-state of a pin. */
 enum {
@@ -216,11 +216,11 @@ enum {
 };
 
 /** Sets the given [pin] to the pull-state given by [pud]. */
-uint8 pin_pull(uint8 pin, uint32 pud);
+uint8_t pin_pull(uint8_t pin, uint32_t pud);
 
 /** Convenience methods that pull a pin up/down. */
-uint8 gpio_set_pulldown(uint8 pin);
-uint8 gpio_set_pullup(uint8 pin);
+uint8_t gpio_set_pulldown(uint8_t pin);
+uint8_t gpio_set_pullup(uint8_t pin);
 
 
 #endif // PIOS_GPIO_H

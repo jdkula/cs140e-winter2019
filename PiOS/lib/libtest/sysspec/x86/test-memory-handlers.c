@@ -20,7 +20,7 @@ void test_default_barrier_handler() {
     printf("\tBARRIER\n");
 }
 
-void test_default_commit_handler(const mem_t* list, uint32 size, uint8 commit_type) {
+void test_default_commit_handler(const mem_t* list, uint32_t size, uint8_t commit_type) {
     printf("\tCOMMIT\n");
     for (const mem_t* this = list; this < (list + size); this++) {
         if (commit_type == COMMIT_READ) {

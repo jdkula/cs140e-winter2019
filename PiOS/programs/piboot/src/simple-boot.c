@@ -18,8 +18,8 @@
 #include "support.h"
 #include "trace.h"
 
-uint32 get_uint_traced(int fd) {
-    uint32 recv = tty_get_uint(fd);
+uint32_t get_uint_traced(int fd) {
+    uint32_t recv = tty_get_uint(fd);
     trace_read32(recv);
     return recv;
 }
@@ -31,8 +31,8 @@ void put_uint_traced(int fd, unsigned data) {
 
 // simple utility function to check that a u32 read from the 
 // file descriptor matches <v>.
-void expect(const char* msg, int fd, uint32 v) {
-    uint32 x = get_uint_traced(fd);
+void expect(const char* msg, int fd, uint32_t v) {
+    uint32_t x = get_uint_traced(fd);
     if (x != v) {
         put_uint_traced(fd, NAK);
         panic("%s: expected %x, got %x\n", msg, v, x);
@@ -41,14 +41,14 @@ void expect(const char* msg, int fd, uint32 v) {
 
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
-void simple_boot(int fd, const uint8* givenBuf, uint32 n) {
-    const uint8* buf = givenBuf;
+void simple_boot(int fd, const uint8_t* givenBuf, uint32_t n) {
+    const uint8_t* buf = givenBuf;
     if(n % 4 != 0) {
         buf = align_file(&n, buf, 4);
     }
 
-    uint32 nCrc = crc32(&n, 4);
-    uint32 bufCrc = crc32(buf, n);
+    uint32_t nCrc = crc32(&n, 4);
+    uint32_t bufCrc = crc32(buf, n);
 
     put_uint_traced(fd, SOH);
     put_uint_traced(fd, n);
@@ -65,8 +65,8 @@ void simple_boot(int fd, const uint8* givenBuf, uint32 n) {
 
     put_uint_traced(fd, ACK);  // We're good to go!
 
-    const uint32* intBuf = (const uint32*) (buf);
-    uint32 intBufSize = n / 4;
+    const uint32_t* intBuf = (const uint32_t*) (buf);
+    uint32_t intBufSize = n / 4;
     fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
 
     for (int i = 0; i < intBufSize; i++) {

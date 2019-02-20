@@ -10,11 +10,11 @@
 #include <integer.h>
 #include "mem-access.h"
 
-uint32 setBit(uint32* addr, uint8 bitNum, uint32 value) {
+uint32_t setBit(uint32_t* addr, uint8_t bitNum, uint32_t value) {
     value = (value) & 0b1U; // ensure value is a single bit.
 
-    uint32 currentValue = get32(addr);
-    uint32 bitValue = value << bitNum;
+    uint32_t currentValue = get32(addr);
+    uint32_t bitValue = value << bitNum;
 
     currentValue = (currentValue & ~bitValue) | bitValue;
 
@@ -22,8 +22,8 @@ uint32 setBit(uint32* addr, uint8 bitNum, uint32 value) {
     return currentValue;
 }
 
-uint8 getBit(uint32* addr, uint8 bitNum) {
-    uint32 currentValue = get32(addr);
+uint8_t getBit(uint32_t* addr, uint8_t bitNum) {
+    uint32_t currentValue = get32(addr);
 
-    return (uint8) ((currentValue >> bitNum) & 1U);
+    return (uint8_t) ((currentValue >> bitNum) & 1U);
 }

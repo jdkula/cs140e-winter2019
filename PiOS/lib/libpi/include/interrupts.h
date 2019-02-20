@@ -18,16 +18,16 @@
 
 // http://xinu.mscs.mu.edu/BCM2835_Interrupt_Controller
 typedef struct {
-    volatile uint32 irq_basic_pending;
-    volatile uint32 irq_pending_1;
-    volatile uint32 irq_pending_2;
-    volatile uint32 fiq_control;
-    volatile uint32 enable_irqs_1;
-    volatile uint32 enable_irqs_2;
-    volatile uint32 enable_basic_irqs;
-    volatile uint32 disable_irqs_1;
-    volatile uint32 disable_irqs_2;
-    volatile uint32 disable_basic_irqs;
+    volatile uint32_t irq_basic_pending;
+    volatile uint32_t irq_pending_1;
+    volatile uint32_t irq_pending_2;
+    volatile uint32_t fiq_control;
+    volatile uint32_t enable_irqs_1;
+    volatile uint32_t enable_irqs_2;
+    volatile uint32_t enable_basic_irqs;
+    volatile uint32_t disable_irqs_1;
+    volatile uint32_t disable_irqs_2;
+    volatile uint32_t disable_basic_irqs;
 } rpi_irq_controller_t;
 
 volatile rpi_irq_controller_t* get_irq_controller(void);

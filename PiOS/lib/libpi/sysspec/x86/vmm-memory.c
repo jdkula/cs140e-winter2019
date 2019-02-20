@@ -29,7 +29,7 @@ static void on_read(mem_t info) {
     }
 }
 
-void put32(void* addr, uint32 data) {
+void put32(void* addr, uint32_t data) {
     put_uint(OP_WRITE32);
     put_uint((unsigned) addr);
     put_uint((unsigned) data);
@@ -37,20 +37,20 @@ void put32(void* addr, uint32 data) {
     on_write(info);
 }
 
-uint32 get32(void* addr) {
+uint32_t get32(void* addr) {
     put_uint(OP_READ32);
     put_uint((unsigned) addr);
-    uint32 data = get_uint();
+    uint32_t data = get_uint();
     mem_t info = {.val = data, .addr = addr};
     on_read(info);
 }
 
 // Get Program Counter
-uint32 GETPC() {
+uint32_t GETPC() {
     return 0; // TODO: Unsure how to do this...
 }
 
 /** Our current x86 test harness doesn't support branching, so this is a no-op. */
-void BRANCHTO(uint32 addr) {
+void BRANCHTO(uint32_t addr) {
     return; // No-op
 }

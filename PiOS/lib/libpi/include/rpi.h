@@ -15,6 +15,6 @@
 void reboot(void);
 
 /** Does nothing -- just uses a CPU cycle. */
-void dummy(uint32 unused);
+void dummy(uint32_t unused);
 
 #endif // __RPI_H__

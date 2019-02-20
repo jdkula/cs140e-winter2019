@@ -14,18 +14,18 @@
 #define PIOS_DEBUG_H
 
 /** Sets the given [pin] to HIGH */
-void debug_on(uint8 pin);
+void debug_on(uint8_t pin);
 
 /** Sets the given [pin] to LOW */
-void debug_off(uint8 pin);
+void debug_off(uint8_t pin);
 
 /** Sets the given [pin]'s function to OUTPUT. */
-void debug_enable(uint8 pin);
+void debug_enable(uint8_t pin);
 
 /** Sets the given [pin]'s function to INPUT. */
-void debug_disable(uint8 pin);
+void debug_disable(uint8_t pin);
 
 /** Delays for the given number of [ticks]. */
-void debug_delay(uint32 ticks);
+void debug_delay(uint32_t ticks);
 
 #endif //PIOS_DEBUG_H

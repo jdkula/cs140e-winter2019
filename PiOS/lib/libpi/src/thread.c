@@ -1,14 +1,16 @@
 #include <demand.h>
 #include "rpi.h"
-#include "rpi-thread.h"
+#include "thread.h"
 
 // typedef rpi_thread_t E;
 #define E rpi_thread_t
+
 #include "Q.h"
+
 #undef E
 
 #include "compat/dawson.h"
-#include "rpi-thread.h"
+#include "thread.h"
 
 static struct Q runq, freeq;
 static unsigned nthreads;
@@ -35,7 +37,7 @@ rpi_thread_t* rpi_fork(void (* code)(void* arg), void* arg) {
     // stack offsets, change them!
     enum {
         // register offsets are in terms of byte offsets!
-                LR_offset = 56 / 4,
+        LR_offset = 56 / 4,
         CPSR_offset = 60 / 4,
         R0_offset = 0,
         R1_offset = 4 / 4,
@@ -45,7 +47,7 @@ rpi_thread_t* rpi_fork(void (* code)(void* arg), void* arg) {
     // write this so that it calls code,arg.
     void rpi_init_trampoline(void);
 
-    t->sp = (((uint32*) t->stack) + 1024 * 8 - 1 - (INIT_SIZE));
+    t->sp = (((uint32_t*) t->stack) + 1024 * 8 - 1 - (INIT_SIZE));
     t->sp[LR_offset] = rpi_init_trampoline;
     t->sp[R0_offset] = arg;
     t->sp[R1_offset] = code;

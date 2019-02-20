@@ -40,14 +40,14 @@ memory_barrier_handler_t test_on_barrier = test_default_barrier_handler;
 on_commit_t test_on_commit = test_default_commit_handler;
 
 /** What the last memory action was; NONE (if there was just a memory barrier or at the start); READ, or WRITE. */
-uint8 commit_mode = COMMIT_NONE;
+uint8_t commit_mode = COMMIT_NONE;
 
 mem_t commit_queue[MEMORY_CHUNKS];
-uint32 queue_size = 0;
+uint32_t queue_size = 0;
 
 /** Locates something with [info]'s address in the queue, or returns NULL if not found. */
 static mem_t* queue_locate(const mem_t* info) {
-    for(uint32 i = 0; i < queue_size; i++) {
+    for(uint32_t i = 0; i < queue_size; i++) {
         if(info->addr == commit_queue[i].addr) {
             return &commit_queue[i];
         }

@@ -7,12 +7,12 @@
 #include <printf.h>
 #include <aux.h>
 
-const uint8 THE_PIN = GPIO_ACT;
+const uint8_t THE_PIN = GPIO_ACT;
 
 int notmain(void) {
     gpio_set_output(THE_PIN);
 
-    uint8 times = 10;
+    uint8_t times = 10;
 
     for (; times > 0; times--) {
         gpio_write(THE_PIN, HIGH);

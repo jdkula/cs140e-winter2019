@@ -15,25 +15,25 @@
 #include "../../include/debug.h"
 #include "../../include/debug.h"
 
-void debug_on(uint8 pin) {
+void debug_on(uint8_t pin) {
 #ifndef DEBUG_OFF
     gpio_write(pin, 1);
 #endif
 }
 
-void debug_off(uint8 pin) {
+void debug_off(uint8_t pin) {
 #ifndef DEBUG_OFF
     gpio_write(pin, 0);
 #endif
 }
 
-void debug_enable(uint8 pin) {
+void debug_enable(uint8_t pin) {
 #ifndef DEBUG_OFF
     gpio_set_function(pin, GPIO_FUNC_OUTPUT);
 #endif
 }
 
-void debug_disable(uint8 pin) {
+void debug_disable(uint8_t pin) {
 #ifndef DEBUG_OFF
     // Input was chosen as the "disable" state since it's the default pin function.
     // See BCM2835-ARM-Peripherals p. 91 -- "All pins reset to normal GPIO input operation."
@@ -41,7 +41,7 @@ void debug_disable(uint8 pin) {
 #endif
 }
 
-void debug_delay(uint32 ticks) {
+void debug_delay(uint32_t ticks) {
 #ifndef DEBUG_OFF
     delay(ticks);
 #endif

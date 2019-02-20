@@ -21,7 +21,7 @@
  */
 typedef struct {
     void* addr;
-    uint32 val;
+    uint32_t val;
 } mem_t;
 
 /** Event handler typedefs */

@@ -11,7 +11,7 @@
 
 #include "integer.h"
 
-typedef int8 bool;
+typedef int8_t bool;
 
 enum {
     true = 1,

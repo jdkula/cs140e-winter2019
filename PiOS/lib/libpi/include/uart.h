@@ -16,7 +16,7 @@ enum {
     UART_ERR_OK,       // Indicates the absence of an error.
     UART_ERR_TIMEOUT   // Indicates that a timeout occurred while waiting to sent/receive data.
 };
-extern int8 uart_errno;
+extern int8_t uart_errno;
 
 /** Sets up the miniUART for use. */
 void uart_init(void);
@@ -25,13 +25,13 @@ void uart_init(void);
  * Gets a character from the peer, blocking until something is recieved or the timeout is reached.
  * Pass a timeout of 0 to wait forever. This function will wait for [timeout_ticks]-1 ticks.
  */
-uint8 uart_getc();
+uint8_t uart_getc();
 
 /**
  * Sends a character to the peer, blocking until something is recieved or the timeout is reached.
  * Pass a timeout of 0 to wait forever. This function will wait for [timeout_ticks]-1 ticks.
  */
-uint8 uart_putc(uint8 c);
+uint8_t uart_putc(uint8_t c);
 
 /** Gets an integer from the UART. */
 unsigned get_uint(void);

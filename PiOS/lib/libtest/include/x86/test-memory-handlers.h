@@ -14,6 +14,6 @@ void test_default_read_handler(const mem_t* m);
 
 void test_default_barrier_handler();
 
-void test_default_commit_handler(const mem_t* list, uint32 size, uint8 commit_type);
+void test_default_commit_handler(const mem_t* list, uint32_t size, uint8_t commit_type);
 
 #endif //PIOS_TEST_MEMORY_HANDLERS_H

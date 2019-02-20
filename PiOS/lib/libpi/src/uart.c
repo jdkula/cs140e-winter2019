@@ -13,7 +13,7 @@
 #include "aux.h"
 
 /** This global keeps track of UART errors. */
-int8 uart_errno = UART_ERR_OK;
+int8_t uart_errno = UART_ERR_OK;
 
 void uart_init(void) {
     data_sync_barrier();
@@ -44,7 +44,7 @@ void uart_init(void) {
     data_sync_barrier();
 }
 
-uint8 uart_getc() {
+uint8_t uart_getc() {
     // Do nothing until the RX buffer has data, or until we time out. If the timeout is 0, wait forever.
 //    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_rx_has_data(); timeout_ticks--);
 //    if (timeout_ticks == 1) {
@@ -58,7 +58,7 @@ uint8 uart_getc() {
     return aux_uart_receive();
 }
 
-uint8 uart_putc(uint8 c) {
+uint8_t uart_putc(uint8_t c) {
     // Do nothing until the TX buffer has space, or until we time out. If the timeout is 0, wait forever.
 //    for (; (timeout_ticks > 1 || timeout_ticks == 0) && !aux_uart_tx_has_space(); timeout_ticks--);
 //    if (timeout_ticks == 1) {
@@ -74,15 +74,15 @@ uint8 uart_putc(uint8 c) {
     return 0;
 }
 
-uint32 get_uint(void) {
-    uint32 u = uart_getc();
+uint32_t get_uint(void) {
+    uint32_t u = uart_getc();
     u |= uart_getc() << 8u;
     u |= uart_getc() << 16u;
     u |= uart_getc() << 24u;
     return u;
 }
 
-void put_uint(uint32 u) {
+void put_uint(uint32_t u) {
     uart_putc((u >> 0u) & 0xffu);
     uart_putc((u >> 8u) & 0xffu);
     uart_putc((u >> 16u) & 0xffu);

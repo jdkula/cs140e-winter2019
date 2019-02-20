@@ -5,9 +5,9 @@
 
 typedef struct rpi_thread {
 	struct rpi_thread *next;
-	uint32 *sp;
-	uint32 tid;
-	uint32 stack[1024 * 8];
+	uint32_t *sp;
+	uint32_t tid;
+	uint32_t stack[1024 * 8];
 } rpi_thread_t;
 
 // create a new thread.
@@ -27,7 +27,7 @@ void rpi_thread_start(int preemptive_p);
 //	- note: if pre-emptive is enabled this can change underneath you!
 rpi_thread_t *rpi_cur_thread(void);
 
-uint32 rpi_get_cpsr(void);
+uint32_t rpi_get_cpsr(void);
 
 // context-switch:
 //      - after saving state, write value of sp to <sp_old>
@@ -35,6 +35,6 @@ uint32 rpi_get_cpsr(void);
 // note:
 // 	for this lab, we have the prototype returning an unsigned to help
 // 	debugging, but it should be <void>
-unsigned rpi_cswitch(uint32 **sp_old, uint32 **sp_new);
+unsigned rpi_cswitch(uint32_t **sp_old, uint32_t **sp_new);
 
 #endif

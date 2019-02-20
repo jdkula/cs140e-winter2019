@@ -14,7 +14,7 @@
  */
 
 /** Provides CRC32's hash table. */
-static uint32 crc32_tab[] = {
+static uint32_t crc32_tab[] = {
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
         0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
         0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -65,9 +65,9 @@ static uint32 crc32_tab[] = {
  * Moves around the above hash table according to
  * each byte of an input [buf] of a given [size].
  */
-uint32 crc32(const void* buf, uint32 size) {
-    const uint8* p;
-    uint32 crc = 0;
+uint32_t crc32(const void* buf, uint32_t size) {
+    const uint8_t* p;
+    uint32_t crc = 0;
 
     p = buf;
     crc = crc ^ ~0U;

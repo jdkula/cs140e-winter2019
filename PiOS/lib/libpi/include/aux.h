@@ -16,7 +16,7 @@
 #include <boolean.h>
 
 /** Setting to enable the UART and UART registers. */
-void aux_uart_register_enable(uint8 enabled);
+void aux_uart_register_enable(uint8_t enabled);
 
 /** Constants for aux_uart_enable_set. */
 enum {
@@ -25,7 +25,7 @@ enum {
 };
 
 /** Clears the UART's TX and/or RX buffers, depending on the constant passed in. */
-void aux_uart_clear(uint8 toClear);
+void aux_uart_clear(uint8_t toClear);
 
 /** Constants for aux_uart_clear. You can OR these to clear both. */
 enum {
@@ -34,7 +34,7 @@ enum {
 };
 
 /** Sets the data size used by the UART. */
-void aux_uart_set_data_size(uint8 dataSize);
+void aux_uart_set_data_size(uint8_t dataSize);
 
 /** Constants used by aux_uart_set_data_size */
 enum {
@@ -43,7 +43,7 @@ enum {
 };
 
 /** Enables sending and/or recieving using the UART. The absence of a flag disables it. */
-void aux_uart_enable_uart(uint8 mode);
+void aux_uart_enable_uart(uint8_t mode);
 
 /** Constants used by aux_uart_enable_uart. May be OR'd together to enable both. */
 enum {
@@ -52,7 +52,7 @@ enum {
 };
 
 /** Sets the baudrate used when communicating. */
-void aux_uart_set_baudrate(uint16 baudRegRate);
+void aux_uart_set_baudrate(uint16_t baudRegRate);
 
 /** Constants used by aux_uart_set_baudrate. Note that the baud rate and the resulting constant are different! */
 enum {
@@ -69,9 +69,9 @@ bool aux_uart_rx_has_data();
 bool aux_uart_tx_has_space();
 
 /** Transmits a [byte] into the UART TX buffer, blocking until the buffer has space. */
-void aux_uart_transmit(uint8 byte);
+void aux_uart_transmit(uint8_t byte);
 
 /** Takes in a [byte] from the UART RX buffer, blocking until some data is recieved. */
-uint8 aux_uart_receive();
+uint8_t aux_uart_receive();
 
 #endif //PIOS_AUX_UART_H
