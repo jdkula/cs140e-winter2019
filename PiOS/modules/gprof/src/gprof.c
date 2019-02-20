@@ -17,7 +17,7 @@
 
 // useful for rounding up.   e.g., roundup(n,8) to roundup <n> to 8 byte
 // alignment.
-#define roundup(x,n) (((x)+((n)-1))&(~((n)-1)))
+#define roundup(x, n) (((x)+((n)-1))&(~((n)-1)))
 
 extern char __heap_start__;
 extern char __bss_start__;
@@ -34,10 +34,10 @@ volatile char* const text_start = (void*) 0x8000;
  *	- note: there is no free, so is trivial.
  * 	- should be just a few lines of code.
  */
-void *kmalloc(unsigned nbytes) {
-  volatile void* here = heap_start;
-  heap_start += nbytes;
-  return (void*) here;
+void* kmalloc(unsigned nbytes) {
+    volatile void* here = heap_start;
+    heap_start += nbytes;
+    return (void*) here;
 }
 
 /*
@@ -45,13 +45,13 @@ void *kmalloc(unsigned nbytes) {
  * 	- should be just a few lines of code.
  */
 void kmalloc_init(void) {
-  bss_start = &__bss_start__;
-  bss_end = &__bss_end__;
-  heap_start = &__heap_start__;
-  //printk("bss start/end | heap = %p/%p | %p\n", bss_start, bss_end, heap_start);
-  //for(volatile char* p = bss_start; p < heap_start; p++) {
-  //  *p = 0;
-  //}
+    bss_start = &__bss_start__;
+    bss_end = &__bss_end__;
+    heap_start = &__heap_start__;
+    //printk("bss start/end | heap = %p/%p | %p\n", bss_start, bss_end, heap_start);
+    //for(volatile char* p = bss_start; p < heap_start; p++) {
+    //  *p = 0;
+    //}
 }
 
 
@@ -69,17 +69,17 @@ unsigned num_entries;
 // allocate table.
 //    few lines of code
 static void gprof_init(void) {
-  kmalloc_init();
-  unsigned size = roundup((bss_start - text_start), 4);
-  gprof_table = kmalloc(size);
-  num_entries = size / 4;
+    kmalloc_init();
+    unsigned size = roundup((bss_start - text_start), 4);
+    gprof_table = kmalloc(size);
+    num_entries = size / 4;
 
-  printk("Table is at %p, of size %u\n", gprof_table, num_entries);
+    printk("Table is at %p, of size %u\n", gprof_table, num_entries);
 
-  for(unsigned* p = gprof_table; p < (gprof_table + num_entries); p++) {
-    *p = 0;
-    //printk("Clearing %p. \n", p);
-  }
+    for (unsigned* p = gprof_table; p < (gprof_table + num_entries); p++) {
+        *p = 0;
+        //printk("Clearing %p. \n", p);
+    }
 }
 
 unsigned char skip_flag = 0;
@@ -87,36 +87,36 @@ unsigned char skip_flag = 0;
 // increment histogram associated w/ pc.
 //    few lines of code
 static void gprof_inc(unsigned pc) {
-  //printk("Incrementing %p.\n", pc);
-  if(skip_flag == 1) {
-    //printk("Skipping.\n");
-    return;
-  }
-  if(pc < (unsigned) text_start || pc > (unsigned) bss_end) {
-    //printk("Out of bounds instruction: %p\n", pc);
-    return;
-  }
+    //printk("Incrementing %p.\n", pc);
+    if (skip_flag == 1) {
+        //printk("Skipping.\n");
+        return;
+    }
+    if (pc < (unsigned) text_start || pc > (unsigned) bss_end) {
+        //printk("Out of bounds instruction: %p\n", pc);
+        return;
+    }
 
-  unsigned idx = (pc - (unsigned) text_start) / 4;
+    unsigned idx = (pc - (unsigned) text_start) / 4;
 
-  //printk("++%u++", idx);
+    //printk("++%u++", idx);
 
-  gprof_table[idx] = gprof_table[idx] + 1;
+    gprof_table[idx] = gprof_table[idx] + 1;
 }
 
 // print out all samples whose count > min_val
 //
 // make sure sampling does not pick this code up!
 static void gprof_dump(unsigned min_val) {
-  skip_flag = 1;
-  dsb();
-  for(unsigned i = 0; i < num_entries; i++) {
-    if(gprof_table[i] > min_val) {
-      printk("%p -> %u\n", text_start + (i * 4), gprof_table[i]);
+    skip_flag = 1;
+    dsb();
+    for (unsigned i = 0; i < num_entries; i++) {
+        if (gprof_table[i] > min_val) {
+            printk("%p -> %u\n", text_start + (i * 4), gprof_table[i]);
+        }
     }
-  }
-  skip_flag = 0;
-  dsb();
+    skip_flag = 0;
+    dsb();
 }
 
 
@@ -129,62 +129,62 @@ static volatile unsigned period;
 
 // client has to define this.
 void int_handler(unsigned pc) {
-	unsigned pending = RPI_GetIRQController()->IRQ_basic_pending;
+    unsigned pending = get_irq_controller()->irq_basic_pending;
 
-	// if this isn't true, could be a GPU interrupt: just return.
-	if((pending & RPI_BASIC_ARM_TIMER_IRQ) == 0)
-		return;
+    // if this isn't true, could be a GPU interrupt: just return.
+    if ((pending & RPI_BASIC_ARM_TIMER_IRQ) == 0)
+        return;
 
-        /* 
-	 * Clear the ARM Timer interrupt - it's the only interrupt we have
-         * enabled, so we want don't have to work out which interrupt source
-         * caused us to interrupt 
-	 *
-	 * Q: if we delete?
-	 */
-        RPI_GetArmTimer()->IRQClear = 1;
-	cnt++;
+    /*
+ * Clear the ARM Timer interrupt - it's the only interrupt we have
+     * enabled, so we want don't have to work out which interrupt source
+     * caused us to interrupt
+ *
+ * Q: if we delete?
+ */
+    get_arm_timer()->irq_clear = 1;
+    cnt++;
 
-        gprof_inc(pc);
+    gprof_inc(pc);
 
-	static unsigned last_clk = 0;
-	unsigned clk = timer_get_time();
-	period = last_clk ? clk - last_clk : 0;
-	last_clk = clk;
-	
-	// Q: if we put a print statement?
+    static unsigned last_clk = 0;
+    unsigned clk = timer_get_time();
+    period = last_clk ? clk - last_clk : 0;
+    last_clk = clk;
+
+    // Q: if we put a print statement?
 }
 
 // trivial program to test gprof implementation.
 // 	- look at output: do you see weird patterns?
 void notmain() {
-	uart_init();
-	
-	printk("about to install handlers\n");
-        install_int_handlers();
+    uart_init();
 
-	printk("setting up timer interrupts\n");
-	// Q: if you change 0x100?
-	timer_interrupt_init(0x10);
+    printk("about to install handlers\n");
+    install_int_handlers();
 
-	// could combine some of these.
-        gprof_init();
+    printk("setting up timer interrupts\n");
+    // Q: if you change 0x100?
+    timer_interrupt_init(0x10);
 
-	// Q: if you don't do?
-	printk("gonna enable ints globally!\n");
-  	system_enable_interrupts();
-	printk("enabled!\n");
+    // could combine some of these.
+    gprof_init();
 
-	// enable_cache(); 	// Q: what happens if you enable cache?
-        unsigned iter = 0;
-        while(cnt<2000) {
-                printk("iter=%d: cnt = %d, period = %dusec, %x\n",
-                                iter,cnt, period,period);
-                iter++;
-                if(iter % 10 == 0)
-                        gprof_dump(2);
-        }
+    // Q: if you don't do?
+    printk("gonna enable ints globally!\n");
+    system_enable_interrupts();
+    printk("enabled!\n");
 
-        gprof_dump(2);
-	clean_reboot();
+    // enable_cache(); 	// Q: what happens if you enable cache?
+    unsigned iter = 0;
+    while (cnt < 2000) {
+        printk("iter=%d: cnt = %d, period = %dusec, %x\n",
+               iter, cnt, period, period);
+        iter++;
+        if (iter % 10 == 0)
+            gprof_dump(2);
+    }
+
+    gprof_dump(2);
+    clean_reboot();
 }

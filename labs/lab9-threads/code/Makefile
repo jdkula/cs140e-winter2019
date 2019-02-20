@@ -22,7 +22,7 @@ CFLAGS += -Wno-unused-function
 all: libpi $(NAME).bin run
 
 run:
-	my-install $(NAME).bin
+	piboot $(NAME).bin
 
 # is there a better way to do this?
 libpi:

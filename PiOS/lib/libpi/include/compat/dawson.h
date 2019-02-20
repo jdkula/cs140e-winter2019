@@ -16,6 +16,9 @@
 #include <mem-access.h>
 #include <printf.h>
 #include <uart.h>
+#include <interrupts.h>
+#include <arm.h>
+#include <timer.h>
 
 #ifdef __arm__
 #include <arm/stdlib.h>

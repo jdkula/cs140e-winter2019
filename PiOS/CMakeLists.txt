@@ -84,11 +84,14 @@ add_subdirectory(lib/libtest)
 add_subdirectory(lib/libpreprocessor)
 add_subdirectory(lib/libtty)
 add_subdirectory(lib/libstart)
+add_subdirectory(lib/libQ)
 
 # Pi Modules
 add_subdirectory(modules/bootloader)
 add_subdirectory(modules/blink)
 add_subdirectory(modules/vmm)
+add_subdirectory(modules/gprof)
+add_subdirectory(modules/sonar)
 
 # Unix Programs
 add_subdirectory(programs/piboot)

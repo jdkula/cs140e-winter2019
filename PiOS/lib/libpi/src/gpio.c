@@ -239,3 +239,11 @@ uint8 pin_pull(uint8 pin, uint32 pud) {
     gpio_errno = GPIO_ERR_OK;
     return 0;
 }
+
+uint8 gpio_set_pulldown(uint8 pin) {
+    return pin_pull(pin, GPIO_PUD_PULLDOWN);
+}
+
+uint8 gpio_set_pullup(uint8 pin) {
+    return pin_pull(pin, GPIO_PUD_PULLUP);
+}

@@ -20,7 +20,10 @@ void part0(void) {
 	unsigned cpsr = rpi_get_cpsr();
 	printk("cpsr() = %x\n", cpsr);
 	// check that interrupts are disabled and that we are in kernel mode.
-	unimplemented();
+  unsigned has_interrupts = (cpsr >> 7) & 0b1;
+  unsigned run_mode = cpsr & 0b11111;
+
+  printk("We're in mode 0x%x; interrupts? %u\n", run_mode, has_interrupts);
 
 	// stack grows down.
 	unsigned u[128+1], *e = &u[127], n, *p;
@@ -94,14 +97,28 @@ void part2(void) {
 	assert(thread_count == n);
 }
 
+
+void part2a_t(void* arg) {
+  printk("I'm in the thread!\n");
+  rpi_exit(0);
+}
+
+void part2a(void) {
+  rpi_fork(part2a_t, 0);
+  rpi_thread_start(0);
+}
+
+void rip_debug(void) {
+  printk("Trapoline was called!");
+}
+
 void notmain() {
         uart_init();
 
-#if 0
-	part0();
-	part1();
+	//part0();
+	//part1();
+  //part2a();
 	for(int i = 0; i < 20; i++)
 		part2();
-#endif
 	clean_reboot();
 }

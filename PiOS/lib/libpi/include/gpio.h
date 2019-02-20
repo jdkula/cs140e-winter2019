@@ -218,5 +218,9 @@ enum {
 /** Sets the given [pin] to the pull-state given by [pud]. */
 uint8 pin_pull(uint8 pin, uint32 pud);
 
+/** Convenience methods that pull a pin up/down. */
+uint8 gpio_set_pulldown(uint8 pin);
+uint8 gpio_set_pullup(uint8 pin);
+
 
 #endif // PIOS_GPIO_H

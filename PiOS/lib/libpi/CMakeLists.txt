@@ -82,7 +82,7 @@ set(SRC_VMM
 set(INCLUDE_DIRECTORIES include)
 
 # Dependencies
-set(DEPENDENCIES libtypes libpreprocessor)
+set(DEPENDENCIES libtypes libpreprocessor libq)
 set(DEPENDENCIES_VMM ${DEPENDENCIES} libtty)
 
 ########################################

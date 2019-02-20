@@ -30,18 +30,23 @@ rpi_thread_t *rpi_fork(void (*code)(void *arg), void *arg) {
 	// stack offsets, change them!
 	enum { 
 		// register offsets are in terms of byte offsets!
-		LR_offset = 0,  
-		CPSR_offset = 4/4,
-		R0_offset = 8/4, 
-		R1_offset = 12/4, 
+		LR_offset = 56 / 4,  
+		CPSR_offset = 60 / 4,
+		R0_offset = 0, 
+		R1_offset = 4/4, 
+    INIT_SIZE = 64 / 4,
 	};
 
 	// write this so that it calls code,arg.
 	void rpi_init_trampoline(void);
 
-	// do the brain-surgery on the new thread stack here.
-	unimplemented();
+  t->sp = (((uint32_t*) t->stack) + 1024 * 8 - 1 - (INIT_SIZE));
+  t->sp[LR_offset] = rpi_init_trampoline;
+  t->sp[R0_offset] = arg;
+  t->sp[R1_offset] = code;
+  t->sp[CPSR_offset] = rpi_get_cpsr();
 
+  printk("Adding to run queue...\n");
 	Q_append(&runq, t);
 	return t;
 }
@@ -57,7 +62,15 @@ void rpi_exit(int exitcode) {
 	 * 3. otherwise we are done, switch to the scheduler thread 
 	 * so we call back into the client code.
 	 */
-	unimplemented();
+  printk("Exiting...\n");
+  Q_append(&freeq, cur_thread);
+  rpi_thread_t* old = cur_thread;
+  cur_thread = Q_pop(&runq);
+  if(cur_thread) {
+    rpi_cswitch(&old->sp, &cur_thread->sp);
+  } else {
+    rpi_cswitch(&old->sp, &scheduler_thread->sp);
+  }
 }
 
 // yield the current thread.
@@ -67,7 +80,15 @@ void rpi_yield(void) {
 	// otherwise: 
 	//	1. enqueue current thread to runq.
 	// 	2. context switch to the new thread.
-	unimplemented();
+  //
+  Q_append(&runq, cur_thread);
+  rpi_thread_t* old = cur_thread;
+  cur_thread = Q_pop(&runq);
+  if(cur_thread) {
+    rpi_cswitch(&old->sp, &cur_thread->sp);
+  } else {
+    cur_thread = old;
+  }
 }
 
 // starts the thread system: nothing runs before.
@@ -75,15 +96,24 @@ void rpi_yield(void) {
 void rpi_thread_start(int preemptive_p) {
 	assert(!preemptive_p);
 
-	// if runq is empty, return.
-	// otherswise:
-	//    1. create a new fake thread 
-	//    2. dequeue a thread from the runq
-	//    3. context switch to it, saving current state in
- 	//	  <scheduler_thread>
-	scheduler_thread = mk_thread();
+  cur_thread = Q_pop(&runq);
+  if(cur_thread) {
 
-	unimplemented();
+    // if runq is empty, return.
+    // otherswise:
+    //    1. create a new fake thread 
+    //    2. dequeue a thread from the runq
+    //    3. context switch to it, saving current state in
+    //	  <scheduler_thread>
+    scheduler_thread = mk_thread();
+
+
+    printk("About to context switch...\n");
+    rpi_cswitch(&scheduler_thread->sp, &cur_thread->sp);
+  } else {
+    printk("No threads!\n");
+    clean_reboot();
+  }
 
 
 	printk("THREAD: done with all threads, returning\n");
