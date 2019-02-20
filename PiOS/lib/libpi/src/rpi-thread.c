@@ -4,8 +4,9 @@
 
 // typedef rpi_thread_t E;
 #define E rpi_thread_t
-
 #include "Q.h"
+#undef E
+
 #include "compat/dawson.h"
 #include "rpi-thread.h"
 

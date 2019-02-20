@@ -1,6 +1,7 @@
 #include <uart.h>
 #include <timer.h>
 #include <mem-access.h>
+#include <mem-barrier.h>
 #include "rpi.h"
 #include "vmm/pi-vmm-ops.h"
 
@@ -25,6 +26,12 @@ int notmain(void) {
             unsigned address = get_uint();
             unsigned value = get_uint();
             put32((void*) address, value);
+        } else if (op == OP_DMB) {
+            data_memory_barrier();
+            put_uint(0);
+        } else if (op == OP_DSB) {
+            data_sync_barrier();
+            put_uint(0);
         } else if (op == OP_DONE || op == OP_ERROR || op == OP_REBOOT) {
             reboot();
         }

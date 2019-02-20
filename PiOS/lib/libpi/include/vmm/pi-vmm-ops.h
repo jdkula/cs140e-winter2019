@@ -21,6 +21,10 @@ enum {
 
 	OP_READY,
 
-	OP_REBOOT
+	OP_REBOOT,
+
+	OP_DMB,
+
+	OP_DSB
 };
 #endif

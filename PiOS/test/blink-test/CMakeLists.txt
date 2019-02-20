@@ -33,7 +33,7 @@ set(MODULE_NAME blink)
 set(SRC x86/main.c)
 
 # Compile Options
-set(DEPENDENCIES libpi-emu libboot libdebug libtest libpreprocessor blink.lib)
+set(DEPENDENCIES libpi-vmm libboot libdebug libtest libpreprocessor blink.lib)
 set(INCLUDE_DIRECTORIES include)
 
 

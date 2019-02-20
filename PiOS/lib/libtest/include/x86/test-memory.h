@@ -12,7 +12,6 @@
 #include <x86/mem-x86-extensions.h>
 
 void test_mem_init();
-const mem_t* get_raw_memory();
 
 typedef void (*on_commit_t)(const mem_t* committed, uint32 size, uint8 commit_type);
 

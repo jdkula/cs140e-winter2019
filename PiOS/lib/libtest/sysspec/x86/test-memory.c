@@ -119,8 +119,3 @@ void test_mem_init() {
 
     mem_on_barrier = on_barrier;
 }
-
-/** Gets the raw memory representation so that clients can poke around. */
-const mem_t* get_raw_memory() {
-    return ram_emulated;
-}

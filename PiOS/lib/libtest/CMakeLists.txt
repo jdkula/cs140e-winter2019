@@ -38,7 +38,7 @@ if (NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
 
     set(INCLUDE_DIRECTORIES include)
 
-    set(DEPENDENCIES libpi-emu libtypes)
+    set(DEPENDENCIES libpi-vmm libtypes)
 
 
     ########################################
