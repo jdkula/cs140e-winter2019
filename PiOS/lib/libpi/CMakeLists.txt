@@ -63,7 +63,8 @@ set(SRC_VMM
         sysspec/x86/dummy.c
         sysspec/x86/aux.c
         sysspec/x86/vmm.c
-        sysspec/x86/vmm-memory.c)
+        sysspec/x86/vmm-memory.c
+        sysspec/x86/thread-vmm.c)
 
 # Compile & Link Options
 set(INCLUDE_DIRECTORIES include)
