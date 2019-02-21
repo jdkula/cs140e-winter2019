@@ -1,10 +1,9 @@
 ##########
-# CS140E: Sonar
+# CS140E: Blink
 # Jonathan Kula
 # Winter 2019
 #
-# This kernel works with the sonar module [INSERT-MODULE-HERE]
-# to print out the distance to the given objet.
+# A basic GPIO test program that blinks an LED at pin 20.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -19,8 +18,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(sonar C ASM)
-set(MODULE_NAME sonar)
+project(hello C)
+set(MODULE_NAME hello)
 
 ########################################
 #> End Project Setup                  <#
@@ -31,12 +30,12 @@ set(MODULE_NAME sonar)
 ########################################
 
 # Source Files
-set(SRC src/sonar.c)
+set(SRC src/hello.c)
 
 # Compile Options
-set(DEPENDENCIES libpi libdebug libpreprocessor libstart)
-set(INCLUDE_DIRECTORIES include)
 
+# Dependencies
+set(DEPENDENCIES libpi libdebug libstart)
 
 # Output Options
 ## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)

@@ -17,4 +17,7 @@ void reboot(void);
 /** Does nothing -- just uses a CPU cycle. */
 void dummy(uint32_t unused);
 
+/** Gets a random number */
+uint16_t rpi_rand();
+
 #endif // __RPI_H__

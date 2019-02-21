@@ -49,7 +49,8 @@ set(SRC_ARM
         sysspec/arm/mem-access.s
         sysspec/arm/mem-barrier.s
         sysspec/arm/stdlib.c
-        sysspec/arm/heap.c)
+        sysspec/arm/heap.c
+        sysspec/arm/rand.c)
 
 set(SRC_VMM
         src/gpio.c
@@ -67,6 +68,7 @@ set(SRC_VMM
         sysspec/x86/aux.c
         sysspec/x86/vmm.c
         sysspec/x86/vmm-memory.c
+        sysspec/x86/rand.c
         sysspec/x86/thread-vmm.c)
 
 # Compile & Link Options

@@ -93,13 +93,15 @@ add_subdirectory(modules/vmm)
 add_subdirectory(modules/gprof)
 add_subdirectory(modules/sonar)
 add_subdirectory(modules/thread-test)
+add_subdirectory(modules/pishell-server)
+add_subdirectory(modules/hello)
 
 # Unix Programs
 add_subdirectory(programs/piboot)
 add_subdirectory(programs/handoff)
 add_subdirectory(programs/replay)
 add_subdirectory(programs/echo)
-#add_subdirectory(programs/vmm)
+add_subdirectory(programs/pishell)
 
 # Tests
 add_subdirectory(test/memory-test)

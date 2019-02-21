@@ -11,5 +11,4 @@ void _cstart() {
         *bss++ = 0;
 
     notmain();
-    reboot();
 }

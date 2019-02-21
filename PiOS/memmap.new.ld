@@ -9,14 +9,14 @@ SECTIONS
             LONG(LINK_ADDR);
     }
 	.text : {
-		KEEP(*(.text.boot))
-		*(.text*)
+		KEEP(*(.text.boot))  
+		*(.text*) 
 	}
     .data : {
 		. = ALIGN(4);
-		*(.data*)
+		*(.data*) 
 		. = ALIGN(4);
-  	}
+  	} 
     .rodata : {
 		. = ALIGN(4);
 		*(.rodata*)

@@ -103,3 +103,8 @@ uint8_t aux_uart_receive() {
 //    return (uint8) get32(&uart->io); // BCM2835AP §2.2.2 p. 11 - When reading from this register, data is retrieved from the RX FIFO.
     return 0;
 }
+
+uint8_t aux_uart_get_enabled() {
+//    return get32(&uart->cntl) & 0b11;
+    return 1;
+}

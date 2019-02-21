@@ -19,6 +19,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
+add_subdirectory(libboot-impl)
+
 project(libboot C)
 set(LIBRARY_NAME libboot)
 

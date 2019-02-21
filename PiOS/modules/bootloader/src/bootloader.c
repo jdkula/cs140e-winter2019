@@ -16,11 +16,8 @@
 #include <boot-messages.h>
 #include <printf.h>
 #include <pios-macros.h>
+#include <arm/boot-impl.h>
 
-static void die(uint32_t code) {
-    put_uint(code);
-    reboot();
-}
 
 //  bootloader:
 //	1. wait for SOH, size, cksum from unix side.
@@ -34,72 +31,6 @@ static void die(uint32_t code) {
 //
 
 void notmain(void) {
-    gpio_init();                            // Initialize diagnostic gpio.
-
-    gpio_set_output(GPIO_ACT);              // Enable ACT & PWR
-    gpio_set_output(GPIO_PWR);
-    gpio_write(GPIO_PWR, LOW);             // PWR on while waiting...
-
-    uart_init();                        // Enable UART
-
-    while (get_uint() != SOH);          // Wait until SOH. Discard other input.
-
-    gpio_write(GPIO_PWR, LOW);              // Swap PWR and ACT to indicate we're taking in data.
-    gpio_write(GPIO_ACT, HIGH);
-
-    uint32_t numBytes = get_uint();       // Take in the number of bytes.
-    uint32_t msgCrc = get_uint();         // Take in the message checksum.
-
-    put_uint(SOH);                      // Let the client know we've got the message
-
-    uint32_t nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
-    put_uint(nCrc);                     // ...and send it back to verify.
-    put_uint(msgCrc);                   // ...also send back the CRC we were given.
-
-    if(get_uint() == NAK) {             // If the UNIX side doesn't like what we sent, reboot.
-        die(NAK);
-    }
-
-    uint32_t bytesRead = 0;               // Get ready to read!
-    uint32_t lastData = get_uint();
-
-    while (lastData != EOT) {
-        IGNORE(-Wint-to-pointer-cast);
-        put32((void*) (ARMBASE + bytesRead), lastData);
-        POP();
-        bytesRead += 4;
-        lastData = get_uint();
-        if(uart_errno == UART_ERR_TIMEOUT) {
-            gpio_write(GPIO_ACT, LOW);
-            gpio_write(GPIO_PWR, HIGH);
-            delay(100000);
-            reboot();
-            return;
-        }
-    }
-
-
-    if (bytesRead != numBytes) die(SIZE_MISMATCH);
-
-    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(BAD_CKSUM);
-
-    debug_off(GPIO_ACT);
-
-    put_uint(ACK);
-
-
-    // XXX: appears we need these delays or the unix side gets confused.
-    // I believe it's b/c the code we call re-initializes the uart; could
-    // disable that to make it a bit more clean.
-    delay_ms(500);
-
-    debug_on(GPIO_PWR);
-    debug_off(GPIO_ACT);
-    debug_disable(GPIO_PWR);
-    debug_disable(GPIO_ACT);
-
-    // run what client sent.
-    BRANCHTO(ARMBASE);
-    // should not get back here, but just in case.
-    reboot();
+    load_code();
+    clean_reboot();
 }

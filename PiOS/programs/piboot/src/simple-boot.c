@@ -41,21 +41,26 @@ void expect(const char* msg, int fd, uint32_t v) {
 
 // unix-side bootloader: send the bytes, using the protocol.
 // read/write using put_uint() get_unint().
-void simple_boot(int fd, const uint8_t* givenBuf, uint32_t n) {
-    const uint8_t* buf = givenBuf;
+void simple_boot(int fd, const uint8_t* givenCode, uint32_t n) {
+    const uint8_t* code = givenCode;
     if(n % 4 != 0) {
-        buf = align_file(&n, buf, 4);
+        code = align_file(&n, code, 4);
     }
+    const uint32_t* intCode = (const uint32_t*) (code);
 
     uint32_t nCrc = crc32(&n, 4);
-    uint32_t bufCrc = crc32(buf, n);
+    uint32_t bufCrc = crc32(code, n);
 
-    put_uint_traced(fd, SOH);
+    send_byte(fd, SOH);
+
+    expect("Pi sends ACK", fd, ACK);
+    printf("Got ack.\n");
+
+    put_uint_traced(fd, code[0]); // Version #
+    put_uint_traced(fd, code[1]); // Link address
+
     put_uint_traced(fd, n);
     put_uint_traced(fd, bufCrc);
-
-    expect("Pi echoes SOH", fd, SOH);
-    fprintf(stderr, "SOH received...\n");
 
     expect("Pi Echoes Byte Number CRC", fd, nCrc);
     fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
@@ -65,12 +70,13 @@ void simple_boot(int fd, const uint8_t* givenBuf, uint32_t n) {
 
     put_uint_traced(fd, ACK);  // We're good to go!
 
-    const uint32_t* intBuf = (const uint32_t*) (buf);
+    expect("Pi sends ACK before code distribution", fd, ACK);
+
     uint32_t intBufSize = n / 4;
     fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
 
     for (int i = 0; i < intBufSize; i++) {
-        put_uint_traced(fd, intBuf[i]);
+        put_uint_traced(fd, intCode[i]);
         fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
     }
 
@@ -82,7 +88,7 @@ void simple_boot(int fd, const uint8_t* givenBuf, uint32_t n) {
     expect("Pi Sends ACK", fd, ACK);
     fprintf(stderr, "Received ACK!\n");
 
-    if(buf != givenBuf) {
-        free((void*) buf);
+    if(code != givenCode) {
+        free((void*) code);
     }
 }

@@ -9,7 +9,7 @@ void notmain(void) {
 	// uart_init();
 
 	// if not working, try just printing characters.
-#if 0
+#if 1
 	uart_putc('h');
 	uart_putc('e');
 	uart_putc('l');
@@ -27,7 +27,7 @@ void notmain(void) {
 	uart_putc('\n');
 #endif
 
-	printk("hello world\n");
+	//printk("hello world\n");
 
 	return;
 

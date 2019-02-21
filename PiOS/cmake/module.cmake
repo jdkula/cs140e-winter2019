@@ -73,23 +73,25 @@ if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     # Link dependencies and add linker arguments (target_link_options only supported in CMake >3.13)
     target_link_libraries(${MODULE_NAME}.elf ${DEPENDENCIES} ${LINK_OPTIONS})
 
+    # Ensure output directory exists
+    file(MAKE_DIRECTORY "${IMAGE_OUTPUT_DIRECTORY}")
+
     # Set other properties
     set_target_properties(${MODULE_NAME}.elf
             PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${EXE_OUT_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${IMAGE_OUTPUT_DIRECTORY}"
             )
 
-    # Ensure output directory exists
-    file(MAKE_DIRECTORY "${IMAGE_OUTPUT_DIRECTORY}")
 
     ########################################
     # Metatarget Setup                     #
     ########################################
     # Target that does all the objdump/objcopy chicanery to convert the base binary to a kernel image with associated metadata.
     # Build this to build the kernel image.
-    add_custom_target(${MODULE_NAME}.img ALL "${CMAKE_OBJDUMP}" -D $<TARGET_FILE:${MODULE_NAME}.elf> > "${IMAGE_OUTPUT_DIRECTORY}/${MODULE_NAME}.list"  # Objdump/asm list
+    add_custom_target(${MODULE_NAME}.bin ALL "${CMAKE_OBJDUMP}" -D $<TARGET_FILE:${MODULE_NAME}.elf> > "${IMAGE_OUTPUT_DIRECTORY}/${MODULE_NAME}.list"  # Objdump/asm list
             COMMAND "${CMAKE_OBJCOPY}" $<TARGET_FILE:${MODULE_NAME}.elf> -O ihex "${IMAGE_OUTPUT_DIRECTORY}/${MODULE_NAME}.hex"  # Hex representation of binary
-            COMMAND "${CMAKE_OBJCOPY}" $<TARGET_FILE:${MODULE_NAME}.elf> -O binary "${IMAGE_OUTPUT_DIRECTORY}/kernel.img"  # Create the image file
+            COMMAND "${CMAKE_OBJCOPY}" $<TARGET_FILE:${MODULE_NAME}.elf> -O binary "${IMAGE_OUTPUT_DIRECTORY}/${MODULE_NAME}.bin"  # Create the image file
+            COMMAND "${CMAKE_OBJCOPY}" $<TARGET_FILE:${MODULE_NAME}.elf> -O binary "${EXE_OUT_DIR}/${MODULE_NAME}.bin"  # Create the image file
             DEPENDS ${MODULE_NAME}.elf # Make sure we've built everything first!
             )
 

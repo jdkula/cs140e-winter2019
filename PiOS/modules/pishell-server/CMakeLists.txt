@@ -1,10 +1,9 @@
 ##########
-# CS140E: Sonar
+# CS140E: PiShell Server
 # Jonathan Kula
 # Winter 2019
 #
-# This kernel works with the sonar module [INSERT-MODULE-HERE]
-# to print out the distance to the given objet.
+# This kernel provides a "server" end of the Pi Shell.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -19,8 +18,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(sonar C ASM)
-set(MODULE_NAME sonar)
+project(pishell-server C ASM)
+set(MODULE_NAME pishell-server)
 
 ########################################
 #> End Project Setup                  <#
@@ -31,10 +30,10 @@ set(MODULE_NAME sonar)
 ########################################
 
 # Source Files
-set(SRC src/sonar.c)
+set(SRC src/bootloader.c src/pi-shell.c)
 
 # Compile Options
-set(DEPENDENCIES libpi libdebug libpreprocessor libstart)
+set(DEPENDENCIES libpi libdebug libpreprocessor libstart libboot)
 set(INCLUDE_DIRECTORIES include)
 
 
