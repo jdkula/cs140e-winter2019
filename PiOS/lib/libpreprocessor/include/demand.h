@@ -67,9 +67,10 @@
 
 #ifndef __linux__
 #define assert(bool) do { if((bool) == 0) panic(#bool); } while(0)
-
+#if 0
 #undef fprintf
 #undef exit
+#endif
 #endif
 
 #endif /* __DEMAND_H__ */

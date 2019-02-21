@@ -45,6 +45,9 @@ enum {
 /** Enables sending and/or recieving using the UART. The absence of a flag disables it. */
 void aux_uart_enable_uart(uint8_t mode);
 
+/** Gets if the uart is currently enabled. */
+uint8_t aux_uart_get_enabled();
+
 /** Constants used by aux_uart_enable_uart. May be OR'd together to enable both. */
 enum {
     UART_TX_ENABLE = 0b10, // BCM2835AP §2.2.2 p. 17 - Transmitter enable @ bit 1

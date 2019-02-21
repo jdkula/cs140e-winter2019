@@ -1,6 +1,8 @@
 #ifndef __Q_H__
 #define __Q_H__
 
+#include <demand.h>
+
 #ifndef E
 #	error "Client must define the Q datatype <E>"
 #endif

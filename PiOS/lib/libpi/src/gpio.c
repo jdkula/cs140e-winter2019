@@ -11,6 +11,7 @@
 #include <mem-barrier.h>
 #include <integer.h>
 #include <boolean.h>
+#include <printf.h>
 #include "gpio.h"
 #include "timer.h"
 
@@ -29,7 +30,7 @@ int8_t gpio_errno = GPIO_ERR_OK;
 static uint32_t* GPIO_FSEL0 = (void*) (GPIO_BASE + 0x00);
 static uint32_t* GPIO_SET0 = (void*) (GPIO_BASE + 0x1C);
 static uint32_t* GPIO_CLR0 = (void*) (GPIO_BASE + 0x28);
-static uint32_t* GPIO_LEV0 = (void*) (GPIO_BASE + 0x32);
+static uint32_t* GPIO_LEV0 = (void*) (GPIO_BASE + 0x34);
 
 /** Registers having to do with event detection. */
 static uint32_t* GPIO_EDS0 = (void*) (GPIO_BASE + 0x40);
@@ -99,9 +100,9 @@ uint8_t gpio_set_function(uint8_t pin, uint8_t function) {
     uint32_t bits = ((uint32_t) function) << (pin * 3);  // Each pin gets 3 bits.
     uint32_t full = 0b111U << (pin * 3);
 
-    current = (current & ~full) | bits;  // Clear those bits, then set them according to the given [function]
+    uint32_t new_mode = (current & ~full) | bits;  // Clear those bits, then set them according to the given [function]
 
-    put32(fsel, current);
+    put32(fsel, new_mode);
     data_sync_barrier();
 
     gpio_errno = GPIO_ERR_OK;
@@ -161,8 +162,11 @@ uint8_t gpio_read(uint8_t pin) {
     data_sync_barrier();
     uint32_t* lev = pin_shift(GPIO_LEV0, &pin);
 
+    uint32_t lev_read = get32(lev);
+    uint8_t bit = (uint8_t) ((lev_read >> pin) & 0b1);
+
     gpio_errno = GPIO_ERR_OK;
-    return getBit(lev, pin);
+    return bit;
 }
 
 // BCM2835AP §6.1 pp. 97-100 - set a 1 to detect the event, set a 0 to do the reverse.
@@ -224,7 +228,8 @@ uint8_t pin_pull(uint8_t pin, uint32_t pud) {
         return GPIO_ERROR;
     }
 
-    put32(GPIO_PUD, pud);      // 1. Write control signal appropriate for pull-control.
+
+    put32(GPIO_PUD, pud & 3);  // 1. Write control signal appropriate for pull-control.
     delay(150);                // 2. Wait 150 cycles
 
     uint32_t* clk = pin_shift(GPIO_PUDCLK0, &pin);

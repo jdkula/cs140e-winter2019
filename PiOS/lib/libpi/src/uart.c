@@ -16,6 +16,12 @@
 int8_t uart_errno = UART_ERR_OK;
 
 void uart_init(void) {
+    if(aux_uart_get_enabled() != 0b11) {
+        uart_force_init();
+    }
+}
+
+void uart_force_init(void) {
     data_sync_barrier();
 
     // Start by setting up GPIO.

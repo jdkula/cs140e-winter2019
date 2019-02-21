@@ -18,8 +18,11 @@ enum {
 };
 extern int8_t uart_errno;
 
-/** Sets up the miniUART for use. */
+/** Sets up the miniUART for use, if it hasn't already been set up. */
 void uart_init(void);
+
+/** Sets up the miniUART for use. */
+void uart_force_init(void);
 
 /**
  * Gets a character from the peer, blocking until something is recieved or the timeout is reached.

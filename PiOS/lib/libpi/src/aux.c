@@ -61,6 +61,10 @@ void aux_uart_enable_uart(uint8_t mode) {
     put32(&uart->cntl, current);  // BCM2835AP §2.2.2 p. 17 - Bits 0 and 1, Receiver/Transmitter enable.
 }
 
+uint8_t aux_uart_get_enabled() {
+    return get32(&uart->cntl) & 0b11;
+}
+
 void aux_uart_set_baudrate(uint16_t baudRegRate) {
     put32(&uart->baud, baudRegRate);  // BCM2835AP §2.2.2 p. 19 - AUX_MU_BAUD - Allows direct access to the baudrate counter.
 }

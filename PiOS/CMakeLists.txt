@@ -92,6 +92,7 @@ add_subdirectory(modules/blink)
 add_subdirectory(modules/vmm)
 add_subdirectory(modules/gprof)
 add_subdirectory(modules/sonar)
+add_subdirectory(modules/thread-test)
 
 # Unix Programs
 add_subdirectory(programs/piboot)

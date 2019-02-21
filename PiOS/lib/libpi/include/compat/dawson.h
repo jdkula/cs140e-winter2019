@@ -19,6 +19,8 @@
 #include <interrupts.h>
 #include <arm.h>
 #include <timer.h>
+#include <thread.h>
+#include <demand.h>
 
 #ifdef __arm__
 #include <arm/stdlib.h>

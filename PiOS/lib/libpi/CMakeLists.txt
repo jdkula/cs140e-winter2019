@@ -42,11 +42,14 @@ set(SRC_ARM
         src/reboot.c
         src/timer.c
         src/uart.c
+        src/thread.c
+        sysspec/arm/thread-asm.s
         sysspec/arm/dummy.s
         sysspec/arm/mem-access.c
         sysspec/arm/mem-access.s
         sysspec/arm/mem-barrier.s
-        sysspec/arm/stdlib.c)
+        sysspec/arm/stdlib.c
+        sysspec/arm/heap.c)
 
 set(SRC_VMM
         src/gpio.c

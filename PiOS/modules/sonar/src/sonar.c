@@ -53,13 +53,17 @@ void notmain(void) {
 
         unsigned timeout = timer_get_time() + 1000000;
         while (gpio_read(ECHO) == 0 && timer_get_time() < timeout);
+        if (timer_get_time() >= timeout) {
+            printk("echo never went high...\n");
+            continue;
+        }
 
         int start = timer_get_time();
 
         while (gpio_read(ECHO) != 0 && timer_get_time() < timeout);
 
         if (timer_get_time() >= timeout) {
-            printk("echo lost...\n");
+            printk("echo never went low...\n");
             continue;
         }
 
