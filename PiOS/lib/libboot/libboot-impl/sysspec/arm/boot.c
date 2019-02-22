@@ -58,7 +58,7 @@ int load_code(void) {
     put_uint(nCrc);                     // ...and send it back to verify.
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
-    if (get_uint() == NAK) {             // If the UNIX side doesn't like what we sent, reboot.
+    if (get_uint() != ACK) {             // If the UNIX side doesn't like what we sent, reboot.
         die(NAK);
     }
 
@@ -67,19 +67,10 @@ int load_code(void) {
     uint32_t bytesRead = 0;               // Get ready to read!
     uint32_t lastData = get_uint();
 
-    while (lastData != EOT) {
-        IGNORE(-Wint - to - pointer - cast);
+    while (bytesRead < numBytes) {
         put32((void*) (addr + bytesRead), lastData);
-        POP();
         bytesRead += 4;
         lastData = get_uint();
-        if (uart_errno == UART_ERR_TIMEOUT) {
-            gpio_write(GPIO_ACT, LOW);
-            gpio_write(GPIO_PWR, HIGH);
-            delay(100000);
-            reboot();
-            return -1;
-        }
     }
 
 

@@ -15,6 +15,10 @@ static int readline(char *buf, int sz) {
 
 void notmain() { 
 	uart_init();
+	
+	load_code();
+	clean_reboot();
+	
 	int n;
 	char buf[1024];
 

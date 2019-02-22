@@ -35,7 +35,7 @@ if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     ########################################
 
     # Source Files
-    set(SRC src/bootloader.c)
+    set(SRC src/cstart.c src/bootloader.c)
     if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
         list(INSERT SRC 0 src/start.s)  # start.s must be built first.
     endif ()

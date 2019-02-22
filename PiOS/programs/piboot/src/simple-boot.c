@@ -89,6 +89,10 @@ void simple_boot(int fd, const uint8_t* givenCode, uint32_t n) {
     fprintf(stderr, "Received ACK!\n");
 
     if(code != givenCode) {
+        fprintf(stderr, "Freeing aligned code.");
         free((void*) code);
     }
+
+    expect("Pi reads from correct area", fd, 0x10001df8);
+    expect("Area is not corrupted", fd, 'H');
 }

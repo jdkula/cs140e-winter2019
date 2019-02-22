@@ -13,5 +13,5 @@ done
 PROJECT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 ## END FROM
 
-rm -rf ${PROJECT_DIR}/out*
-rm -rf ${PROJECT_DIR}/cmake-build*
+find ${PROJECT_DIR}/out* -type f -exec rm -fv {} \;
+find ${PROJECT_DIR}/cmake-build* -type f -exec rm -fv {} \;
