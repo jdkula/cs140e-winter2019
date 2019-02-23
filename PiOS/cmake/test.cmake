@@ -24,7 +24,7 @@
 # Executable Setup                     #
 ########################################
 
-if (NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
+if (NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM" AND FALSE)
     # Create executable target with predefined source
     add_executable(${MODULE_NAME}.test ${SRC})
 

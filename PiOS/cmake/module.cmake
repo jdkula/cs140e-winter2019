@@ -99,7 +99,7 @@ if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     #> End Executable Setup               <#
     ########################################
 
-else ()
+elseif (FALSE)
 
     ########################################
     # Library Setup                        #

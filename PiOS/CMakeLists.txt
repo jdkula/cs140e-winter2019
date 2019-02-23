@@ -58,13 +58,13 @@ include(${CMAKE_INCLUDE_DIR}/macros.cmake)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(LINKER_SCRIPT linker/script-arm)
     set(LINK_OPTIONS -nostdlib)
-    set(COMPILE_OPTIONS -nostdlib -nostartfiles -ffreestanding -fno-builtin)
+    set(COMPILE_OPTIONS -nostdlib -nostartfiles -ffreestanding -fno-builtin -Wno-int-conversion)
 
     # X86 Options
 else ()
     set(LINKER_SCRIPT linker/script-x86)
     set(LINK_OPTIONS)
-    set(COMPILE_OPTIONS -Og -ggdb -Wall)
+    set(COMPILE_OPTIONS -Og -ggdb -Wall -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast)
 endif ()
 
 ########################################
