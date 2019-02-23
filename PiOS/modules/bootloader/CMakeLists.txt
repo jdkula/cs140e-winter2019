@@ -41,7 +41,7 @@ if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
     endif ()
 
     # Compile Options
-    set(DEPENDENCIES libpi libboot libdebug libpreprocessor libboot-impl)
+    set(DEPENDENCIES libpi libboot libdebug libpreprocessor)
     set(INCLUDE_DIRECTORIES include)
 
 

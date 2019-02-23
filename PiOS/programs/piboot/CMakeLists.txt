@@ -34,7 +34,6 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             src/my-install.c
             src/fatal.c
             src/simple-boot.c
-            src/support.c
             src/trace.c
             )
 

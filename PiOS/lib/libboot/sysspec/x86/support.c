@@ -9,7 +9,18 @@
 
 #include <demand.h>
 #include <integer.h>
-#include "support.h"
+#include <x86/tty-comm.h>
+#include "x86/support.h"
+
+// simple utility function to check that a u32 read from the
+// file descriptor matches <v>.
+void expect(const char* msg, int fd, uint32_t v) {
+    uint32_t x = tty_get_uint(fd);
+    if (x != v) {
+        tty_put_uint(fd, NAK);
+        panic("%s: expected %x, got %x\n", msg, v, x);
+    }
+}
 
 // read entire file into buffer.  return it, write totat bytes to <size>
 uint8_t* read_file(int* size, const char* name) {

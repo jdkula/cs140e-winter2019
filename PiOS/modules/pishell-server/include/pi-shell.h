@@ -18,6 +18,6 @@
 
 // uses a stripped down protocol to get code from unix side, copy it
 // into memory, jump to it.
-int load_code(void);
+uint32_t load_code(void);
 
 #endif

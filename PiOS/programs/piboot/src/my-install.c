@@ -27,7 +27,6 @@
 #include <sys/wait.h>
 
 #include "demand.h"
-#include "support.h"
 #include "trace.h"
 
 static int exit_code(int pid) {

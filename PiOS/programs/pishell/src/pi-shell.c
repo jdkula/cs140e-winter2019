@@ -16,7 +16,8 @@
 
 #include <x86/tty.h>
 #include <x86/tty-comm.h>
-#include <support.h>
+#include <x86/support.h>
+#include <x86/boot-impl.h>
 
 #include "pi-shell.h"
 #include "demand.h"
@@ -141,30 +142,19 @@ static int do_unix_cmd(char* argv[], int nargs) {
     return 0;
 }
 
-
-static void send_prog(int fd, const char* name) {
-    int nbytes;
-
-    // from homework.
-    unsigned* code = (void*) read_file(&nbytes, name);
-    assert(nbytes % 4 == 0);
-
-    expect_val(fd, ACK);
-    printf("got ACK\n");
-
-    unimplemented();
-}
-
 void reboot_pi(int pi_fd) {
-    pi_put(pi_fd, pi_done);
+    pi_put(pi_fd, "reboot\n");
     printf("Pi Rebooted. Shell done.\n");
     exit(0);
 }
 
 // ship pi program to the pi.
 static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
-    if (is_pi_prog(argv[0])) {
+    if (is_pi_prog(argv[0]) && access(argv[0], F_OK) >= 0) {
         printf("Found pi program! %s\n", argv[0]);
+        pi_put(pi_fd, "boot\n");
+        send_program(pi_fd, argv[0]);
+        return 1;
     }
     return 0;
 }
@@ -221,7 +211,11 @@ static int shell(int pi_fd, int unix_fd) {
             // is it a builtin?  do it.
         else if (do_builtin_cmd(pi_fd, argv, nargs) != 0);
             // if not a pi program (end in .bin) fork-exec
-        else if (run_pi_prog(pi_fd, argv, nargs) == 0) {
+        else if (run_pi_prog(pi_fd, argv, nargs) == 1) {
+            echo_until(pi_fd, "PI FINISHED!!!\n");
+            note("> ");
+            continue; // skip reading a line from the Pi
+        } else {
             do_unix_cmd(argv, nargs);
             note("> ");
             continue; // skip reading a line from the Pi

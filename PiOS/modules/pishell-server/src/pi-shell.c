@@ -20,12 +20,16 @@ void notmain() {
     char buf[1024];
 
     while ((n = readline(buf, sizeof buf))) {
-        if (strncmp(buf, "echo ", 4) == 0) {
+        if (strncmp(buf, "echo", 4) == 0) {
             printk("%s\n", buf);
-        } else if (strncmp(buf, "PI REBOOT!!!", 12) == 0) {
+        } else if (strncmp(buf, "reboot", 6) == 0) {
             printk("PI REBOOT!!!\n");
             delay_ms(100);
             clean_reboot();
+        } else if (strncmp(buf, "boot", 4) == 0) {
+//            printk("PI BOOTING!!!\n");
+            BRANCHTO(load_code());
+            printk("PI FINISHED!!!\n");
         } else {
             printk("Found unrecognized command! %s\n", buf);
         }

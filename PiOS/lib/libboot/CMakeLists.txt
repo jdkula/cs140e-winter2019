@@ -19,8 +19,6 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-add_subdirectory(libboot-impl)
-
 project(libboot C)
 set(LIBRARY_NAME libboot)
 
@@ -33,14 +31,17 @@ set(LIBRARY_NAME libboot)
 ########################################
 
 # Source Files
-list_add_sources_multiarch(SRC crc32.c)
+list_add_sources_multiarch(SRC crc32.c boot.c send.c support.c)
 
 # Compile Options
 set(INCLUDE_DIRECTORIES include)
 
 # Dependencies
-set(DEPENDENCIES libtypes)
-
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    set(DEPENDENCIES libtypes libpi)
+else ()
+    set(DEPENDENCIES libtypes libtty libpreprocessor)
+endif ()
 
 ########################################
 #> End Build Variable Setup           <#
