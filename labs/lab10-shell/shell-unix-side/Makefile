@@ -11,7 +11,7 @@ OBJS = $(NAME).o shell-support.o \
 	$(BOOT_DIR)/unix-side/trace.o
 
 CC = gcc
-CFLAGS = -Wall -g -std=gnu99  -I$(BOOT_DIR) -Wno-unused-variable -Wno-unused-function
+CFLAGS = -Wall -g -std=gnu99  -I$(BOOT_DIR) -Wno-unused-variable -Wno-unused-function -I../bootloader/shared-code
 
 all: make-deps $(NAME)
 

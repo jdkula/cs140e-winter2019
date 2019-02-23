@@ -14,7 +14,7 @@ enum {
     ARMBASE = 0x8000,
 
     /** Start Of Header constant */
-    SOH = 0x12345678,
+    SOH = 0xCCU,
 
     /** Error code for a bad checksum on either side. */
     BAD_CKSUM = 0x1,

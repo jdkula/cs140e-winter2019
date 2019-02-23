@@ -12,7 +12,7 @@ endif
 # useful set of defines.
 include $(LIBPI_PATH)/includes.mk
 
-CFLAGS += -I$(TI)
+CFLAGS += -I$(TI) -I../bootloader/shared-code
 CFLAGS += -Wno-unused-function
 
 all: libpi $(NAME).bin 

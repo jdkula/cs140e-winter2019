@@ -42,14 +42,42 @@ int load_code(void) {
 
 	// let unix know we are ready.
 	put_uint(ACK);
+	
+	    uint32_t version = get_uint();
+    if(version != 2) {
+        die(NAK);
+    }
+    addr = get_uint();
 
-	// bootloader code.
- 	unimplemented();
+    uint32_t numBytes = get_uint();       // Take in the number of bytes.
+    uint32_t msgCrc = get_uint();         // Take in the message checksum.
 
-        put_uint(ACK);
+    uint32_t nCrc = crc32(&numBytes, 4);  // CRC the number of bytes...
+    put_uint(nCrc);                     // ...and send it back to verify.
+    put_uint(msgCrc);                   // ...also send back the CRC we were given.
+
+    if (get_uint() != ACK) {             // If the UNIX side doesn't like what we sent, reboot.
+        die(NAK);
+    }
+
+    put_uint(ACK);
+
+    for(int i = 0; i < numBytes; i += 4) {
+        unsigned data = get_uint();
+        put32(addr + i, data);
+    }
+    
+    if (get_uint() != EOT) die(TOO_BIG);
+
+    if (crc32((void*) addr, numBytes) != msgCrc) die(BAD_CKSUM);
+
+
+    put_uint(ACK);
 
         // give time to flush out; ugly.   implement `uart_flush()`
 	delay_ms(100);  
+	
+	BRANCHTO(addr + 8); // +8 for version + address!
 
 	/* return address */
 }
