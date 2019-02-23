@@ -22,7 +22,7 @@ volatile rpi_irq_controller_t* get_irq_controller(void) {
 
 // only the lower 8 bits seem to be used --- higher ones are GPU enabled.
 unsigned extract_byte(unsigned x) {
-    return x & 0xff;
+    return x & 0xffu;
 }
 
 /** @brief See the documentation for the ARM side timer (Section 14 of the

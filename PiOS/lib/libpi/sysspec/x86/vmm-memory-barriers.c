@@ -14,7 +14,7 @@ memory_barrier_handler_t mem_on_barrier = NULL;
 
 void data_memory_barrier(void) {
     put_uint(OP_DMB);
-    uint32_t ack = get_uint();
+    get_uint();
     if(mem_on_barrier != NULL) {
         mem_on_barrier();
     }
@@ -23,7 +23,7 @@ void data_memory_barrier(void) {
 
 void data_sync_barrier(void) {
     put_uint(OP_DSB);
-    uint32_t ack = get_uint();
+    get_uint();
     if(mem_on_barrier != NULL) {
         mem_on_barrier();
     }

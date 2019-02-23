@@ -7,6 +7,7 @@
  * then do additional tests.
  */
 #include <compat/dawson.h>
+#include <demand.h>
 
 // implement these: just pass in constants for <a1>, <a2>, <a3> to verify
 // these registers got saved.  check the values printed for the pc, lr and

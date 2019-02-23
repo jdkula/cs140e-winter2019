@@ -12,7 +12,6 @@
 #include <x86/tty.h>
 
 #include "trace.h"
-#include "support.h"
 #include "demand.h"
 
 // synchronously wait for <pid> to exit.  Return its exit code.

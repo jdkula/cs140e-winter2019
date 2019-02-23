@@ -17,7 +17,7 @@ int main() {
     test_on_commit = test_default_commit_handler;
     test_on_barrier = test_default_barrier_handler;
 
-IGNORE(-Wint-conversion);
+IGNORE("-Wint-conversion");
     get32(0x0);
     get32(0x1);
     get32(0x2);

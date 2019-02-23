@@ -32,9 +32,6 @@ typedef struct {
 
 volatile rpi_irq_controller_t* get_irq_controller(void);
 
-// and this with irq_basic_pending to see if it's a timer interrupt.
-#define RPI_BASIC_ARM_TIMER_IRQ         (1 << 0)
-
 unsigned extract_byte(unsigned);
 
 void system_enable_interrupts(void);

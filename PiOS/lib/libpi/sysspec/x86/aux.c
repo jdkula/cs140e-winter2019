@@ -13,6 +13,7 @@
  */
 
 #include <mem-access.h>
+#include <pios-macros.h>
 #include "rpi.h"
 #include "aux.h"
 
@@ -36,12 +37,15 @@ struct aux_mu_peripherals {
     uint32_t baud;
 };
 
+IGNORE("-Wunused-const-variable");
+
 // BCM2835AP §2.1 p. 8 - Auxiliary enables
 static uint32_t* const AUX_ENABLES = (void*) (AUX_BASE + 0x4);
 
 // BCM2835AP §2.1 p. 8 - maps to all AUX_MU_* registers.
 static struct aux_mu_peripherals* const uart = (void*) (AUX_BASE + 0x40);
 
+POP();
 
 void aux_uart_register_enable(uint8_t enabled) {
 //    setBit(AUX_ENABLES, 0, enabled); // BCM2835AP §2.1.1 p. 9 - Mini UART enable

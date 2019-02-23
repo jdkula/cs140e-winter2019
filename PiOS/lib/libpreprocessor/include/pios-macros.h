@@ -18,7 +18,7 @@
 
 /** Ignores the given compiler warning until a POP() call. */
 #define IGNORE(WARN) _Pragma("GCC diagnostic push") \
-                     _Pragma(_STRINGIFY(GCC diagnostic ignored #WARN))
+                     _Pragma(_STRINGIFY(GCC diagnostic ignored WARN))
 
 /** Undoes an IGNORE operation. */
 #define POP() _Pragma("GCC diagnostic pop")

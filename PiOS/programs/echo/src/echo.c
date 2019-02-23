@@ -12,7 +12,6 @@
 #include <x86/tty.h>
 
 #include "demand.h"
-#include "support.h"
 #include "trace.h"
 
 // simple state machine to indicate when we've seen a special string

@@ -43,6 +43,7 @@ uint32_t get32(void* addr) {
     uint32_t data = get_uint();
     mem_t info = {.val = data, .addr = addr};
     on_read(info);
+    return data;
 }
 
 // Get Program Counter
