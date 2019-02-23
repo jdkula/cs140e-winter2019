@@ -39,28 +39,79 @@ void expect(const char* msg, int fd, uint32_t v) {
     }
 }
 
-// unix-side bootloader: send the bytes, using the protocol.
-// read/write using put_uint() get_unint().
-void simple_boot(int fd, const uint8_t* givenCode, uint32_t n) {
-    const uint8_t* code = givenCode;
-    if(n % 4 != 0) {
-        code = align_file(&n, code, 4);
+
+void send_program(int fd, const char* name) {
+    int nbytes;
+
+    // from homework.
+    unsigned* code = (void*) read_file(&nbytes, name);
+    assert(nbytes % 4 == 0);
+
+    tty_send_byte(fd, SOH);
+
+    expect("ack", fd, ACK);
+    printf("got ACK\n");
+
+    tty_put_uint(fd, code[0]);
+    tty_put_uint(fd, code[1]);
+    printf("put code\n");
+
+    unsigned msgCrc = crc32(code, nbytes);
+    unsigned numberCrc = crc32(&nbytes, 4);
+    printf("got crc\n");
+
+    tty_put_uint(fd, nbytes);
+    tty_put_uint(fd, msgCrc);
+    printf("put info\n");
+
+    unsigned backNumber = tty_get_uint(fd);
+    unsigned backMsgCrc = tty_get_uint(fd);
+    printf("checking %d == %d and %d == %d\n", backNumber, numberCrc, backMsgCrc, msgCrc);
+
+    if(backNumber != numberCrc || backMsgCrc != msgCrc) {
+        tty_put_uint(fd, NAK);
+        printf("rip, didn't match\n");
+        return;
     }
-    const uint32_t* intCode = (const uint32_t*) (code);
+
+    tty_put_uint(fd, ACK);
+
+    printf("about to expect ack\n");
+    unsigned back = tty_get_uint(fd);
+    printf("got back %d, expected %d\n", back, ACK);
+    if(back != ACK) {
+        exit(1);
+    }
+
+    for(int i = 0; i < (nbytes / 4); i += 1) {
+        tty_put_uint(fd, code[i]);
+    }
+    printf("sent code.\n");
+
+    tty_put_uint(fd, EOT);
+    printf("sent eot.\n");
+
+    expect("ack", fd, ACK);
+    printf("done.\n");
+}
+
+// unix-side bootloader: send the bytes, using the protocol.
+// read/write using tty_put_uint() get_unint().
+void simple_boot(int fd, const uint8_t* givenBuf, uint32_t n) {
+    const uint8_t* buf = givenBuf;
+    if(n % 4 != 0) {
+        buf = align_file(&n, buf, 4);
+    }
 
     uint32_t nCrc = crc32(&n, 4);
-    uint32_t bufCrc = crc32(code, n);
+    uint32_t bufCrc = crc32(buf, n);
 
-    send_byte(fd, SOH);
-
-    expect("Pi sends ACK", fd, ACK);
-    printf("Got ack.\n");
-
-    put_uint_traced(fd, code[0]); // Version #
-    put_uint_traced(fd, code[1]); // Link address
-
+    put_uint_traced(fd, SOH);
     put_uint_traced(fd, n);
     put_uint_traced(fd, bufCrc);
+
+    expect("Pi echoes SOH", fd, SOH);
+    fprintf(stderr, "SOH received...\n");
 
     expect("Pi Echoes Byte Number CRC", fd, nCrc);
     fprintf(stderr, "Byte number CRC verified... %#010x\n", nCrc);
@@ -70,13 +121,12 @@ void simple_boot(int fd, const uint8_t* givenCode, uint32_t n) {
 
     put_uint_traced(fd, ACK);  // We're good to go!
 
-    expect("Pi sends ACK before code distribution", fd, ACK);
-
+    const uint32_t* intBuf = (const uint32_t*) (buf);
     uint32_t intBufSize = n / 4;
     fprintf(stderr, "File info: %u bytes / %u chunks\n", n, intBufSize);
 
     for (int i = 0; i < intBufSize; i++) {
-        put_uint_traced(fd, intCode[i]);
+        put_uint_traced(fd, intBuf[i]);
         fprintf(stderr, "Sent %u/%u (%d%%) chunks\r", i, intBufSize, (i * 100) / intBufSize);
     }
 
@@ -88,11 +138,7 @@ void simple_boot(int fd, const uint8_t* givenCode, uint32_t n) {
     expect("Pi Sends ACK", fd, ACK);
     fprintf(stderr, "Received ACK!\n");
 
-    if(code != givenCode) {
-        fprintf(stderr, "Freeing aligned code.");
-        free((void*) code);
+    if(buf != givenBuf) {
+        free((void*) buf);
     }
-
-    expect("Pi reads from correct area", fd, 0x10001df8);
-    expect("Area is not corrupted", fd, 'H');
 }

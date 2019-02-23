@@ -8,13 +8,13 @@
 
 #include "x86/tty-comm.h"
 
-void send_byte(int fd, uint8_t b) {
+void tty_send_byte(int fd, uint8_t b) {
     if (write(fd, &b, 1) < 0) {
         sys_die(write, "write failed in send_byte\n");
     }
 }
 
-uint8_t get_byte(int fd) {
+uint8_t tty_get_byte(int fd) {
     uint8_t b;
     int n;
     if ((n = read(fd, &b, 1)) != 1) {
@@ -31,20 +31,20 @@ uint8_t get_byte(int fd) {
 // 	(get_byte(fd) | get_byte(fd) << 8 ...)
 // isn't guaranteed to be called in that order b/c | is not a seq point.
 uint32_t tty_get_uint(int fd) {
-    uint32_t u = get_byte(fd);
-    u |= get_byte(fd) << 8;
-    u |= get_byte(fd) << 16;
-    u |= get_byte(fd) << 24;
+    uint32_t u = tty_get_byte(fd);
+    u |= tty_get_byte(fd) << 8;
+    u |= tty_get_byte(fd) << 16;
+    u |= tty_get_byte(fd) << 24;
     return u;
 }
 
 void tty_put_uint(int fd, uint32_t u) {
     // mask not necessary.
 //    fprintf(stderr, "> %#010x\n", u);
-    send_byte(fd, (u >> 0) & 0xff);
-    send_byte(fd, (u >> 8) & 0xff);
-    send_byte(fd, (u >> 16) & 0xff);
-    send_byte(fd, (u >> 24) & 0xff);
+    tty_send_byte(fd, (u >> 0) & 0xff);
+    tty_send_byte(fd, (u >> 8) & 0xff);
+    tty_send_byte(fd, (u >> 16) & 0xff);
+    tty_send_byte(fd, (u >> 24) & 0xff);
 }
 
 
