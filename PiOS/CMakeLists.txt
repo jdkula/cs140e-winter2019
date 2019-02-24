@@ -102,6 +102,7 @@ add_subdirectory(programs/handoff)
 add_subdirectory(programs/replay)
 add_subdirectory(programs/echo)
 add_subdirectory(programs/pishell)
+add_subdirectory(programs/pifs)
 
 # Tests
 add_subdirectory(test/memory-test)
