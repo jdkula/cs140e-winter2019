@@ -77,6 +77,8 @@ static int done(unsigned char *s) {
 }
 
 #include <errno.h>
+#include <x86/boot-send.h>
+#include <boot-messages.h>
 
 // read and echo the characters from the tty until it closes (pi rebooted)
 // or we see a string indicating a clean shutdown.
@@ -175,7 +177,23 @@ int main(int argc, char *argv[]) {
 #endif
     fprintf(stderr, "my-install: about to boot\n");
 
-    send_program(fd, name);
+    int failed = send_program(fd, name);
+    switch (failed) {
+        case 0: // worked
+            break;
+        case BAD_VERSION:
+            printf("Error: The Pi didn't recognize the linker version of that binary.\n");
+            return BAD_VERSION;
+        case BAD_START:
+            printf("Error: The Pi couldn't link that binary (the start is too low).\n");
+            return BAD_START;
+        case BAD_END:
+            printf("Error: The Pi couldn't link that binary (the end is too high).\n");
+            return BAD_END;
+        default:
+            printf("Error: There was corruption during transmission. Please try again.\n");
+    }
+
     if(exec_args) {
         handoff_to(fd,exec_args);
     } else if(print_p) {

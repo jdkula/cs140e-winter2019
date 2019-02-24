@@ -16,7 +16,7 @@
 #include <boot-messages.h>
 #include <printf.h>
 #include <pios-macros.h>
-#include <arm/boot-impl.h>
+#include <arm/boot-load.h>
 
 static void die(unsigned err) {
     put_uint(err);

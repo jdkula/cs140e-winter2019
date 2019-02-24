@@ -29,7 +29,7 @@ void notmain() {
         } else if (strncmp(buf, "boot", 4) == 0) {
 //            printk("PI BOOTING!!!\n");
             BRANCHTO(load_code());
-            printk("PI FINISHED!!!\n");
+            printk("\nPIX:> ");
         } else {
             printk("Found unrecognized command! %s\n", buf);
         }

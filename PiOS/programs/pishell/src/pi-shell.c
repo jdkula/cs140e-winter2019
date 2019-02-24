@@ -16,8 +16,8 @@
 
 #include <x86/tty.h>
 #include <x86/tty-comm.h>
-#include <x86/support.h>
-#include <x86/boot-impl.h>
+#include <x86/boot-support.h>
+#include <x86/boot-send.h>
 
 #include "pi-shell.h"
 #include "demand.h"
@@ -153,8 +153,23 @@ static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
     if (is_pi_prog(argv[0]) && access(argv[0], F_OK) >= 0) {
         printf("Found pi program! %s\n", argv[0]);
         pi_put(pi_fd, "boot\n");
-        send_program(pi_fd, argv[0]);
-        return 1;
+        int failed = send_program(pi_fd, argv[0]);
+        switch (failed) {
+            case 0: // worked
+                return 1;
+            case BAD_VERSION:
+                printf("Error: The Pi didn't recognize the linker version of that binary.\n");
+                return 0;
+            case BAD_START:
+                printf("Error: The Pi couldn't link that binary (the start is too low).\n");
+                return 0;
+            case BAD_END:
+                printf("Error: The Pi couldn't link that binary (the end is too high).\n");
+                return 0;
+            default:
+                printf("Error: There was corruption during transmission. Please try again.\n");
+                return 0;
+        }
     }
     return 0;
 }
@@ -209,21 +224,19 @@ static int shell(int pi_fd, int unix_fd) {
         // empty line: skip.
         if (nargs == 0);
             // is it a builtin?  do it.
-        else if (do_builtin_cmd(pi_fd, argv, nargs) != 0);
+        else if (do_builtin_cmd(pi_fd, argv, nargs)) {
+            if (pi_readline(pi_fd, in_buf, sizeof(in_buf))) {
+                printf("Pi Echoed: %s\n", in_buf);
+            }
+        }
             // if not a pi program (end in .bin) fork-exec
-        else if (run_pi_prog(pi_fd, argv, nargs) == 1) {
-            echo_until(pi_fd, "PI FINISHED!!!\n");
-            note("> ");
-            continue; // skip reading a line from the Pi
+        else if (run_pi_prog(pi_fd, argv, nargs)) {
+            echo_until(pi_fd, "PIX:> ");
+            continue; // pi echoed the shell, so don't print it.
         } else {
             do_unix_cmd(argv, nargs);
-            note("> ");
-            continue; // skip reading a line from the Pi
         }
 
-        if (pi_readline(pi_fd, in_buf, sizeof(in_buf)) != 0) {
-            printf("Pi Echoed: %s\n", in_buf);
-        }
         note("> ");
     }
 

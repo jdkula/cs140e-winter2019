@@ -10,19 +10,16 @@
 #define PIOS_BOOT_MESSAGES_H
 
 enum {
-    /** Location the sent payload gets stored. */
-    ARMBASE = 0x8000,
-
     /** Start Of Header constant */
     SOH = 0xCCU,
 
     /** Error code for a bad checksum on either side. */
     BAD_CKSUM = 0x1,
 
-    /** Error code for bad start (?) TODO: Why? */
+    /** Error code for bad start  */
     BAD_START,
 
-    /** Error code for a bad end (?) TODO: Understand this */
+    /** Error code for a bad end  */
     BAD_END,
 
     /** Error code sent when the recieved payload's size doesn't match what was telegraphed. */
@@ -35,7 +32,10 @@ enum {
     NAK,
 
     /** Indicates the End of Transmission */
-    EOT
+    EOT,
+
+    /** The loader version was incorrect. */
+    BAD_VERSION
 };
 
 #endif //PIOS_BOOT_MESSAGES_H

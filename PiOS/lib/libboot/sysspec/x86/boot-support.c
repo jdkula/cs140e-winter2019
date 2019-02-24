@@ -10,7 +10,7 @@
 #include <demand.h>
 #include <integer.h>
 #include <x86/tty-comm.h>
-#include "x86/support.h"
+#include "x86/boot-support.h"
 
 // simple utility function to check that a u32 read from the
 // file descriptor matches <v>.

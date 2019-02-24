@@ -3,14 +3,21 @@
 //
 
 
-#include <x86/support.h>
+#include <x86/boot-support.h>
 #include <demand.h>
 #include <x86/tty-comm.h>
 #include <assert.h>
 #include <boot-messages.h>
 #include <crc32.h>
 
-void send_program(int fd, const char* name) {
+#define returnIfNot(fd, result) do {        \
+    uint32_t got = tty_get_uint(fd);        \
+    if(result != got) {                     \
+        return got;                         \
+    }                                       \
+} while(0);
+
+int send_program(int fd, const char* name) {
     int nbytes;
 
     // from homework.
@@ -19,7 +26,7 @@ void send_program(int fd, const char* name) {
 
     tty_send_byte(fd, SOH);
 
-    expect("ack", fd, ACK);
+    returnIfNot(fd, ACK);
     printf("got ACK\n");
 
     tty_put_uint(fd, code[0]);
@@ -41,17 +48,12 @@ void send_program(int fd, const char* name) {
     if (backNumber != numberCrc || backMsgCrc != msgCrc) {
         tty_put_uint(fd, NAK);
         printf("rip, didn't match\n");
-        return;
+        return BAD_CKSUM;
     }
 
     tty_put_uint(fd, ACK);
 
-    printf("about to expect ack\n");
-    unsigned back = tty_get_uint(fd);
-    printf("got back %d, expected %d\n", back, ACK);
-    if (back != ACK) {
-        exit(1);
-    }
+    returnIfNot(fd, ACK);
 
     for (int i = 0; i < (nbytes / 4); i += 1) {
         tty_put_uint(fd, code[i]);
@@ -61,6 +63,8 @@ void send_program(int fd, const char* name) {
     tty_put_uint(fd, EOT);
     printf("sent eot.\n");
 
-    expect("ack", fd, ACK);
+    returnIfNot(fd, ACK);
     printf("done.\n");
+
+    return 0;
 }

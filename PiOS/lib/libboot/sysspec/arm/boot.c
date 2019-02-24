@@ -12,14 +12,19 @@
 #include <pios-macros.h>
 #include <mem-access.h>
 
-#include "arm/boot-impl.h"
+#include "arm/boot-load.h"
 
 
 static void die(uint32_t code) {
     put_uint(code);
     gpio_write(GPIO_ACT, HIGH);
     gpio_write(GPIO_PWR, HIGH);
-    delay_ms(5000);
+    delay_ms(100);
+    gpio_write(GPIO_ACT, LOW);
+    delay_ms(50);
+    gpio_write(GPIO_PWR, LOW);
+    gpio_write(GPIO_ACT, HIGH);
+    delay_ms(50);
     reboot();
 }
 
@@ -43,9 +48,6 @@ uint32_t load_code(void) {
     put_uint(ACK);
 
     uint32_t version = get_uint();
-    if (version != 2) {
-        die(NAK);
-    }
     addr = get_uint();
 
     uint32_t numBytes = get_uint();       // Take in the number of bytes.
@@ -55,9 +57,20 @@ uint32_t load_code(void) {
     put_uint(nCrc);                     // ...and send it back to verify.
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
-    gpio_write(GPIO_ACT, LOW);
     if (get_uint() != ACK) {             // If the UNIX side doesn't like what we sent, reboot.
         die(NAK);
+    }
+
+    if (version != 2) {
+        die(BAD_VERSION);
+    }
+
+    if (addr < LAST_USED_ADDRESSES || addr > MAX_ADDRESS) {
+        die(BAD_START);
+    }
+
+    if ((addr + numBytes) > MAX_ADDRESS) {
+        die(BAD_END);
     }
 
     put_uint(ACK);

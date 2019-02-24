@@ -17,7 +17,6 @@ static int trace_init_p = 0;
  */
 static const char *cmd_to_str(unsigned u) {
     switch(u) {
-        case ARMBASE:       return "ARMBASE?";
         case SOH:           return "SOH?";
         case BAD_CKSUM:     return "BAD_CKSUM?";
         case BAD_START:     return "BAD_START?";

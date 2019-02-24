@@ -2,8 +2,10 @@
 #define __DEMAND_H__
 
 #ifdef __linux__
+
 #include <stdio.h>
 #include <stdlib.h>
+
 #else
 #include "printf.h"
 #define fprintf(ignored, ...) printk(__VA_ARGS__)
@@ -44,18 +46,22 @@
 } while(0)
 #else
 #define panic(msg, args...) do { 					\
-	printk("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
-	reboot();							\
+    printk("PANIC:%s:%s:%d:" msg "\n", __FILE__, __FUNCTION__, __LINE__, ##args); \
+    reboot();							\
 } while(0)
 #endif
 
 #ifndef NDEBUG
 #define debug(msg, args...) \
-	(printf)("%s:%s:%d:" msg, __FILE__, __FUNCTION__, __LINE__, ##args)
+    (printf)("%s:%s:%d:" msg, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
 #define debug(msg, args...) do { } while(0)
 #endif
 
+#define note(msg...) do {                                              \
+        fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); \
+        fprintf(stderr, ##msg);                                            \
+} while(0)
 
 #define safe_sys(...) if((__VA_ARGS__) < 0) { sys_die(_XSTRING(__VA_ARGS__), failed); }
 

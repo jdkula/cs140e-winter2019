@@ -13,7 +13,7 @@
 #include <boot-messages.h>
 #include <demand.h>
 #include <x86/tty-comm.h>
-#include <x86/support.h>
+#include <x86/boot-support.h>
 
 #include "simple-boot.h"
 #include "trace.h"

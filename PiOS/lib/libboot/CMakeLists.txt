@@ -31,7 +31,7 @@ set(LIBRARY_NAME libboot)
 ########################################
 
 # Source Files
-list_add_sources_multiarch(SRC crc32.c boot.c send.c support.c)
+list_add_sources_multiarch(SRC crc32.c boot.c send.c boot-support.c)
 
 # Compile Options
 set(INCLUDE_DIRECTORIES include)

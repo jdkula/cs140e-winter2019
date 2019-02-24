@@ -7,6 +7,6 @@
 
 #include <integer.h>
 
-void send_program(int fd, const char* name);
+int send_program(int fd, const char* name);
 
 #endif //PIOS_PIBOOT_H
