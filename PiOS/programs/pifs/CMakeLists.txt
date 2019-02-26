@@ -32,6 +32,8 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     set(SRC
             src/pi-fs.c
             src/pi-fs-support.c
+            src/redirect.c
+            src/echo-until.c
             )
 
     pkg_check_modules(FUSE fuse)
@@ -82,6 +84,24 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             PROPERTIES
             ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUT_DIR}"
             )
+
+
+    add_executable(test-redirect-driver src/driver.c src/redirect.c src/echo-until.c )
+    target_compile_options(test-redirect-driver PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(test-redirect-driver ${DEPENDENCIES})
+    target_include_directories(test-redirect-driver PUBLIC ${INCLUDE_DIRECTORIES})
+
+    add_executable(test-pi-shell-redirect src/redirect.c src/echo-until.c src/test-pi-shell-redirect.c)
+    target_compile_options(test-pi-shell-redirect PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(test-pi-shell-redirect ${DEPENDENCIES})
+    target_include_directories(test-pi-shell-redirect PUBLIC ${INCLUDE_DIRECTORIES})
+
+    add_executable(test-redirect src/redirect.c src/test-redirect.c src/echo-until.c)
+    target_compile_options(test-redirect PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(test-redirect ${DEPENDENCIES})
+    target_include_directories(test-redirect PUBLIC ${INCLUDE_DIRECTORIES})
+
+
 
     ########################################
     #> End Executable Target Setup        <#

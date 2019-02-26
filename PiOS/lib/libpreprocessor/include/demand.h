@@ -65,6 +65,11 @@
 
 #define safe_sys(...) if((__VA_ARGS__) < 0) { sys_die(_XSTRING(__VA_ARGS__), failed); }
 
+#define error(msg...) do { 						\
+        fprintf(stderr, "%s:%s:%d:ERROR:", __FILE__, __FUNCTION__, __LINE__); \
+        fprintf(stderr, ##msg);						\
+        exit(1);                                                        \
+} while(0)
 
 /* Compile-time assertion used in function. */
 #define AssertNow(x) switch(1) { case (x): case 0: ; }
