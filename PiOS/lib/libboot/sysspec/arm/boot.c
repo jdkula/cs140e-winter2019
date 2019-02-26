@@ -41,6 +41,8 @@ uint32_t load_code(void) {
 
     unsigned addr = 0;
 
+    uart_init();
+
     while (uart_getc() != SOH);
 
     // let unix know we are ready.
