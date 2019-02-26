@@ -185,7 +185,7 @@ You'll have to implement six methods:
    - `getattr` get attributes of the file: its size, permissions, and
    number of hardlinks to it.
 
-   - `open`: read fro the file at a `offset` of `size` bytes.
+   - `open`: I'd use `file_lookup` in `pi-fs-support.c`
 
    - `read`: read fro the file at a `offset` of `size` bytes.
 
@@ -242,6 +242,18 @@ Now you'll combine everything together.
   1.  Copy all your code from part1 into this directory: (`cp ../part1-pi-fs/`\*.[ch] .`).
 
   2. Implement the `do_echo`, `do_reboot`, `do_run`.
+
+  3. You'll have to use `Makefile.use`
+
+  4. Also, you'll need to replace your main with the code in `patch.c`.
+  The easiest way is to put this in your `pi-fs.c`:
+
+
+    #ifndef PART3
+       ...your original main() code....
+    #else
+    #    include "patch.c"
+    #endif
 
 
 Break this down into steps.
