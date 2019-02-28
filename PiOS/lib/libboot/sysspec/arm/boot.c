@@ -15,8 +15,7 @@
 #include "arm/boot-load.h"
 
 
-static void die(uint32_t code) {
-    put_uint(code);
+static void error_led() {
     gpio_write(GPIO_ACT, HIGH);
     gpio_write(GPIO_PWR, HIGH);
     delay_ms(100);
@@ -25,7 +24,8 @@ static void die(uint32_t code) {
     gpio_write(GPIO_PWR, LOW);
     gpio_write(GPIO_ACT, HIGH);
     delay_ms(50);
-    reboot();
+    gpio_set_input(GPIO_ACT);
+    gpio_set_input(GPIO_PWR);
 }
 
 
@@ -60,19 +60,27 @@ uint32_t load_code(void) {
     put_uint(msgCrc);                   // ...also send back the CRC we were given.
 
     if (get_uint() != ACK) {             // If the UNIX side doesn't like what we sent, reboot.
-        die(NAK);
+        put_uint(NAK);
+        error_led();
+        return NAK;
     }
 
     if (version != 2) {
-        die(BAD_VERSION);
+        put_uint(BAD_VERSION);
+        error_led();
+        return BAD_VERSION;
     }
 
     if (addr < LAST_USED_ADDRESSES || addr > MAX_ADDRESS) {
-        die(BAD_START);
+        put_uint(BAD_START);
+        error_led();
+        return BAD_START;
     }
 
     if ((addr + numBytes) > MAX_ADDRESS) {
-        die(BAD_END);
+        put_uint(BAD_END);
+        error_led();
+        return BAD_END;
     }
 
     put_uint(ACK);
@@ -82,9 +90,17 @@ uint32_t load_code(void) {
         put32(addr + i, data);
     }
 
-    if (get_uint() != EOT) die(SIZE_MISMATCH);
+    if (get_uint() != EOT) {
+        put_uint(SIZE_MISMATCH);
+        error_led();
+        return SIZE_MISMATCH;
+    }
 
-    if (crc32((void*) addr, numBytes) != msgCrc) die(BAD_CKSUM);
+    if (crc32((void*) addr, numBytes) != msgCrc) {
+        put_uint(BAD_CKSUM);
+        error_led();
+        return BAD_CKSUM;
+    }
 
 
     put_uint(ACK);

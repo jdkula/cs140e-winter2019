@@ -28,7 +28,12 @@ void notmain() {
             clean_reboot();
         } else if (strncmp(buf, "boot", 4) == 0) {
 //            printk("PI BOOTING!!!\n");
-            BRANCHTO(load_code());
+            uint32_t result = load_code();
+            if(result < LAST_USED_ADDRESSES) { // i.e. there was an error
+                printk("BOOT ERROR!\n");
+            } else {
+                BRANCHTO(result);
+            }
             printk("\nPIX:> ");
         } else {
             printk("Found unrecognized command! %s\n", buf);

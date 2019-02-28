@@ -33,6 +33,11 @@ static void die(unsigned err) {
 
 void notmain(void) {
     uart_init();
-    BRANCHTO(load_code());
+    uint32_t result = load_code();
+    if(result < LAST_USED_ADDRESSES) { // i.e. there was an error
+        printk("BOOT ERROR!\n");
+    } else {
+        BRANCHTO(result);
+    }
     clean_reboot();
 }

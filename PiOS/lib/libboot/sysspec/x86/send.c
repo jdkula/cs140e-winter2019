@@ -24,30 +24,34 @@ int send_program(int fd, const char* name) {
     unsigned* code = (void*) read_file(&nbytes, name);
     assert(nbytes % 4 == 0);
 
+    fprintf(stderr, "Read file.\n");
+
     tty_send_byte(fd, SOH);
 
+    fprintf(stderr, "sent SOH\n");
+
     returnIfNot(fd, ACK);
-    printf("got ACK\n");
+    fprintf(stderr, "got ACK\n");
 
     tty_put_uint(fd, code[0]);
     tty_put_uint(fd, code[1]);
-    printf("put code\n");
+    fprintf(stderr, "put code\n");
 
     unsigned msgCrc = crc32(code, nbytes);
     unsigned numberCrc = crc32(&nbytes, 4);
-    printf("got crc\n");
+    fprintf(stderr, "got crc\n");
 
     tty_put_uint(fd, nbytes);
     tty_put_uint(fd, msgCrc);
-    printf("put info\n");
+    fprintf(stderr, "put info\n");
 
     unsigned backNumber = tty_get_uint(fd);
     unsigned backMsgCrc = tty_get_uint(fd);
-    printf("checking %d == %d and %d == %d\n", backNumber, numberCrc, backMsgCrc, msgCrc);
+    fprintf(stderr, "checking %d == %d and %d == %d\n", backNumber, numberCrc, backMsgCrc, msgCrc);
 
     if (backNumber != numberCrc || backMsgCrc != msgCrc) {
         tty_put_uint(fd, NAK);
-        printf("rip, didn't match\n");
+        fprintf(stderr, "rip, didn't match\n");
         return BAD_CKSUM;
     }
 
@@ -58,13 +62,13 @@ int send_program(int fd, const char* name) {
     for (int i = 0; i < (nbytes / 4); i += 1) {
         tty_put_uint(fd, code[i]);
     }
-    printf("sent code.\n");
+    fprintf(stderr, "sent code.\n");
 
     tty_put_uint(fd, EOT);
-    printf("sent eot.\n");
+    fprintf(stderr, "sent eot.\n");
 
     returnIfNot(fd, ACK);
-    printf("done.\n");
+    fprintf(stderr, "done.\n");
 
     return 0;
 }

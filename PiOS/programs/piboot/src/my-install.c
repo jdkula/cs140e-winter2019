@@ -45,6 +45,7 @@ void handoff_to(int tty_fd, char* argv[]) {
     safe_sys(pid = fork());
 
     if(pid == 0) {
+        fprintf(stderr, "Duping fd %d to fd %d\n", tty_fd, TRACE_FD_HANDOFF);
         safe_sys(dup2(tty_fd, TRACE_FD_HANDOFF));
         safe_sys(close(tty_fd));
         safe_sys(execvp(argv[0], argv));

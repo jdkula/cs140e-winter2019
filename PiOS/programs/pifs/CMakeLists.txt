@@ -45,11 +45,11 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
             -Iinclude
             -g
             -lm
-            ${FUSE_FLAGS})
+            ${FUSE_CFLAGS})
 
     set(INCLUDE_DIRECTORIES include)
 
-    set(DEPENDENCIES libboot libpreprocessor libtty piboot.lib ${FUSE_LIBS})
+    set(DEPENDENCIES libboot libpreprocessor libtty piboot.lib ${FUSE_LDFLAGS})
 
     ## Output is controlled by ${EXE_OUT_DIR}
 
@@ -65,8 +65,8 @@ if (NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     add_executable(pifs ${SRC})
 
     # Commit compile options
-    target_compile_options(pifs PUBLIC ${COMPILE_OPTIONS} ${FUSE_CFLAGS})
-    target_link_libraries(pifs ${DEPENDENCIES} ${FUSE_LDFLAGS})
+    target_compile_options(pifs PUBLIC ${COMPILE_OPTIONS})
+    target_link_libraries(pifs ${DEPENDENCIES})
 
     target_include_directories(pifs PRIVATE ${INCLUDE_DIRECTORIES})
 

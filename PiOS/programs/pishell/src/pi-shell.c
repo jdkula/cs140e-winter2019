@@ -94,7 +94,7 @@ static int is_pi_prog(char* prog) {
     // must be .bin + at least one character.
     if (n < 5)
         return 0;
-    return strcmp(prog + n - 4, ".bin") == 0;
+    return strcmp(prog + n - 4, ".bin") == 0 || (n > 6 && strcmp(prog + n - 7, "run.cmd") == 0);
 }
 
 
@@ -150,8 +150,12 @@ void reboot_pi(int pi_fd) {
 
 // ship pi program to the pi.
 static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
-    if (is_pi_prog(argv[0]) && access(argv[0], F_OK) >= 0) {
+    if (is_pi_prog(argv[0])) {
         printf("Found pi program! %s\n", argv[0]);
+        if(access(argv[0], F_OK) < 0) {
+            printf("Error: Couldn't open binary.\n");
+            return 0;
+        }
         pi_put(pi_fd, "boot\n");
         int failed = send_program(pi_fd, argv[0]);
         switch (failed) {
@@ -167,7 +171,7 @@ static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
                 printf("Error: The Pi couldn't link that binary (the end is too high).\n");
                 return 0;
             default:
-                printf("Error: There was corruption during transmission. Please try again.\n");
+                printf("Error: There was corruption during transmission. Please try again. Code: %d\n", failed);
                 return 0;
         }
     }
@@ -215,7 +219,7 @@ static int shell(int pi_fd, int unix_fd) {
     // wait for the welcome message from the pi?  note: we
     // will hang if the pi does not send an entire line.  not
     // sure about this: should we keep reading til newline?
-    note("> ");
+    fprintf(stderr, "PIX:> ");
     while (!done && fgets(buf, sizeof buf, stdin)) {
         int n = strlen(buf) - 1;
         buf[n] = 0;
@@ -226,7 +230,7 @@ static int shell(int pi_fd, int unix_fd) {
             // is it a builtin?  do it.
         else if (do_builtin_cmd(pi_fd, argv, nargs)) {
             if (pi_readline(pi_fd, in_buf, sizeof(in_buf))) {
-                printf("Pi Echoed: %s\n", in_buf);
+                fprintf(stderr, "Pi Echoed: %s\n", in_buf);
             }
         }
             // if not a pi program (end in .bin) fork-exec
@@ -234,10 +238,10 @@ static int shell(int pi_fd, int unix_fd) {
             echo_until(pi_fd, "PIX:> ");
             continue; // pi echoed the shell, so don't print it.
         } else {
-            do_unix_cmd(argv, nargs);
+//            do_unix_cmd(argv, nargs);
         }
 
-        note("> ");
+        fprintf(stderr, "PIX:> ");
     }
 
     if (done) {

@@ -7,6 +7,7 @@
  */
 
 #define FUSE_USE_VERSION 26
+#define USE_PI_SHELL
 
 #include <fuse.h>
 #include <stdio.h>
@@ -16,6 +17,7 @@
 
 #include <assert.h>
 #include <demand.h>
+#include <signal.h>
 
 #include "pi-fs.h"
 
@@ -25,16 +27,16 @@ static int do_reboot(dirent_t* e, const char* path, const char* buf,
 static int do_echo(dirent_t* e, const char* path, const char* buf,
                    size_t size, off_t offset, void* data);
 
-static int do_run(dirent_t* e, const char* path, const char* buf,
-                  size_t size, off_t offset, void* data);
+static int do_run(dirent_t* e, const char* path, void* data);
 
 
 // simple pi file system: no directories.
 static dirent_t root[] = {
         {.name = "/echo.cmd",   perm_rw, 0, .on_wr = do_echo},
         {.name = "/reboot.cmd", perm_rw, 0, .on_wr = do_reboot},
-        {.name = "/run.cmd",    perm_rw, 0, .on_wr = do_run},
+        {.name = "/run.cmd",    perm_rw, 0, .on_rel = do_run},
         {.name = "/console",    perm_rd, 0},
+        {.name = "/.boot.bin",  perm_rd, 0},
         {0}
 };
 
@@ -66,6 +68,7 @@ static int pi_open(const char* path, struct fuse_file_info* fi) {
 
     if (!e)
         return retv;
+
 
     return 0;
 }
@@ -121,6 +124,10 @@ static int pi_read(const char* path, char* buf, size_t size,
 
     memcpy(buf, e->f->data, read_size);
 
+    if (e->on_rd) {
+        e->on_rd(e, path, buf, size, offset, fi);
+    }
+
     return read_size;
 }
 
@@ -140,6 +147,9 @@ static int pi_write(const char* path, const char* buf, size_t size,
     e->f->n_data = e->f->n_data > (size + offset) ? e->f->n_data : (size + offset);
     memcpy(e->f->data + offset, buf, size);
 
+    if(e->on_wr) {
+        e->on_wr(e, path, buf, size, offset, fi);
+    }
 
     return size;
 }
@@ -163,6 +173,21 @@ static int pi_ftruncate(const char* path, off_t offset, struct fuse_file_info* f
     return pi_truncate(path, offset);
 }
 
+static int pi_release(const char* path, struct fuse_file_info* fi) {
+    int retv;
+    dirent_t* e = file_lookup(&retv, root, path, flag_to_perm(fi->flags));
+
+    if (!e)
+        return retv;
+
+    if(e->on_rel) {
+        e->on_rel(e, path, fi);
+    }
+
+    return 0;
+
+}
+
 /* these were enough for me for the lab. */
 static struct fuse_operations pi_oper = {
         .getattr = pi_getattr,
@@ -172,6 +197,7 @@ static struct fuse_operations pi_oper = {
         .write = pi_write,
         .truncate = pi_truncate,
         .ftruncate = pi_ftruncate,
+        .release = pi_release
 };
 
 /*
@@ -185,6 +211,11 @@ static struct fuse_operations pi_oper = {
 
     -s Run single-threaded instead of multi-threaded. 
 */
+#ifdef USE_PI_SHELL
+
+#include "patch.c"
+
+#else
 int main(int argc, char* argv[]) {
     assert(ent_lookup(root, "/console"));
     assert(ent_lookup(root, "/echo.cmd"));
@@ -192,19 +223,28 @@ int main(int argc, char* argv[]) {
     assert(ent_lookup(root, "/run.cmd"));
     return fuse_main(argc, argv, &pi_oper, 0);
 }
+#endif
 
 // not needed for this part.
 static int do_reboot(dirent_t* e, const char* path, const char* buf,
                      size_t size, off_t offset, void* data) {
-    error("dont need for part1\n");
+    fd_puts(pi_wr_fd, "reboot\n");
+    kill(getpid(), SIGINT);
+    return 0;
 }
 
 static int do_echo(dirent_t* e, const char* path, const char* buf,
                    size_t size, off_t offset, void* data) {
-    error("dont need for part1\n");
+    fd_puts(pi_wr_fd, "echo ");
+    fd_puts(pi_wr_fd, buf);
+    fd_putc(pi_wr_fd, '\n');
+    echo_until_fn(pi_rd_fd, prompt, wr_console);
+    return 0;
 }
 
-static int do_run(dirent_t* e, const char* path, const char* buf,
-                  size_t size, off_t offset, void* data) {
-    error("dont need for part1\n");
+static int do_run(dirent_t* e, const char* path, void* data) {
+    fprintf(stderr, "BOOTING!\n");
+    fd_puts(pi_wr_fd, "MTPT/run.cmd\n");
+    echo_until_fn(pi_rd_fd, prompt, wr_console);
+    return 0;
 } 

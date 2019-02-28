@@ -39,9 +39,12 @@ int redir(int* rd_fd, int* wr_fd, char* const pi_process) {
 
     if (pid == 0) {
         safe_sys(dup2(to_process[0], STDIN_FILENO));
+        safe_sys(close(to_process[0]));
         safe_sys(close(to_process[1]));
-        safe_sys(dup2(from_process[1], STDOUT_FILENO));
         safe_sys(dup2(from_process[1], STDERR_FILENO));
+        safe_sys(dup2(from_process[1], STDOUT_FILENO));
+        safe_sys(close(from_process[0]))
+        safe_sys(close(from_process[1]))
 
         char* argv[2];
         argv[0] = pi_process;
