@@ -163,16 +163,16 @@ static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
                 return 1;
             case BAD_VERSION:
                 printf("Error: The Pi didn't recognize the linker version of that binary.\n");
-                return 0;
+                return 2;
             case BAD_START:
                 printf("Error: The Pi couldn't link that binary (the start is too low).\n");
-                return 0;
+                return 2;
             case BAD_END:
                 printf("Error: The Pi couldn't link that binary (the end is too high).\n");
-                return 0;
+                return 2;
             default:
                 printf("Error: There was corruption during transmission. Please try again. Code: %d\n", failed);
-                return 0;
+                return 2;
         }
     }
     return 0;
@@ -238,7 +238,7 @@ static int shell(int pi_fd, int unix_fd) {
             echo_until(pi_fd, "PIX:> ");
             continue; // pi echoed the shell, so don't print it.
         } else {
-//            do_unix_cmd(argv, nargs);
+            do_unix_cmd(argv, nargs);
         }
 
         fprintf(stderr, "PIX:> ");

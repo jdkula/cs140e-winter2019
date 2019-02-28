@@ -166,8 +166,6 @@ struct cache_size {
 
 // implemement this.
 static struct cache_size get_size(unsigned u) {
-    unimplemented();
-
     struct cache_size s;
 
     // b6-15
@@ -232,6 +230,7 @@ static void cache_size_print(const char *msg, struct cache_size s) {
 static void part0(void) {
 
     printk("***************** part 0 START *********************\n");
+
     unsigned u = get_cache_type();
 
     printk("cache type: %b\n", u);
@@ -441,6 +440,113 @@ fld_t *mmu_init(unsigned base) {
     return pt;
 }
 
+void part0_1(void) {
+    printk("******** part 0.1! ************\n");
+    unsigned base = 0x100000;
+
+    fld_t *pt = our_mmu_init(base);
+
+    // only mapping a single section: do more.
+    our_mmu_map_section(pt, 0x0, 0x0);
+    our_mmu_map_section(pt, 0x20000000, 0x20000000);
+    our_mmu_map_section(pt, 0x20200000, 0x20200000);
+
+    // this should be wrapped up neater.  broken down so can replace 
+    // one by one.
+
+    struct control_reg1 c1 = read_control_reg1();
+    c1.XP_pt = 1;
+    write_control_reg1(c1);
+    c1 = read_control_reg1();
+    assert(c1.XP_pt);
+    assert(!c1.MMU_enabled);
+
+    our_write_domain_access_ctrl(~0UL);
+    dsb();
+
+    // use the sequence on B2-25
+    our_set_procid_ttbr0(1, pt);
+
+    printk("About to enable MMU.\n");
+    // have to flush I/D cache and TLB, BTB, prefetch buffer.
+    c1.MMU_enabled = 1;
+    our_mmu_enable(c1);
+    
+    // mmu_enable(c1, pt);
+
+    // VM ON!
+    c1 = read_control_reg1();
+    assert(c1.MMU_enabled);
+
+    unsigned shouldfault = get32(0x15000000);
+
+    printk("Didn't fault? %d\n", shouldfault);
+
+
+    // turn off.
+    c1.MMU_enabled = 0;
+    our_mmu_disable(c1);
+
+    c1 = read_control_reg1();
+    assert(!c1.MMU_enabled);
+    printk("OFF\n");
+
+    // our reads worked.
+    printk("******** success ************\n");
+}
+
+void part0_2(void) {
+    printk("******** part 0.2! ************\n");
+    unsigned base = 0x100000;
+
+    fld_t *pt = our_mmu_init(base);
+
+    // only mapping a single section: do more.
+    our_mmu_map_section(pt, 0x0, 0x0);
+    our_mmu_map_section(pt, 0x20000000, 0x40000000);
+
+    // this should be wrapped up neater.  broken down so can replace 
+    // one by one.
+
+    struct control_reg1 c1 = read_control_reg1();
+    c1.XP_pt = 1;
+    write_control_reg1(c1);
+    c1 = read_control_reg1();
+    assert(c1.XP_pt);
+    assert(!c1.MMU_enabled);
+
+    our_write_domain_access_ctrl(~0UL);
+    dsb();
+
+    // use the sequence on B2-25
+    our_set_procid_ttbr0(1, pt);
+
+    printk("About to enable MMU.\n");
+    // have to flush I/D cache and TLB, BTB, prefetch buffer.
+    c1.MMU_enabled = 1;
+    our_mmu_enable(c1);
+    
+    // mmu_enable(c1, pt);
+
+    // VM ON!
+    c1 = read_control_reg1();
+    assert(c1.MMU_enabled);
+
+    put32(0x20000000, 0x88); // should map to 0x40000000
+
+    // turn off.
+    c1.MMU_enabled = 0;
+    our_mmu_disable(c1);
+
+    c1 = read_control_reg1();
+    assert(!c1.MMU_enabled);
+    printk("OFF\n");
+
+    assert(get32(0x40000000) == 0x88);
+
+    // our reads worked.
+    printk("******** success ************\n");
+}
 
 void part1(void) {
     printk("******** part 1! ************\n");
@@ -469,6 +575,7 @@ void part1(void) {
     // use the sequence on B2-25
     our_set_procid_ttbr0(1, pt);
 
+    printk("About to enable MMU.\n");
     // have to flush I/D cache and TLB, BTB, prefetch buffer.
     c1.MMU_enabled = 1;
     our_mmu_enable(c1);
@@ -506,11 +613,7 @@ void part1(void) {
 void notmain() {
     uart_init();
     printk("implement one at a time.\n");
-    part1();
-    clean_reboot();
 
-    // move about reboot and implement
     part0();
-
-	clean_reboot();
+    clean_reboot();
 }
