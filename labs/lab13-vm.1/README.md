@@ -20,49 +20,47 @@ The trickiest part of this lab is not figuring out the instructions
 to change the state we need, but is making sure you do --- exactly ---
 the operations needed to flush all stale state throughout the machine. 
 As mentioned in the previous lab, the hardware caches:
-  - Page table entries (in the TLB) --- if you change the page table,
-  you need to flush the ones affected.
-  - Memory (in data, and instruction caches): if you change a mapping
-  or switch which address space you are running, you need to flush
-  all affected entries.
-  - Similarly, the ARM optionally caches branch targets so that it
-  can predict execution paths better.  These entries are not tagged,
-  so you need to flush.
+  - Page table entries (in the TLB).  If you change the page table,
+  you need to flush the entries affected.
+  - Memory (in both data and instruction caches).  If you change a virtual
+  mapping or change addresses, you need to flush all affected entries.
+  - The ARM optionally caches branch targets in a "branch target buffer"
+  (`BTB`) so that it can predict execution paths better.  Unlike TLB
+  entries, these entries are not tagged with an address space identifier
+  (`ASID`).  Thus, you need to flush the BTB on almost all VM changes.
   - Further, ARM prefetches instructions: if you change a translation
   or change the address space you are in, the instructions in the 
   buffer are then almost certainly wrong, and you need to flush the
   prefetch buffer.
   - Finally, when you flush a cache or modify ARM co-processor state,
-  there is often no guarantee that the operation has completed when
-  the instruction finishes!  So you need to insert
-  barriers.
+  there is often no guarantee that the operation has completed when the
+  instruction finishes!  So you need to insert barriers.
 
 Mistakes in the above are incredibly, incredibly nasty.  I believe if
-you have one today, you will never track it down before the quarter ends.
+you have one today, you will never track it down before the quarter ends
+(I'd be surprised if there were more than 10 people in our building that
+could such bugs):
 
-  1. If you get it wrong, your code may "work" fine. We are running with
-  caches disabled, no branch prediction, and strongly-ordered memory
-  accesses so many of the gotcha's can't come up.  However, later,
-  they will.  And since at that point there will be more going on,
-  it will be hard to figure out WTH is going wrong.
+  1. If you get it wrong, your code will likely "work" fine today.  We are
+  running with caches disabled, no branch prediction, and strongly-ordered
+  memory accesses so many of the gotcha's can't come up.  However, they
+  will make a big entrance later when we are more aggressive about speed.
+  And since at that point there will be more going on, it will be hard
+  to figure out WTH is going wrong.
 
   2. Because flaws relate to memory --- what values are returned from
   a read, or what values are written --- they give "impossible" bugs
   that you won't even be looking for, so won't see.  (E.g., a write to a
   location disappears despite you staring right at the store that does it,
   a branch is followed the wrong way despite its condition being true).
-  They are the ultimate memory corruption, but much fancier.
+  They are the ultimate, Godzilla-level memory corruption.
 
-So for this part, like the `uart` lab, you're going to have to rely very
-strongly on the documents from ARM and find the exact prose that states
-the exact sequence of (oft non-intuitive) actions you have to do.
-Mostly you'll find these in:
+Thus, as in the `uart` lab, you're going to have to rely very strongly
+on the documents from ARM and find the exact prose that states the exact
+sequence of (oft non-intuitive) actions you have to do.  
 
-   * Section B2 of the ARM manual (`docs/armv6.b2-memory.annot.pdf`)
-   describing memory ordering requirements --- what you have to do when
-   you update the page table, the page table registers, etc.
-
-Useful pages:
+These advices are consolidated towards the end of Section B2 of the
+ARMv6 manual (`docs/armv6.b2-memory.annot.pdf`).  Useful pages:
   - B2-25: how to change the address space identifier (ASID). 
   - B6-22: all the different ways to flush caches, memory barriers (various
     snapshots below).  As you figured out in the previous lab, the r/pi A+
@@ -77,24 +75,26 @@ but it has to be the right code.  You will:
 
   1. Set up domains.  You must put in barriers correctly (give the page
   number and what the ARM requires).  Show the code faults when you
-  (1) run code where execution is disabled, (2) write to memory that
-  is read-only.
+  (1) run code for memory that has the "execute never" bit set, (2)
+  write to memory that is read-only.
 
-  2. Switch the ASID and page-table pointer.  You handle coherence
-  correctly and the cookbook from ARM on how to do this (give with page
-  number citations, succinct intuition).
+  2. Set the ASID and page-table pointer.  You must handle coherence
+  correctly, using the ARM provided instruction sequence to switch
+  `ASID`s (your comments should state page number citations and succinct
+  intuition).
 
-  3. Turn on/turn off the MMU.  You must handle coherence / flushing
-  corectly (with page number citations).  You should extend this to
-  handle caching.
+  3. Turn on/turn off the MMU.  As in (2) you must handle coherence /
+  flushing correctly (with page number citations).
 
-  4. Delete all of our files and starter code (remove references from the
+  4. Delete our files and starter code (remove references from the
   `Makefile`).  At this point, all code is written by you!
 
 Extensions:
-
-  1. Set-up two-level paging.
-  2. Set-up 16MB paging.
+  1. Set up code so that it cleans the cache rather than just invalidates.
+  2. Write code to make it easy to look up a PTE (`mmu_lookup_pte(void *addr)`)
+  and change permissions, write-buffer, etc.
+  3. Set-up two-level paging.
+  4. Set-up 16MB paging.
 
 ----------------------------------------------------------------------
 ## Part 1: setting up domains.
@@ -116,6 +116,12 @@ Useful pages:
   page table entry.
   - B4-42: setting the domain register.
 
+Useful intuition:
+  - When you flush the `BTB`, you need to do a `DSB` to wait for
+  it to complete, and then a `Prefetch` flush.
+  - before you do a flush, you need to do a `DSB` to ensure the 
+  modifications that caused you to do it have completed.
+
 #### Some intuition and background on domains.
 
 ARM has an interesting take on protection.  Like most modern architectures
@@ -127,7 +133,7 @@ Mechanically it works as follows.
   - each page-table entry (PTE) has a 4-bit field stating which single 
   domain the entry belongs to.
 
-  - the sytem control register (CP15) has a 32-bit domain register (`c3`,
+  - the system control register (CP15) has a 32-bit domain register (`c3`,
   page B4-42) that contains 2-bits for each of the 16 domains stating
   what mode each the domain is in.  
     - no-access (`0b00`): no load or store can be done to any virtual
@@ -201,11 +207,14 @@ In terms of our data structures:
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
-## Part 1: Implement `set_procid_ttbr0`
+## Part 2: Implement `set_procid_ttbr0`
 
-You will setup the page table pointer and address space identifier by
-replacing `our_set_procid_ttbr0` with yours.  Make sure you can switch
-between multiple address spaces.  Where and what:
+Deliverable:
+   - Set the page table pointer and address space identifier by replacing
+   `our_set_procid_ttbr0` with yours.  Make sure you can switch between
+   multiple address spaces.
+
+Where and what:
 
   1. B4-41: The hardware has to be able to find the page table when
   there is a TLB miss.  You will write the address of the page table to
@@ -242,14 +251,14 @@ between multiple address spaces.  Where and what:
 </td></tr></table>
 
 ----------------------------------------------------------------------
-##### B2-23 How to invalidate after a PTE change
+##### B2-23: How to invalidate after a PTE change
 
 <table><tr><td>
   <img src="images/part3-invalidate-pte.png"/>
 </td></tr></table>
 
 ----------------------------------------------------------------------
-##### When to flush BTB
+##### B2-24: When to flush BTB
 
 <table><tr><td>
   <img src="images/part3-flush-btb.png"/>
@@ -259,70 +268,48 @@ between multiple address spaces.  Where and what:
 ----------------------------------------------------------------------
 ## Part 3: implement `mmu_enable` and `mmu_disable`
 
-Now you can write the code to turn the MMU on/off.
+Now you can write the code to turn the MMU on/off:
+  - `mmu_enable()`
+  - `mmu_disable()`
 
-The exact sequence is given below.  (See below) Your code should be
-`mmu_enable`.  You will have to also: flush the D/I cache, the TLB,
-the prefetch buffer, and the wait for everything.  You'll have to look
-at Part 3 for the description.  Sorry!
+The high-level sequence is given on page 6-9 of the `arm1176.pdf` document
+(screen shot below).  You will also have to flush:
+   - all caches (D/I cache, the I/D TLBs)
+   - PrefetchBuffer.
+   - BTB
+   - and wait for everything correctly.
+
+We provided macros for most of these; but you should check that they 
+are correct.  
+
+   * Note that the flush instruction cache operation has bugs in many
+   in some ARM v6 chips, so we provided the recommended sequences (taken
+   from Linux).
 
 ----------------------------------------------------------------------
-##### Protocol for turning on MMU.
+##### 6-9: Protocol for turning on MMU.
 
 <table><tr><td>
   <img src="images/part2-enable-mmu.png"/>
 </td></tr></table>
 
 ----------------------------------------------------------------------
-##### Bits to set to turn on MMU
+##### B4-39 and B4-40: Bits to set to turn on MMU
 
 <table><tr><td>
   <img src="images/part2-control-reg1.png"/>
 </td></tr></table>
 
 ----------------------------------------------------------------------
-##### Invalidate TLB instruction
+##### B6-21: Various invalidation instructions
 
 <table><tr><td>
   <img src="images/part2-inv-tlb.png"/>
 </td></tr></table>
 
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+## Part 4: Get rid of our code.
 
------------------------------------------------------------------------
-#### Lab reading.
-
-The main documents in the `docs/` directory:
-
-   1. `armv6.b2-memory.annot.pdf`: section B2 of the ARM manual,
-   describing memory ordering requirements --- what you have to do when
-   you update the page table, the page table registers, etc.
-
-   2. `armv6.b3-coprocessor.annot.pdf`: section B3 of the ARM manual,
-   describing the different co-processor options.
-
-   3. `armv6.b4-mmu.annot.pdf`: section B4 of the ARM manual, describing
-   the page table format(s), and how to setup/manage hardware state for
-   page tables and the TLB.
-
-### Further reading
-
-As an alternative to our lab writeup:
- * [Concise, concrete pi MMU](https://github.com/naums/raspberrypi/blob/master/mmu/README.md)
-
-Useful code (use to double-check understanding):
- - [Linux TLB code for V6](https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/tlb-v6.S).
- - [Linux cache code for V6](https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/cache-v6.S).
- - [MMU code for vmwos](https://github.com/deater/vmwos/blob/master/kernel/memory/arm1176-mmu.c)
- - [PiOS source](https://www.stefannaumann.de/git/snaums/PiOS/src/branch/master/source)
-
-To re-affirm your grasp of virtual memory, the slides from 
-[CS140 lecture notes](http://www.scs.stanford.edu/19wi-cs140/notes/) give
- a big picture overview:
-  1. [Virtual memory hardware](http://www.scs.stanford.edu/19wi-cs140/notes/vm_hardware-print.pdf).
-  2. [Virtual memory OS](http://www.scs.stanford.edu/19wi-cs140/notes/vm_os-print.pdf)
-
-And for more detail, the book [Operating systems in three easy pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/) provides chapters online.  You want to look at:
-  1. [Address spaces](http://pages.cs.wisc.edu/~remzi/OSTEP/vm-intro.pdf).
-  2. [Address translation](http://pages.cs.wisc.edu/~remzi/OSTEP/vm-mechanism.pdf).
-  3. [Translation lookaside buffers](http://pages.cs.wisc.edu/~remzi/OSTEP/vm-tlbs.pdf).
-  4. [Complete VM systems](http://pages.cs.wisc.edu/~remzi/OSTEP/vm-complete.pdf).
+You should go through and delete all of our files, changing the `Makefile`
+to remove references to them.  At this point, all code is written by you!
