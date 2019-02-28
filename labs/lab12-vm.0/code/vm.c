@@ -421,9 +421,23 @@ void mmu_map_section(fld_t *pt, unsigned va, unsigned pa) {
     assert(is_aligned(pa, 20));
 
     // set to the right index in pt.
-    fld_t *pte = 0;
+    unsigned index = va >> 20;
+    fld_t *pte = (pt + index);
 
-    unimplemented();
+    assert(pte->tag == 0b00);
+
+    pte->tag = 0b10;
+    pte->B = 0;
+    pte->C = 0;
+    pte->XN = 0;
+    pte->domain = 0;
+    pte->IMP = 0;
+    pte->AP = 0b11;
+    pte->TEX = 0b000;
+    pte->APX = 0;
+    pte->S = 0;
+    pte->nG = 0;
+    pte->sec_base_addr = (pa >> 20);
 
     fld_print(pte);
     printk("my.pte@ 0x%x = %b\n", pt, *(unsigned*)pte);
@@ -555,9 +569,9 @@ void part1(void) {
     fld_t *pt = our_mmu_init(base);
 
     // only mapping a single section: do more.
-    our_mmu_map_section(pt, 0x0, 0x0);
-    our_mmu_map_section(pt, 0x20000000, 0x20000000);
-    our_mmu_map_section(pt, 0x20200000, 0x20200000);
+    mmu_map_section(pt, 0x0, 0x0);
+    mmu_map_section(pt, 0x20000000, 0x20000000);
+    mmu_map_section(pt, 0x20200000, 0x20200000);
 
     // this should be wrapped up neater.  broken down so can replace 
     // one by one.
