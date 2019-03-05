@@ -152,7 +152,7 @@ void reboot_pi(int pi_fd) {
 static int run_pi_prog(int pi_fd, char* argv[], int nargs) {
     if (is_pi_prog(argv[0])) {
         printf("Found pi program! %s\n", argv[0]);
-        if(access(argv[0], F_OK) < 0) {
+        if (access(argv[0], F_OK) < 0) {
             printf("Error: Couldn't open binary.\n");
             return 0;
         }

@@ -10,7 +10,7 @@
     b4-7: strongly recommended that the code which enables or disables the 
      mmu has identical virtual and physical addresses.
 */
-#include "rpi.h"
+#include <compat/dawson.h>
 #include "vm.h"
 
 /************************************************************************

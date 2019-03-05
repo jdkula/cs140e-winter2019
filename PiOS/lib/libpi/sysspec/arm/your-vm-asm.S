@@ -68,9 +68,112 @@
 #define SET_ASID(Rd)  mcr p15, 0, Rd, c13, c0, 1
 #define SET_TTBR0(Rd)  mcr p15, 0, Rd, c2, c0, 0
 #define GET_TTBR0(Rd)  mrc p15, 0, Rd, c2, c0, 0
-#define SET_TTBR1(Rd)   mcr p15, 0, Rd, c2, c0, 1
+#define GET_TTBR1(Rd)  mrc p15, 0, Rd, c2, c0, 1
+#define SET_TTBR1(Rd)  mcr p15, 0, Rd, c2, c0, 1
+#define SET_TTBRC(Rd)  mcr p15, 0, Rd, c2, c0, 2
 
 .globl get_cache_type
 get_cache_type:
-    MRC p15, 0, r0, c0, c0, 1
+    mrc p15, 0, r0, c0, c0, 1
+    bx lr
+
+.globl write_control_reg1
+write_control_reg1:
+    mcr p15, 0, r0, c1, c0, 0
+    CLR(r0)
+    DSB(r0)
+    bx lr
+
+.globl read_control_reg1
+read_control_reg1:
+    CLR(r0)
+    mrc p15, 0, r0, c1, c0, 0
+    bx lr
+
+.globl read_tlb_config
+read_tlb_config:
+    CLR(r0)
+    mrc p15, 0, r0, c0, c0, 0b11  ;@ B3-7 - TLB type register
+    bx lr
+
+.globl read_ttbr0
+read_ttbr0:
+    CLR(r0)
+    GET_TTBR0(r0)
+    bx lr
+
+.globl read_ttbr1
+read_ttbr1:
+    CLR(r0)
+    GET_TTBR1(r0)
+    bx lr
+
+.globl read_domain_access_ctrl
+read_domain_access_ctrl:
+    CLR(r0)
+    mrc p15, 0, r0, c3, c0, 0    ;@ B4-42 - register 3. Store to r0.
+    bx lr
+
+.globl write_domain_access_ctrl
+write_domain_access_ctrl:
+    CLR(r1)                    ;@ B6-21 - data SBZ
+    mcr p15, 0, r0, c3, c0, 0  ;@ B4-42 - register 3. r0 has our value.
+    CLR(r2)
+    DSB(r2)                    ;@ Various examples seem to have this, so just in case...
+    PREFETCH_FLUSH(r1)         ;@ B2-24 - CP15 changes need a prefetch flush.
+    bx lr
+
+
+.globl set_procid_ttbr0
+set_procid_ttbr0:
+    CLR(r2)
+    SET_ASID(r2)          ;@= "cookbook" from B2-25 under "Example Solution"
+    PREFETCH_FLUSH(r2)
+    SET_TTBR1(r2)         ;@ We're not using TTBR1.
+    SET_TTBRC(r2)         ;@ B4-41 - have N = 0 to only use TTBR0.
+    SET_TTBR0(r1)
+    DSB(r2)               ;@ Various examples seem to have this, so just in case...
+    PREFETCH_FLUSH(r2)
+    SET_ASID(r0)          ;@= End cookbook
+    FLUSH_BTB(r2)         ;@ B2-24 - Flush BTB after changing TTBR*
+    DSB(r2)               ;@ Various examples seem to have this, so just in case...
+    PREFETCH_FLUSH(r2)    ;@ B2-24 - Flush prefetch after BTB
+    bx lr
+
+.globl enable_mmu
+enable_mmu:
+    CLR(r2)
+    INV_TLB(r2)         ;@
+    INV_ICACHE(r2)      ;@ B2-20 (cache management sequence)
+    INV_DCACHE(r2)      ;@ note: "drain write buffer" == "data sync barrier" B6-22
+    PREFETCH_FLUSH(r2)  ;@ B2-22 (TLB operations observed after flush)
+    DSB(r2)             ;@ B2-22 (DSB required after TLB operations)
+
+    orr r0, r0, #1             ;@ B3-14 (set M  = 1; write 1 to byte 0)
+    mcr p15, 0, r0, c1, c0, 0  ;@ B3-14 (write new processor values)
+
+    CLR(r2)
+    FLUSH_BTB(r2)       ;@ B2-24 (should flush after MMU enable)
+    DSB(r2)             ;@ B2-22 (DSB required after BTB flush)
+    PREFETCH_FLUSH(r2)  ;@ B2-24 (prefetch flush should follow BTB flush)
+
+    bx lr
+
+.globl disable_mmu
+disable_mmu:
+    CLR(r2)
+    INV_TLB(r2)         ;@
+    INV_ICACHE(r2)      ;@ B2-20 (cache management sequence)
+    INV_DCACHE(r2)      ;@ note: "drain write buffer" == "data sync barrier" B6-22
+    PREFETCH_FLUSH(r2)  ;@ B2-22 (TLB operations observed after flush)
+    DSB(r2)             ;@ B2-22 (DSB required after TLB operations)
+
+    and r0, r0, #0xFFFFFF8     ;@ B3-14 and 6-9 (set M  = 0; write 0 to bytes 2-0)
+    mcr p15, 0, r0, c1, c0, 0  ;@ B3-14 (write new processor values)
+
+    CLR(r2)
+    FLUSH_BTB(r2)       ;@ B2-24 (should flush after MMU enable)
+    DSB(r2)             ;@ B2-22 (DSB required after BTB flush)
+    PREFETCH_FLUSH(r2)  ;@ B2-24 (prefetch flush should follow BTB flush)
+
     bx lr

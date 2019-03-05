@@ -50,7 +50,9 @@ set(SRC_ARM
         sysspec/arm/mem-barrier.s
         sysspec/arm/stdlib.c
         sysspec/arm/heap.c
-        sysspec/arm/rand.c)
+        sysspec/arm/rand.c
+        sysspec/arm/vm.c
+        sysspec/arm/your-vm-asm.S)
 
 set(SRC_VMM
         src/gpio.c
