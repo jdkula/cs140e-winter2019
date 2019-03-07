@@ -95,6 +95,7 @@ add_subdirectory(modules/sonar)
 add_subdirectory(modules/thread-test)
 add_subdirectory(modules/pishell-server)
 add_subdirectory(modules/hello)
+add_subdirectory(modules/xbee_echo)
 
 # Unix Programs
 add_subdirectory(programs/piboot)
@@ -103,6 +104,7 @@ add_subdirectory(programs/replay)
 add_subdirectory(programs/echo)
 add_subdirectory(programs/pishell)
 add_subdirectory(programs/pifs)
+add_subdirectory(programs/cmd-watch)
 
 # Tests
 add_subdirectory(test/memory-test)

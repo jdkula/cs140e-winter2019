@@ -62,13 +62,13 @@ struct control_reg1 control_reg1_mk(void) {
 
 void check_control_reg1(void) {
     assert(sizeof(struct control_reg1) == 4);
-    check_bitfield(struct control_reg1, MMU_enabled,        0,      1);
-    check_bitfield(struct control_reg1, A_alignment,        1,      1);
-    check_bitfield(struct control_reg1, C_unified_enable,   2,      1);
-    check_bitfield(struct control_reg1, W_write_buf,        3,      1);
-    check_bitfield(struct control_reg1, B_endian,           7,      1);
-    check_bitfield(struct control_reg1, S_prot,             8,      1);
-    check_bitfield(struct control_reg1, R_rom_prot,         9,      1);
+    check_bitfield(struct control_reg1, MMU_enabled,        0,       1);
+    check_bitfield(struct control_reg1, A_alignment,        1,       1);
+    check_bitfield(struct control_reg1, C_unified_enable,   2,       1);
+    check_bitfield(struct control_reg1, W_write_buf,        3,       1);
+    check_bitfield(struct control_reg1, B_endian,           7,       1);
+    check_bitfield(struct control_reg1, S_prot,             8,       1);
+    check_bitfield(struct control_reg1, R_rom_prot,         9,       1);
     check_bitfield(struct control_reg1, F,                  10,      1);
     check_bitfield(struct control_reg1, Z_branch_pred,      11,      1);
     check_bitfield(struct control_reg1, I_icache_enable,    12,      1);
@@ -107,7 +107,7 @@ void control_reg1_valid(struct control_reg1 *r) {
     assert(!r->I_icache_enable);
     assert(!r->C_unified_enable);
 }
-    
+
 void control_reg1_print(struct control_reg1 *r) {
     control_reg1_valid(r);
 
@@ -135,7 +135,7 @@ void control_reg1_print(struct control_reg1 *r) {
 /*************************************************************************
  * tlb config: b4-39
  */
-static void check_tlb_config(void) { 
+static void check_tlb_config(void) {
     assert(sizeof(struct tlb_config) == 4);
     check_bitfield(struct tlb_config, unified_p,    0,      1);
     check_bitfield(struct tlb_config, n_d_lock,     8,      8);
@@ -160,7 +160,7 @@ void tlb_config_print(struct tlb_config *c) {
  * part0
  */
 
-struct cache_size { 
+struct cache_size {
     unsigned char len, m, assoc, size, p;
 };
 
@@ -185,10 +185,10 @@ static void cache_size_print(const char *msg, struct cache_size s) {
 
     unsigned K = 0;
     switch(s.size) {
-    case 0b00: 
-    case 0b01: 
-    case 0b10: 
-    case 0b11: 
+    case 0b00:
+    case 0b01:
+    case 0b10:
+    case 0b11:
         panic("too small\n");
 
     case 0b100: K = !s.m ? 8 : 12; break;
@@ -485,7 +485,7 @@ void part0_1(void) {
     // have to flush I/D cache and TLB, BTB, prefetch buffer.
     c1.MMU_enabled = 1;
     enable_mmu(c1);
-    
+
     // mmu_enable(c1, pt);
 
     // VM ON!
@@ -539,7 +539,7 @@ void part0_2(void) {
     // have to flush I/D cache and TLB, BTB, prefetch buffer.
     c1.MMU_enabled = 1;
     enable_mmu(c1);
-    
+
     // mmu_enable(c1, pt);
 
     // VM ON!
@@ -593,7 +593,7 @@ void part1(void) {
     // have to flush I/D cache and TLB, BTB, prefetch buffer.
     c1.MMU_enabled = 1;
     enable_mmu(c1);
-    
+
     // mmu_enable(c1, pt);
 
     // VM ON!
