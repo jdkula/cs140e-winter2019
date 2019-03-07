@@ -12,6 +12,7 @@
  */
 #include "bvec.h"
 
+
 typedef struct env {
     uint32_t pid,
              domain,
@@ -105,8 +106,8 @@ void cpsr_print_mode(unsigned cpsr_r) {
 // you will call this with the pc of the SWI instruction, and the saved registers
 // in saved_regs.  r0 at offset 0, r1 at offset 1, etc.
 void handle_swi(uint8_t sysno, uint32_t pc, uint32_t *saved_regs) {
-    printk("sysno=%d\n", sysno);
-    printk("\tcpsr =%x\n", cpsr_read());
+    //printk("sysno=%d\n", sysno);
+    //printk("\tcpsr =%x\n", cpsr_read());
     assert(cpsr_read_c() == SUPER_MODE);
 
     // check that the stack is in-bounds.
@@ -114,12 +115,12 @@ void handle_swi(uint8_t sysno, uint32_t pc, uint32_t *saved_regs) {
     assert(&i < (int*)SWI_STACK_ADDR);
     assert(&i > (int*)SYS_STACK_ADDR);
 
-    printk("\treturn=%x stack=%x\n", pc, saved_regs);
-    printk("arg[0]=%d, arg[1]=%d, arg[2]=%d, arg[3]=%d\n", 
-                saved_regs[0], 
-                saved_regs[1], 
-                saved_regs[2], 
-                saved_regs[3]);
+    //printk("\treturn=%x stack=%x\n", pc, saved_regs);
+    //printk("arg[0]=%d, arg[1]=%d, arg[2]=%d, arg[3]=%d\n", 
+    //            saved_regs[0], 
+    //            saved_regs[1], 
+    //            saved_regs[2], 
+    //            saved_regs[3]);
 
     saved_regs[0] = 13;
     return;
@@ -140,7 +141,9 @@ void swi_setup_stack(unsigned stack_addr);
 
 // don't modify this: it should run fine when everything works.
 void int_part0(void) {
+    printk("About to do int_init\n");
     int_init();
+    printk("About to setup SWI stack.\n");
     swi_setup_stack(SWI_STACK_ADDR);
 
     printk("about to do a SWI\n");
@@ -151,6 +154,12 @@ void int_part0(void) {
 /*******************************************************************************
  * part1
  */
+
+fld_t* markcache(fld_t* f) {
+    f->B = 1;
+    f->C = 1;
+    return f;
+}
 
 /*
  * for this: run with virtual memory.  actually should work out of the box.
@@ -167,8 +176,11 @@ void int_part1(void) {
 
     env_t *e = env_alloc();
 
-    // map the sections you need.
-    unimplemented();
+    mmu_all_cache_on();
+    markcache(mmu_map_section(e->pt, 0x0, 0x0))->domain = e->domain;
+    markcache(mmu_map_section(e->pt, SYS_STACK_ADDR, SYS_STACK_ADDR))->domain = e->domain;
+    markcache(mmu_map_section(e->pt, SWI_STACK_ADDR, SWI_STACK_ADDR))->domain = e->domain;
+    markcache(mmu_map_section(e->pt, INT_STACK_ADDR, INT_STACK_ADDR))->domain = e->domain;
 
     // gpio
     mmu_map_section(e->pt, 0x20000000, 0x20000000)->domain = e->domain;
@@ -182,14 +194,17 @@ void int_part1(void) {
 
     uint32_t cpsr_before = cpsr_read_c();
     uint32_t reg1_before = cp15_ctrl_reg1_rd_u32();
-    printk("about to call swi\n");
-    printk("swi_asm = %d\n", swi_asm1(1,2,3,4));
+    //printk("about to call swi\n");
+    unsigned time = timer_get_time();
+    for(int i = 0; i < 10000; i++) {
+      swi_asm1(1,2,3,4);
+    }
+    printk("Used %u time!\n", (timer_get_time() - time));
     assert(cpsr_before == cpsr_read_c());
     assert(reg1_before == cp15_ctrl_reg1_rd_u32());
 
     // have to disable mmu before reboot.  probably should build in.
     mmu_disable();
-    clean_reboot();
 }
 
 /**********************************************************************
@@ -201,11 +216,13 @@ void notmain() {
     // start the heap after the max stack address
     kmalloc_set_start(MAX_STACK_ADDR);
 
+#if 0
     // implement swi interrupts without vm
     int_part0();
-#if 0
+#else
     // implement swi interrupts with vm
     int_part1();
 #endif
+
     clean_reboot();
 }
