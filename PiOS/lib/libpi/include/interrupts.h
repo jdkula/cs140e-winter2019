@@ -2,6 +2,10 @@
 #define __RPI_INTERRUPT_H__
 
 #include "rpi.h"
+#include "gpio.h"
+
+typedef void (*gpio_interrupt_t)(uint8_t pin);
+typedef void (*timer_interrupt_t)();
 
 // from the valvers description.
 
@@ -15,6 +19,31 @@
 #define RPI_BASIC_GPU_1_HALTED_IRQ      (1 << 5)
 #define RPI_BASIC_ACCESS_ERROR_1_IRQ    (1 << 6)
 #define RPI_BASIC_ACCESS_ERROR_0_IRQ    (1 << 7)
+#define RPI_BASIC_REG1_PENDING_IRQ      (1 << 8)
+#define RPI_BASIC_REG2_PENDING_IRQ      (1 << 9)
+
+/** Bits in interrupt register 1 */
+#define RPI_INTREG1_AUX_IRQ (1 << 29)
+
+/** Bits in interrupt register 2 */
+#define RPI_INTREG2_I2C_SPI_SLV_IRQ   (1 << (43 - 32))
+#define RPI_INTREG2_PWA0_IRQ          (1 << (45 - 32))
+#define RPI_INTREG2_PWA1_IRQ          (1 << (46 - 32))
+#define RPI_INTREG2_SMI_IRQ           (1 << (48 - 32))
+#define RPI_INTREG2_GPIO0_IRQ         (1 << (49 - 32))
+#define RPI_INTREG2_GPIO1_IRQ         (1 << (50 - 32))
+#define RPI_INTREG2_GPIO2_IRQ         (1 << (51 - 32))
+#define RPI_INTREG2_GPIO3_IRQ         (1 << (52 - 32))
+#define RPI_INTREG2_GPIO_ALL_IRQ      RPI_INTREG2_GPIO3_IRQ
+#define RPI_INTREG2_I2C_IRQ           (1 << (53 - 32))
+#define RPI_INTREG2_SPI_IRQ           (1 << (54 - 32))
+#define RPI_INTREG2_PCM_IRQ           (1 << (55 - 32))
+#define RPI_INTREG2_UART_IRQ          (1 << (57 - 32))
+
+extern gpio_interrupt_t gpio_interrupts[GPIO_PIN_LAST];
+extern timer_interrupt_t timer_interrupts[128];
+extern uint8_t timer_ints;
+
 
 // http://xinu.mscs.mu.edu/BCM2835_Interrupt_Controller
 typedef struct {
@@ -49,5 +78,11 @@ void system_disable_interrupts(void);
 extern unsigned _interrupt_table;
 extern unsigned _interrupt_table_end;
 
-void install_int_handlers(void);
+void install_interrupt_handlers(void);
+void initialize_interrupts(uint32_t basic, uint32_t reg1, uint32_t reg2);
+void disable_interrupts(uint32_t basic, uint32_t reg1, uint32_t reg2);
+void enable_interrupts(uint32_t basic, uint32_t reg1, uint32_t reg2);
+void set_gpio_interrupt(uint8_t pin, gpio_interrupt_t interrupt);
+bool gpio_interrupt_is_set(uint8_t pin);
+bool set_timer_interrupt(timer_interrupt_t interrupt);
 #endif 

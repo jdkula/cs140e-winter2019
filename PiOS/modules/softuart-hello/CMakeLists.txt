@@ -1,9 +1,9 @@
 ##########
-# CS140E: XBee Echo
+# CS140E: Soft UART Hello World
 # Jonathan Kula
 # Winter 2019
 #
-# Echoes data between two XBees.
+# Transmits "Hello World!\n" ad infinatum using software uart.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -18,8 +18,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(xbee-echo C ASM)
-set(MODULE_NAME xbee-echo)
+project(softuart-hello C ASM)
+set(MODULE_NAME softuart-hello)
 
 ########################################
 #> End Project Setup                  <#
@@ -30,11 +30,10 @@ set(MODULE_NAME xbee-echo)
 ########################################
 
 # Source Files
-set(SRC src/cstart.c src/xbee-echo.c)
+set(SRC src/cstart.c src/softuart-hello.c)
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     list(INSERT SRC 0 src/start.s)  # start.s must be built first.
 endif ()
-
 # Compile Options
 
 # Dependencies

@@ -161,11 +161,11 @@ void notmain() {
     uart_init();
 
     printk("about to install handlers\n");
-    install_int_handlers();
+    install_interrupt_handlers();
 
     printk("setting up timer interrupts\n");
     // Q: if you change 0x100?
-    timer_interrupt_init(0x10);
+    timer_interrupt_setup(RPI_ARMTIMER_CTRL_ENABLE, 0x10, RPI_ARMTIMER_CTRL_23BIT, RPI_ARMTIMER_CTRL_INT_ENABLE, RPI_ARMTIMER_CTRL_PRESCALE_16);
 
     // could combine some of these.
     gprof_init();

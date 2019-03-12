@@ -1,9 +1,9 @@
 ##########
-# CS140E: XBee Echo
+# CS140E: LibQ
 # Jonathan Kula
 # Winter 2019
 #
-# Echoes data between two XBees.
+# Provides a really basic FIFO Queue.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -18,8 +18,8 @@ cmake_minimum_required(VERSION 3.10)
 # Project Setup                        #
 ########################################
 
-project(xbee-echo C ASM)
-set(MODULE_NAME xbee-echo)
+project(libq C)
+set(LIBRARY_NAME libq)
 
 ########################################
 #> End Project Setup                  <#
@@ -29,24 +29,18 @@ set(MODULE_NAME xbee-echo)
 # Build Variable Setup                 #
 ########################################
 
-# Source Files
-set(SRC src/cstart.c src/xbee-echo.c)
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
-endif ()
-
-# Compile Options
+# Compile & Link Options
+set(INCLUDE_DIRECTORIES include)
 
 # Dependencies
-set(DEPENDENCIES libpi libdebug libsoftuart)
-
-# Output Options
-## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)
-## See ${IMG_OUT_DIR} in root CMakeLists.txt
-set(IMAGE_OUTPUT_DIRECTORY "${IMG_OUT_DIR}/${MODULE_NAME}")
+set(DEPENDENCIES libtypes)
 
 ########################################
 #> End Build Variable Setup           <#
 ########################################
 
-include(${CMAKE_INCLUDE_DIR}/module.cmake)
+# Create static library target from predefined source
+add_library(${LIBRARY_NAME} INTERFACE)
+
+# Add include directories and share them with dependants.
+target_include_directories(${LIBRARY_NAME} INTERFACE ${INCLUDE_DIRECTORIES})

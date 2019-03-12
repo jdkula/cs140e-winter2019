@@ -52,7 +52,8 @@ set(SRC_ARM
         sysspec/arm/heap.c
         sysspec/arm/rand.c
         sysspec/arm/vm.c
-        sysspec/arm/your-vm-asm.S)
+        sysspec/arm/your-vm-asm.S
+        src/interrupt-vectors.c)
 
 set(SRC_VMM
         src/gpio.c

@@ -141,7 +141,7 @@ uint8_t gpio_write(uint8_t pin, uint8_t val) {
     data_sync_barrier();
 
     if (val == 0) {
-        put32(pin_shift(GPIO_CLR0, &pin), 1U << pin);
+        put32(pin_shift(GPIO_CLR0, &pin), 1U << (pin % 32));
     } else {
         put32(pin_shift(GPIO_SET0, &pin), 1U << (pin % 32)); // pin % 32 ensures pin is adjusted even with pin_shift, just in case of weird cache stuff.
     }

@@ -85,6 +85,9 @@ add_subdirectory(lib/libpreprocessor)
 add_subdirectory(lib/libtty)
 add_subdirectory(lib/libstart)
 add_subdirectory(lib/libQ)
+add_subdirectory(lib/libxbee)
+add_subdirectory(lib/libzigbee)
+add_subdirectory(lib/libsoftuart)
 
 # Pi Modules
 add_subdirectory(modules/bootloader)
@@ -96,6 +99,8 @@ add_subdirectory(modules/thread-test)
 add_subdirectory(modules/pishell-server)
 add_subdirectory(modules/hello)
 add_subdirectory(modules/xbee_echo)
+add_subdirectory(modules/softuart-hello)
+add_subdirectory(modules/softuart-echo)
 
 # Unix Programs
 add_subdirectory(programs/piboot)

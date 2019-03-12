@@ -10,6 +10,7 @@
 #define RPI_ARMTIMER_BASE               0x2000B400
 
 /** @brief 0 : 16-bit counters - 1 : 23-bit counter */
+#define RPI_ARMTIMER_CTRL_16BIT         ( 0 << 1 )
 #define RPI_ARMTIMER_CTRL_23BIT         ( 1 << 1 )
 
 #define RPI_ARMTIMER_CTRL_PRESCALE_1    ( 0 << 2 )

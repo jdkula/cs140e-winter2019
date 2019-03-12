@@ -38,13 +38,14 @@ system_disable_interrupts:
 .globl _interrupt_table
 .globl _interrupt_table_end
 _interrupt_table:
+  ldr pc, _reset_asm                 ;@ Reset          @ 0x00
+  ldr pc, _undefined_instruction_asm ;@ Undef. Instruc @ 0x04
+  ldr pc, _software_interrupt_asm    ;@ Syscall        @ 0x08
+  ldr pc, _prefetch_abort_asm        ;@ Prefetch Abort @ 0x0C
+  ldr pc, _data_abort_asm            ;@ Data Abort     @ 0x10
   ldr pc, _reset_asm
-  ldr pc, _undefined_instruction_asm
-  ldr pc, _software_interrupt_asm
-  ldr pc, _prefetch_abort_asm
-  ldr pc, _data_abort_asm
-  ldr pc, _reset_asm
-  ldr pc, _interrupt_asm
+  ldr pc, _interrupt_asm             ;@ IRQ            @ 0x18
+  ldr pc, _fast_interrupt_asm        ;@ FIQ            @ 0x1C
 fast_interrupt_asm:
   sub   lr, lr, #4 @First instr of FIQ handler
   push  {lr}
@@ -60,6 +61,7 @@ _software_interrupt_asm:      .word software_interrupt_asm
 _prefetch_abort_asm:          .word prefetch_abort_asm
 _data_abort_asm:              .word data_abort_asm
 _interrupt_asm:               .word interrupt_asm
+_fast_interrupt_asm:          .word fast_interrupt_asm
 _interrupt_table_end:
 
 @ only handler that should run since we only enable general interrupts

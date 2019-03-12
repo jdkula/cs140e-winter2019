@@ -35,26 +35,11 @@ volatile rpi_arm_timer_t* get_arm_timer(void) {
     return rpi_arm_timer;
 }
 
-void timer_interrupt_init(unsigned ncycles) {
-//	install_int_handlers();
+void timer_interrupt_setup(uint32_t enabled, uint32_t ncycles, uint32_t bits, uint32_t interrupt_enabled, uint32_t prescale) {
+//	install_interrupt_handlers();
 
-    // BCM2835 manual, section 7.5
-    put32(INTERRUPT_DISABLE_1, 0xffffffff);
-    put32(INTERRUPT_DISABLE_2, 0xffffffff);
     data_memory_barrier();
     data_sync_barrier();
-
-    // Bit 52 in IRQ registers enables/disables all GPIO interrupts
-#if 0
-    // Bit 52 is in the second register, so subtract 32 for index
-    PUT32(INTERRUPT_ENABLE_2, (1 << (52 - 32)));
-      dmb();
-      dsb();
-#endif
-
-    // from valvers:
-    //	 Enable the timer interrupt IRQ
-    get_irq_controller()->enable_basic_irqs = RPI_BASIC_ARM_TIMER_IRQ;
 
     /* Setup the system timer interrupt */
     /* Timer frequency = Clk/256 * 0x400 */
@@ -65,10 +50,10 @@ void timer_interrupt_init(unsigned ncycles) {
 
     // Setup the ARM Timer
     get_arm_timer()->control =
-            RPI_ARMTIMER_CTRL_23BIT |
-            RPI_ARMTIMER_CTRL_ENABLE |
-            RPI_ARMTIMER_CTRL_INT_ENABLE |
-            RPI_ARMTIMER_CTRL_PRESCALE_1;
+            bits |
+            enabled |
+            interrupt_enabled |
+            prescale;
 
     //              RPI_ARMTIMER_CTRL_PRESCALE_256;
 

@@ -65,12 +65,14 @@
 @ invalidate unified TLB or both I/D TLB
 #define INV_TLB(Rd)         mcr p15, 0, Rd, c8, c7, 0
 
-#define SET_ASID(Rd)  mcr p15, 0, Rd, c13, c0, 1
+#define SET_ASID(Rd)   mcr p15, 0, Rd, c13, c0, 1
+#define GET_ASID(Rd)   mrc p15, 0, Rd, c13, c0, 1
 #define SET_TTBR0(Rd)  mcr p15, 0, Rd, c2, c0, 0
 #define GET_TTBR0(Rd)  mrc p15, 0, Rd, c2, c0, 0
-#define GET_TTBR1(Rd)  mrc p15, 0, Rd, c2, c0, 1
 #define SET_TTBR1(Rd)  mcr p15, 0, Rd, c2, c0, 1
+#define GET_TTBR1(Rd)  mrc p15, 0, Rd, c2, c0, 1
 #define SET_TTBRC(Rd)  mcr p15, 0, Rd, c2, c0, 2
+#define GET_TTBRC(Rd)  mrc p15, 0, Rd, c2, c0, 2
 
 .globl get_cache_type
 get_cache_type:
@@ -88,6 +90,18 @@ write_control_reg1:
 read_control_reg1:
     CLR(r0)
     mrc p15, 0, r0, c1, c0, 0
+    bx lr
+
+.globl tlb_get_procid
+tlb_get_procid:
+    CLR(r0)
+    GET_ASID(r0)
+    bx lr
+
+.globl read_tlb_base_ctrl
+read_tlb_base_ctrl:
+    CLR(r0)
+    GET_TTBRC(r0)  ;@ B3-7 - TLB type register
     bx lr
 
 .globl read_tlb_config

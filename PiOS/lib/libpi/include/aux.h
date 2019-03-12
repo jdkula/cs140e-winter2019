@@ -57,9 +57,10 @@ enum {
 /** Sets the baudrate used when communicating. */
 void aux_uart_set_baudrate(uint16_t baudRegRate);
 
-/** Constants used by aux_uart_set_baudrate. Note that the baud rate and the resulting constant are different! */
+/** Constants used by aux_uart_set_baudrate. Note that the baud rate and the resulting constant are different! BCM p. 11 */
 enum {
-    UART_BAUD_115200 = 270
+    UART_BAUD_115200 = 270,
+    UART_BAUD_9600 = 3254
 };
 
 /** Sets all UART registers to their defaults. */
