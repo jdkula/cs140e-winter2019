@@ -1,9 +1,9 @@
 ##########
-# CS140E: LibStart
+# CS140E: XBee Echo
 # Jonathan Kula
 # Winter 2019
 #
-# Provides start functionality for RPI modules.
+# Echoes data between two XBees.
 #
 # This build file was last updated on January 27th, 2019.
 # If you're unfamiliar with CMake, you can just use the
@@ -14,39 +14,39 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-
 ########################################
 # Project Setup                        #
 ########################################
 
-project(libxbee C)
-set(LIBRARY_NAME libxbee)
+project(xbee-send-hello C ASM)
+set(MODULE_NAME xbee-send-hello)
 
 ########################################
 #> End Project Setup                  <#
 ########################################
-
 
 ########################################
 # Build Variable Setup                 #
 ########################################
 
 # Source Files
-
-list_add_sources_multiarch(SRC xbee.c)
-
-if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM")
-    set(DEPENDENCIES libpi libsoftuart)
-else ()
-    set(DEPENDENCIES)
+set(SRC src/cstart.c src/xbee-send-hello.c)
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    list(INSERT SRC 0 src/start.s)  # start.s must be built first.
 endif ()
 
-set(INCLUDE_DIRECTORIES include)
+# Compile Options
+
+# Dependencies
+set(DEPENDENCIES libpi libdebug libsoftuart)
+
+# Output Options
+## Raw Binary goes to ${EXE_OUT_DIR} (see root CMakeLists.txt)
+## See ${IMG_OUT_DIR} in root CMakeLists.txt
+set(IMAGE_OUTPUT_DIRECTORY "${IMG_OUT_DIR}/${MODULE_NAME}")
 
 ########################################
 #> End Build Variable Setup           <#
 ########################################
 
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
-    include(${CMAKE_INCLUDE_DIR}/library.cmake)
-endif ()
+include(${CMAKE_INCLUDE_DIR}/module.cmake)

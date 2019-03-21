@@ -12,10 +12,7 @@ void interrupt_vector(unsigned pc) {
 
     uint32_t pending = irq->irq_basic_pending;
 
-//	if(pending & RPI_BASIC_REG1_PENDING_IRQ) {
-//
-//	}
-
+    // Handle timer interrupts
     if (pending & RPI_BASIC_ARM_TIMER_IRQ) {
         for (uint8_t i = 0; i < timer_ints; i++) {
             timer_interrupts[i]();
@@ -23,9 +20,11 @@ void interrupt_vector(unsigned pc) {
         get_arm_timer()->irq_clear = 1;
     }
 
+    // handle "reg2" interrupts
     if (pending & RPI_BASIC_REG2_PENDING_IRQ) {
         uint32_t pending2 = irq->irq_pending_2;
 
+        // handle GPIO interrupts
         if ((pending2 >> 20) & 1) { //  gpio_int[3]
             for (uint8_t pin = GPIO_PIN_FIRST; pin <= GPIO_PIN_LAST; pin++) {
                 if (gpio_check_and_clear_event(pin) && gpio_interrupts[pin]) {

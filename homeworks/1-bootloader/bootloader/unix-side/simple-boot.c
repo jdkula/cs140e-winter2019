@@ -75,6 +75,7 @@ void expect(const char* msg, int fd, uint32 v) {
     uint32 x = get_uint_traced(fd);
     if (x != v) {
         put_uint_traced(fd, NAK);
+        fprintf(stderr, "Error: Expected %u, got %u.\n", v, x);
         exit(1);
     }
 }

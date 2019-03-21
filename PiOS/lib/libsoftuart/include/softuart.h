@@ -8,6 +8,7 @@
 #include <integer.h>
 #include <boolean.h>
 
+// values in us per bit.
 #define SOFT_UART_1200 833U
 #define SOFT_UART_2400 416U
 #define SOFT_UART_4800 208U
@@ -34,7 +35,6 @@ struct softuart {
     char _txbuf[SOFT_UART_BUFFER_SIZE];
     char _rxbuf[SOFT_UART_BUFFER_SIZE];
 
-//    uint32_t baud;
     uint8_t txpin;
     uint8_t rxpin;
 };
@@ -54,5 +54,7 @@ bool soft_uart_should_transmit();
 bool soft_uart_can_receive();
 bool soft_uart_has_characters();
 bool soft_uart_can_transmit();
+
+void soft_uart_write_now(char byte);
 
 #endif //PIOS_SOFTUART_H

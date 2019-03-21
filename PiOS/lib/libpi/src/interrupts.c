@@ -8,8 +8,10 @@
 #include "interrupts.h"
 #include "demand.h"
 
+#define MAX_TIMER_INTS 128
+
 gpio_interrupt_t gpio_interrupts[GPIO_PIN_LAST] = {0};
-timer_interrupt_t timer_interrupts[128] = {0};
+timer_interrupt_t timer_interrupts[MAX_TIMER_INTS] = {0};
 uint8_t timer_ints = 0;
 
 void initialize_interrupts(uint32_t basic, uint32_t reg1, uint32_t reg2) {
@@ -50,7 +52,7 @@ void install_interrupt_handlers(void) {
 }
 
 bool set_timer_interrupt(timer_interrupt_t interrupt) {
-    if (timer_ints == 127) {
+    if (timer_ints == MAX_TIMER_INTS) {
         return false;
     } else {
         timer_interrupts[timer_ints++] = interrupt;
@@ -58,10 +60,6 @@ bool set_timer_interrupt(timer_interrupt_t interrupt) {
     }
 }
 
-bool gpio_interrupt_is_set(uint8_t pin) {
-    if(pin < GPIO_PIN_FIRST || pin > GPIO_PIN_LAST) return false;
-    return gpio_interrupts[pin] != 0;
-}
 
 void set_gpio_interrupt(uint8_t pin, gpio_interrupt_t interrupt) {
     if(pin >= GPIO_PIN_FIRST && pin <= GPIO_PIN_LAST) {

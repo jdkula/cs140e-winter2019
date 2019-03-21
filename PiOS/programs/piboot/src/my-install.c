@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
         fd = open_tty(&portname);
 
         // set it to be 8n1  and 115200 baud
-        fd = set_tty_to_8n1(fd, B9600, 1);
+        fd = set_tty_to_8n1(fd, B115200, 20);
 
         // giving the pi side a chance to get going.
         sleep(1);

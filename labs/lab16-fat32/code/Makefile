@@ -2,7 +2,7 @@
 # 	http://scottmcpeak.com/autodepend/autodepend.html
 
 NAME= sd
-OBJS = driver.o fat32-helpers.o external-code/unicode-utf8.o 
+OBJS = driver.o fat32-helpers.o external-code/unicode-utf8.o sd.o
 
 #external-code/bzt-sd.o 
 
@@ -22,7 +22,7 @@ include $(LIBPI_PATH)/includes.mk
 
 CPP_ASFLAGS =  -nostdlib -nostartfiles -ffreestanding   -Wa,--warn -Wa,--fatal-warnings -Wa,-mcpu=arm1176jzf-s -Wa,-march=armv6zk
 
-CFLAGS += -Wstack-usage=512 -Iexternal-code -Wno-unused-variable
+CFLAGS += -Wstack-usage=1024 -Iexternal-code -Wno-unused-variable
 
 # -marm_prefer_ldrd_strd
 
@@ -31,7 +31,7 @@ CFLAGS += -Wno-unused-function -Werror
 all: libpi $(NAME).bin run
 
 run:
-	my-install $(NAME).bin
+	piboot $(NAME).bin
 
 # is there a better way to do this?
 libpi:

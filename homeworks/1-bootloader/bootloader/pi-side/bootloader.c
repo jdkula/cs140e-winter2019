@@ -63,16 +63,16 @@ void notmain(void) {
     uint32 bytesRead = 0;               // Get ready to read!
     uint32 lastData = get_uint();
 
-    while (lastData != EOT && bytesRead <= numBytes) {
+    while (lastData != EOT || bytesRead <= numBytes) {
         put32((void*) (ARMBASE + bytesRead), lastData);
         bytesRead += 4;                 // Read 4 bytes at at time. Files are aligned to
         lastData = get_uint();           // 4 bytes on the client.
     }
 
-    if (bytesRead != numBytes) die(NAK); // If we've read too much, die.
+    if (bytesRead != numBytes) die(bytesRead); // If we've read too much, die.
 
                                         // If we've read in corrupt data, die.
-    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(NAK);
+    if (crc32((void*) ARMBASE, bytesRead) != msgCrc) die(BAD_CKSUM);
 
     // We use NAK instead of other messages here, since Dawson
     // told us to do this in lab.

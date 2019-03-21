@@ -38,7 +38,7 @@ void uart_force_init(void) {
     data_sync_barrier();
 
     // Next, our settings. We're using a baud rate of 115200 in 8-bit mode.
-    aux_uart_set_baudrate(UART_BAUD_115200);
+    aux_uart_set_baudrate(UART_BAUD_9600);
     aux_uart_set_data_size(UART_EIGHT_BIT_MODE);
 
     // Finally, before we enable TX/RX, let's clear their buffers.

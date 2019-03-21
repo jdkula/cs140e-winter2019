@@ -7,6 +7,9 @@
 typedef void (*gpio_interrupt_t)(uint8_t pin);
 typedef void (*timer_interrupt_t)();
 
+uint32_t cspr_read();
+void int_setup_stack();
+
 // from the valvers description.
 
 /** @brief Bits in the Enable_Basic_IRQs register to enable various interrupts.

@@ -53,7 +53,6 @@ char soft_uart_read_now() {
 }
 
 void soft_uart_read_interrupt(uint8_t pin) {
-
     if (!soft_uart_can_receive()) {
         softuart_current._rx_known_dropped++;
         return;

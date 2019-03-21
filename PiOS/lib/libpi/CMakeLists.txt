@@ -32,7 +32,7 @@ set(LIBRARY_NAME libpi)
 
 # Source Files
 set(SRC_ARM
-        sysspec/arm/interrupts.s
+        sysspec/arm/interrupts.S
         src/interrupts.c
         src/arm.c
         src/aux.c
