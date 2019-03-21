@@ -1,6 +1,10 @@
-//
-// Created by jonak on 3/9/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: xbee.h
+ * --------------
+ * Provides XBee configuration structures, and
+ * functions to fill those structures.
+ */
 
 #ifndef PIOS_XBEE_H
 #define PIOS_XBEE_H
@@ -19,7 +23,7 @@ union transmit_options {
 };
 
 struct xbee_addresses {
-    uint32_t destination_high;
+    uint32_t destination_high;  // pages 154-157
     uint32_t destination_low;
     uint16_t network_address;
     uint16_t parent_network_address;
@@ -41,5 +45,7 @@ void xbee_init(uint8_t reset_pin);
 struct xbee_addresses xbee_get_address_info();
 
 void xbee_send_address_info(struct xbee_addresses info);
+
+void xbee_commit();
 
 #endif //PIOS_XBEE_H

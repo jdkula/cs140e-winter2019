@@ -1,3 +1,5 @@
+> For the final project, please see [PiOS](PiOS).
+
 This is a lab-based class.  We will do two 3-hour labs each week.
 You should be able to complete almost all of the lab in one sitting.
 

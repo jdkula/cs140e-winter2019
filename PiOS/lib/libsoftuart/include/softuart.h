@@ -1,6 +1,11 @@
-//
-// Created by jonak on 3/10/19.
-//
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: softuart.h
+ * --------------
+ * Defines the softuart structure (which emulates
+ * the internals of a hardware uart), and functions
+ * that operate on it.
+ */
 
 #ifndef PIOS_SOFTUART_H
 #define PIOS_SOFTUART_H
@@ -18,6 +23,7 @@
 #define SOFT_UART_57600 17U
 #define SOFT_UART_115200 8U
 
+// The Pi has plenty of ram; we can spare a bit for nice big buffers.
 #define SOFT_UART_BUFFER_SIZE 4096
 
 struct softuart {
