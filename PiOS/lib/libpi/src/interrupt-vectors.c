@@ -17,7 +17,7 @@ void interrupt_vector(unsigned pc) {
         for (uint8_t i = 0; i < timer_ints; i++) {
             timer_interrupts[i]();
         }
-        get_arm_timer()->irq_clear = 1;
+        get_arm_timer()->irq_clear = 1; // clear by writing; BCM p. 198
     }
 
     // handle "reg2" interrupts
@@ -25,10 +25,10 @@ void interrupt_vector(unsigned pc) {
         uint32_t pending2 = irq->irq_pending_2;
 
         // handle GPIO interrupts
-        if ((pending2 >> 20) & 1) { //  gpio_int[3]
+        if ((pending2 >> 20) & 1) { //  gpio_int[3] - BCM p. 113
             for (uint8_t pin = GPIO_PIN_FIRST; pin <= GPIO_PIN_LAST; pin++) {
                 if (gpio_check_and_clear_event(pin) && gpio_interrupts[pin]) {
-                    gpio_interrupts[pin](pin);
+                    gpio_interrupts[pin](pin);  // defined in interrupts.c
                 }
             }
         }

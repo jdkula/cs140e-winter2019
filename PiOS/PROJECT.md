@@ -1,3 +1,5 @@
+> Since this project is integrated with and uses the structure of the rest of the project, the [project readme](./README.md) goes along with this write-up.
+
 XBee & Soft UART Project
 =============
 CS140E - Winter Quarter
@@ -58,17 +60,3 @@ Hardware
 * 2x XBee Adapter (2mm pins -> 0.1in pins)
 * 4x XBee 2mm pin socket (so I don't solder the XBees directly into the board)
 * 1x FTDI Serial Cable (for debugging and firmware updates)
-
-
-Supporting Documents
----------------------
-
-Digi's XBee + ZigBee documentation - https://www.digi.com/resources/documentation/digidocs/PDFs/90000976.pdf
-- Page 11: Theoretical max speed and other overview info
-- (will fill in pages as I get around to it)
-
-ARM documentation for caching (+ lab 12!) + Interrupts - XYZ
-- (will fill in pages as I get around to it)
-
-ARM Peripherals documentation for GPIO and timer interrupts - ABC
-- (will fill in pages as I get around to it)

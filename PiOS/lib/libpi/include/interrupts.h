@@ -1,3 +1,17 @@
+/**
+ * Jonathan Kula | CS140E | Winter Quarter 2019
+ * File: interrupts.h
+ * --------------
+ * Provides methods to initialize, enable, and disable
+ * interrupts of various types.
+ *
+ * Also defines several structs that represent interrupt
+ * controllers as defined in the BCM manual.
+ *
+ * Also defines values of various interrupts that can be OR'd
+ * together when calling initialize/enable/disable_interrupts.
+ */
+
 #ifndef __RPI_INTERRUPT_H__
 #define __RPI_INTERRUPT_H__
 

@@ -21,10 +21,12 @@ why this is the case, but it bears noting. Receiving does not seem
 affected.
 
 By far the most difficult part of implementing this was going back
-and making GPIO interrupts work.
+and making GPIO interrupts work properly (I was getting some stack
+weirdness on return, which was *very* difficult for me to debug...).
 
-Reference Material
--------------------
+Reference Documentation
+------------------------
 * [The ARM Manual](../../../docs/armv6.pdf)
 * [The ARM Peripherals Manual](../../../docs/BCM2835-ARM-Peripherals.pdf)
 * [Wikipedia's UART page](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter)
+* [This Pi forum thread about GPIO interrupts](https://www.raspberrypi.org/forums/viewtopic.php?t=67457)
