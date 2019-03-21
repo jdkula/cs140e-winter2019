@@ -66,3 +66,20 @@ end, each compilation target has this structure:
 > `sysspec/arm` - just compiled on ARM
 >
 > `sysspec/x86` - just compiled on x86
+
+Module Structure
+-----------------
+TL;DR: Standard entrypoint is `notmain`. `libstart` is responsible for
+getting you there but doesn't set up a stack, so more is required if
+you don't already have one.
+
+For modules that inherit a stack from somewhere else, it's enough
+to link against `libstart` so long as the linker script begins the
+`.TEXT` section with `.text.boot`. `libstart` automatically branches
+to a method called `notmain` after zeroing out the `.bss` section.
+Then, you can just write your code starting from there. This is what
+happens, for example, if the UART bootloader bootstraps your module.
+
+If you don't inherit a stack, you need to provide your own start code and
+make sure it's the first thing linked in the output. [Bootloader](modules/bootloader)
+is a good example of how to do this.

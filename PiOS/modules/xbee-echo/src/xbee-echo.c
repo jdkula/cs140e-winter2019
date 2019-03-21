@@ -13,7 +13,6 @@
 #define LED_PIN 13
 #define TXPIN 21
 #define RXPIN 20
-#define BUFSIZE 128
 
 #define RESETPIN 5
 
@@ -24,9 +23,9 @@ int notmain(void) {
     gpio_set_output(RESETPIN);
     gpio_write(RESETPIN, HIGH);
 
-//    soft_uart_init_timer_helper(SOFT_UART_9600);
+    soft_uart_init_timer_helper(SOFT_UART_9600);
 
-//    initialize_interrupts(RPI_BASIC_ARM_TIMER_IRQ, 0, RPI_INTREG2_GPIO_ALL_IRQ);
+    initialize_interrupts(RPI_BASIC_ARM_TIMER_IRQ, 0, RPI_INTREG2_GPIO_ALL_IRQ);
 
     soft_uart_init(TXPIN, RXPIN, SOFT_UART_9600);
 
@@ -34,6 +33,5 @@ int notmain(void) {
 
     while(true) {
         soft_uart_write_now(uart_getc());
-        uart_putc('s');
     }
 }
